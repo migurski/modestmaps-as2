@@ -16,10 +16,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var columns:Number;
     private var tiles:Array;
 
-    // TODO:
     // Real maps use 256.
-    private var tileWidth:Number = 128;
-    private var tileHeight:Number = 128;
+    private var tileWidth:Number = 256;
+    private var tileHeight:Number = 256;
     
     // some limits on scrolling distance, initially set to none
     private var rowTop:Number = -Infinity;
@@ -62,7 +61,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // initial tile centers the map on the SF Bay Area
         tiles = [[well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(),
                                    {origin: true, grid: this, width: tileWidth, height: tileHeight,
-                                    row: 328, column: 792, zoom: 11})]];
+                                    row: 328, column: 791, zoom: 11})]];
                                    
         rows = 1;
         columns = 1;
