@@ -59,8 +59,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
         buildWell();
         buildMask();
         
+        // initial tile centers the map on the SF Bay Area
         tiles = [[well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(),
-                                   {origin: true, grid: this, width: tileWidth, height: tileHeight})]];
+                                   {origin: true, grid: this, width: tileWidth, height: tileHeight,
+                                    row: 328, column: 792, zoom: 11})]];
                                    
         rows = 1;
         columns = 1;
