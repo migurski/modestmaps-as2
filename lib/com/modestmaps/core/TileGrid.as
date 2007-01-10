@@ -557,7 +557,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             var aDist:Number = Math.sqrt(Math.pow(a.center().x - p.x, 2) + Math.pow(a.center().y - p.y, 2));
             var bDist:Number = Math.sqrt(Math.pow(b.center().x - p.x, 2) + Math.pow(b.center().y - p.y, 2));
             return aDist - bDist;
-        }
+        };
     }
     
     private static function compareRowColumn(a:Tile, b:Tile):Number
