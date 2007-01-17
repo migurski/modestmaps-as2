@@ -1,6 +1,10 @@
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
+import com.modestmaps.core.mapproviders.IMapProvider;
+import com.modestmaps.core.mapproviders.MapProviderFactory;
+import com.modestmaps.core.mapproviders.MapProviders;
 
 import mx.utils.Delegate;
 import com.stamen.twisted.*;
@@ -10,21 +14,21 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var width:Number;
     private var height:Number;
 
-    // Row and column counts are kept up-to-date, though they
-    // could just as easily be read directly from the tiles array.
+    // Row and column counts are kept up-to-date.
     private var rows:Number;
     private var columns:Number;
-    private var tiles:Array;
+    private var tiles:/*Tile*/Array;
 
     // Real maps use 256.
     private var tileWidth:Number = 256;
     private var tileHeight:Number = 256;
     
+    // the currently-native zoom level
+    private var zoomLevel:Number;
+    
     // some limits on scrolling distance, initially set to none
-    private var rowTop:Number = -Infinity;
-    private var rowBottom:Number = Infinity;
-    private var columnLeft:Number = -Infinity;
-    private var columnRight:Number = Infinity;
+    private var topLeftOutLimit:Coordinate;
+    private var bottomRightInLimit:Coordinate;
 
     // Tiles attach to the well.
     private var well:MovieClip;
@@ -38,16 +42,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
     // Active when the well is being dragged on the stage.
     private var wellDragTask:DelayedCall;
     
-    // Active when the well is being zoomed on the stage.
-    private var wellZoomTask:DelayedCall;
-    
-    // *sigh*
-    private var wellCount:Number = 0;
-    
     // Defines a ring of extra, masked-out tiles around
     // the edges of the well, acting as a pre-fetching cache.
     // High tileBuffer may hurt performance.
     private var tileBuffer:Number = 0;
+
+    // Who do we get our Map graphics from?
+    public var mapProviderType:Number;
+    private var __mapProvider : IMapProvider;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.TileGrid';
     public static var symbolOwner:Function = TileGrid;
@@ -55,31 +57,41 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     public function TileGrid()
     {
+        setMapProvider(mapProviderType);
+        
         buildWell();
         buildMask();
         
+        // impose some limits
+        zoomLevel = 11;
+        topLeftOutLimit = new Coordinate(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, 0);
+        bottomRightInLimit = new Coordinate(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Coordinate.MAX_ZOOM);
+        
         // initial tile centers the map on the SF Bay Area
-        tiles = [[well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(),
-                                   {origin: true, grid: this, width: tileWidth, height: tileHeight,
-                                    row: 328, column: 791, zoom: 11})]];
-                                   
+        var initObj : Object =
+        { 
+            origin: true, 
+            grid: this, 
+            width: tileWidth, 
+            height: tileHeight,
+            coord: new Coordinate(791, 328, zoomLevel)
+        };
+        
+        tiles = [createTile(initObj)];
+                                                                  
         rows = 1;
         columns = 1;
-
+        
         // buffer must not be negative!
         tileBuffer = Math.max(0, tileBuffer);
         
         allocateTiles();
         redraw();
-
+        
         createTextField('label', getNextHighestDepth(), 10, 10, width-20, height-20);
         label.selectable = false;
         
         log('FUCK YEAH '+width+'x'+height);
-        
-        // TODO:
-        // Figure out why positionTiles() doesn't seem to work
-        // when called from here, even on a delay via the Reactor.
     }
     
    /**
@@ -87,8 +99,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     public function buildWell():Void
     {
-        wellCount += 1;
-        well = createEmptyMovieClip('well'+wellCount, 1);
+        well = createEmptyMovieClip('well', 1);
         well.onPress = Delegate.create(this, this.startWellDrag);
         well.onRelease = Delegate.create(this, this.stopWellDrag);
         well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
@@ -103,38 +114,45 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well.setMask(mask);
     }
     
-    public function replaceTiles(newWell:MovieClip, newTiles:Array):Void
+   /**
+    * Create a new tile and return it, but don't add it to tiles array.
+    */
+    private function createTile(tileParams:Object):Tile
     {
-        // replace old well
-        newWell.swapDepths(well);
-        well.removeMovieClip();
-        well = newWell;
+        var tile:Tile;
+
+        tile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), tileParams));
+        tile.addEventObserver(this, "invalidated", "handleTileInvalidated");
+        tile.redraw();
         
-        // correct properties
-        well.onPress = Delegate.create(this, this.startWellDrag);
-        well.onRelease = Delegate.create(this, this.stopWellDrag);
-        well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
-        well.setMask(mask);
-
-        tiles = newTiles;
-        columns = tiles[0].length;
-        rows = tiles.length;
-
-        allocateTiles();
-        positionTiles();
-        
-        log('Rows? '+rows+', columns? '+columns+', well? '+well._xscale+' - '+well._x);
-
-        for(var row:Number = 0; row < rows; row += 1) {
-            for(var col:Number = 0; col < columns; col += 1) {
-                //log(row+', '+col+': '+tiles[row][col].toString());
-            }
-        }
+        return tile;
+    }
+    
+   /**
+    * Destroy an old tile, but don't remove it from tiles array.
+    */
+    private function destroyTile(tile:Tile):Void
+    {
+        tile.removeEventObserver(this, "invalidated", "handleTileInvalidated");
+        tile.destroy();
+        tile.removeMovieClip();
     }
     
     public function log(msg:String):Void
     {
         label.text += msg + '\n';
+    }
+    
+    public function clearLog():Void
+    {
+        label.text = '';
+    }
+    
+    private function setMapProvider( mapProviderType : Number ) : Void
+    {
+        this.mapProviderType = mapProviderType;
+        var mapProviderFactory : MapProviderFactory = MapProviderFactory.getInstance();
+        __mapProvider = MapProviderFactory.getInstance().getMapProvider( mapProviderType ); 
     }
     
    /*
@@ -147,34 +165,39 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
     
    /*
-    * Return the x, y position of a tile with the given row and column at the
-    * current zoom level (whether it exists on the stage or not) in the context
-    * of the given movie clip.
+    * Return the point position of a tile with the given coordinate in the
+    * context of the given movie clip.
     *
     * Respect infinite rows or columns, to bind movement on one (or no) axis.
     */
-    private function tilePosition(row:Number, column:Number, context:MovieClip):Point
+    private function coordinatePoint(coord:Coordinate, context:MovieClip):Point
     {
-        // get the position of the first tile, an arbitrary
-        // choice but known to exist regardless of grid size.
-        var point:Point = new Point(tiles[0][0]._x, tiles[0][0]._y);
+        // pick a reference tile, an arbitrary choice
+        // but known to exist regardless of grid size.
+        var tile:Tile = tiles[0];
+    
+        // get the position of the reference tile.
+        var point:Point = new Point(tile._x, tile._y);
+        
+        // make sure coord is using the same zoom level
+        coord = coord.zoomTo(tile.coord.zoom);
         
         // store the infinite
         var force:Point = new Point(0, 0);
         
-        if(column == Infinity || column == -Infinity) {
-            force.x = column;
+        if(coord.column == Number.POSITIVE_INFINITY || coord.column == Number.NEGATIVE_INFINITY) {
+            force.x = coord.column;
             
         } else {
-            point.x += tileWidth * (column - tiles[0][0].column);
+            point.x += tileWidth * (coord.column - tile.coord.column);
         
         }
         
-        if(row == Infinity || row == -Infinity) {
-            force.y = row;
+        if(coord.row == Number.POSITIVE_INFINITY || coord.row == Number.NEGATIVE_INFINITY) {
+            force.y = coord.row;
             
         } else {
-            point.y += tileHeight * (row - tiles[0][0].row);
+            point.y += tileHeight * (coord.row - tile.coord.row);
 
         }
         
@@ -190,6 +213,35 @@ class com.modestmaps.core.TileGrid extends MovieClip
         return point;
     }
     
+    /*
+    private function pointCoordinate(point:Point):Coordinate
+    {
+        var tile:Tile;
+        var tileCoord:Coordinate;
+        var pointCoord:Coordinate;
+        
+        // an arbitrary reference tile, zoomed to the maximum
+        tile = tiles[0];
+        tileCoord = new Coordinate(tile.row, tile.column, tile.zoom);
+        tileCoord.zoomTo(Coordinate.MAX_ZOOM);
+        
+        // distance in tile widths from reference tile to point
+        var xTiles:Number = (point.x - tile._x) / tileWidth;
+        var yTiles:Number = (point.y - tile._y) / tileHeight;
+        
+        // distance in rows & columns at maximum zoom
+        var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.zoom));
+        var yDistance:Number = yTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.zoom));
+        
+        // new point coordinate reflecting that distance
+        pointCoord = new Coordinate(Math.round(tileCoord.row + yDistance),
+                                    Math.round(tileCoord.column + xDistance),
+                                    tileCoord.zoom);
+        
+        return pointCoord;
+    }
+    */
+    
    /*
     * Start dragging the well with the mouse.
     * Calls onWellDrag().
@@ -200,15 +252,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         // "min" = furthest well position left & up,
         // use the location of the bottom-right limit
-        min = tilePosition(rowBottom, columnRight, this);
-        min.x = well._x - min.x + width - tileWidth;
-        min.y = well._y - min.y + height - tileHeight;
-
+        min = coordinatePoint(bottomRightInLimit, this);
+        min.x = well._x - min.x + width;
+        min.y = well._y - min.y + height;
+        
         // "max" = furthest well position right & down,
         // use the location of the top-left limit
-        max = tilePosition(rowTop, columnLeft, this);
+        max = coordinatePoint(topLeftOutLimit, this);
         max.x = well._x - max.x;
         max.y = well._y - max.y;
+        
+        log('min/max for drag: '+min+', '+max+' ('+topLeftOutLimit+', '+bottomRightInLimit+')');
         
         // weird negative edge conditions, limit all movement on an axis
         if(min.x > max.x)
@@ -231,27 +285,27 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // MovieClip.startDrag seems to hate the infinities,
         // so we'll fudge it with some implausibly large numbers.
         
-        var xMin:Number = (bounds.min.x == Infinity)
+        var xMin:Number = (bounds.min.x == Number.POSITIVE_INFINITY)
                             ? 100000
-                            : ((bounds.min.x == -Infinity)
+                            : ((bounds.min.x == Number.NEGATIVE_INFINITY)
                                 ? -100000
                                 : bounds.min.x);
         
-        var yMin:Number = (bounds.min.y == Infinity)
+        var yMin:Number = (bounds.min.y == Number.POSITIVE_INFINITY)
                             ? 100000
-                            : ((bounds.min.y == -Infinity)
+                            : ((bounds.min.y == Number.NEGATIVE_INFINITY)
                                 ? -100000
                                 : bounds.min.y);
         
-        var xMax:Number = (bounds.max.x == Infinity)
+        var xMax:Number = (bounds.max.x == Number.POSITIVE_INFINITY)
                             ? 100000
-                            : ((bounds.max.x == -Infinity)
+                            : ((bounds.max.x == Number.NEGATIVE_INFINITY)
                                 ? -100000
                                 : bounds.max.x);
         
-        var yMax:Number = (bounds.max.y == Infinity)
+        var yMax:Number = (bounds.max.y == Number.POSITIVE_INFINITY)
                             ? 100000
-                            : ((bounds.max.y == -Infinity)
+                            : ((bounds.max.y == Number.NEGATIVE_INFINITY)
                                 ? -100000
                                 : bounds.max.y);
         
@@ -270,6 +324,36 @@ class com.modestmaps.core.TileGrid extends MovieClip
         positionTiles();
         centerWell(true);
     }
+    
+    public function startZoomIn():Void
+    {
+        if(zoomLevel >= bottomRightInLimit.zoom && Math.round(well._xscale) >= 100)
+            return;
+    
+        well._xscale *= Math.pow(2, .25);
+        well._yscale *= Math.pow(2, .25);
+        
+        normalizeWell();
+        allocateTiles();
+        positionTiles();
+        
+        log('New well scale: '+well._xscale.toString());
+    }
+    
+    public function startZoomOut():Void
+    {
+        if(zoomLevel <= topLeftOutLimit.zoom && Math.round(well._xscale) <= 100)
+            return;
+    
+        well._xscale /= Math.pow(2, .25);
+        well._yscale /= Math.pow(2, .25);
+        
+        normalizeWell();
+        allocateTiles();
+        positionTiles();
+        
+        log('New well scale: '+well._xscale.toString());
+    }
 
    /*
     * TODO:
@@ -286,15 +370,50 @@ class com.modestmaps.core.TileGrid extends MovieClip
         redraw();
     }
     
+    public function panEast( pixels : Number ) : Void
+    {
+    	well._x -= pixels;
+    	positionTiles();
+       centerWell(true);
+    }
+ 
+    public function panWest( pixels : Number ) : Void
+    {
+    	well._x += pixels;
+    	positionTiles();
+        centerWell(true);
+    } 
+    
+    public function panNorth( pixels : Number ) : Void
+    {
+    	well._y -= pixels;
+    	positionTiles();
+        centerWell(true);
+    }
+ 
+    public function panSouth( pixels : Number ) : Void
+    {
+    	well._y += pixels;
+    	positionTiles();
+        centerWell(true);
+    }      
+
    /**
     * Determine the number of tiles needed to cover the current grid,
     * and add rows and columns if necessary.
     */
     private function allocateTiles():Void
     {
+        // internal pixel dimensions of well, compensating for scale
+        var wellWidth:Number  = (100 / well._xscale) * width;
+        var wellHeight:Number = (100 / well._yscale) * height;
+
+        var targetCols:Number = Math.ceil(wellWidth  / tileWidth)  + 1 + 2 * tileBuffer;
+        var targetRows:Number = Math.ceil(wellHeight / tileHeight) + 1 + 2 * tileBuffer;
+
         // grid can't drop below 1 x 1
-        var targetCols:Number = Math.max(1, Math.ceil(width / tileWidth) + 1 + 2 * tileBuffer);
-        var targetRows:Number = Math.max(1, Math.ceil(height / tileHeight) + 1 + 2 * tileBuffer);
+        targetCols = Math.max(1, targetCols);
+        targetRows = Math.max(1, targetRows);
 
         // change column count to match target
         while(columns != targetCols) {
@@ -321,8 +440,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
    /**
     * Adjust position of the well, so it stays in the center.
-    * Optionally, compensate tile positions to prevent visual
-    * discontinuity with respect to upper-left hand corner.
+    * Optionally, compensate tile positions to prevent
+    * visual discontinuity.
     */
     private function centerWell(adjustTiles:Boolean):Void
     {
@@ -330,18 +449,176 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         var xAdjustment:Number = well._x - center.x;
         var yAdjustment:Number = well._y - center.y;
-        
+
         well._x -= xAdjustment;
         well._y -= yAdjustment;
         
         if(adjustTiles) {
-            for(var row:Number = 0; row < rows; row += 1) {
-                for(var col:Number = 0; col < columns; col += 1) {
-                    tiles[row][col]._x += xAdjustment;
-                    tiles[row][col]._y += yAdjustment;
-                }
+            for(var i:Number = 0; i < tiles.length; i += 1) {
+                tiles[i]._x += xAdjustment * 100 / well._xscale;
+                tiles[i]._y += yAdjustment * 100 / well._xscale;
             }
         }
+    }
+    
+   /**
+    * Adjust position and scale of the well, so it stays
+    * in the center and within reason.  Compensate tile
+    * zoom and positions to prevent visual discontinuity.
+    */
+    private function normalizeWell():Void
+    {
+        var zoomAdjust:Number, scaleAdjust:Number;
+        
+        // just in case?
+        centerWell(true);
+
+        if(Math.abs(well._xscale - 100) < 1) {
+            // set to 100% if within 99% - 101%
+            well._xscale = well._yscale = 100;
+            
+            tiles.sort(compareTileRowColumn);
+            
+            // lock the tiles back to round-pixel positions
+            tiles[0]._x = Math.round(tiles[0]._x);
+            tiles[0]._y = Math.round(tiles[0]._y);
+            
+            for(var i:Number = 1; i < tiles.length; i += 1) {
+                tiles[i]._x = tiles[0]._x + (tiles[i].coord.column - tiles[0].coord.column) * tileWidth;
+                tiles[i]._y = tiles[0]._y + (tiles[i].coord.row    - tiles[0].coord.row)    * tileHeight;
+            
+                log(tiles[i].toString()+' at '+tiles[i]._x+', '+tiles[i]._y+' vs. '+tiles[0].toString());
+            }
+
+        } else if(Math.floor(well._xscale) <= 60 || Math.ceil(well._xscale) >= 165) {
+            // split or merge tiles if outside of 60% - 165%
+
+            // zoom adjust: base-2 logarithm of the scale
+            // see http://mathworld.wolfram.com/Logarithm.html (15)
+            zoomAdjust = Math.round(Math.log(well._xscale / 100) / Math.log(2));
+            scaleAdjust = Math.pow(2, zoomAdjust);
+        
+            log('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
+
+            for(var i:Number = 0; i < zoomAdjust; i += 1) {
+                zoomLevel += 1;
+                splitTiles();
+            }
+                
+            for(var i:Number = 0; i > zoomAdjust; i -= 1) {
+                zoomLevel -= 1;
+                mergeTiles();
+            }
+                
+            well._xscale /= scaleAdjust;
+            well._yscale /= scaleAdjust;
+            
+            for(var i:Number = 0; i < tiles.length; i += 1) {
+                tiles[i]._x *= scaleAdjust;
+                tiles[i]._y *= scaleAdjust;
+
+                tiles[i]._xscale *= scaleAdjust;
+                tiles[i]._yscale *= scaleAdjust;
+            }
+        
+            log('Scaled to '+zoomLevel+', '+well._xscale+'%');
+        }
+    }
+    
+   /**
+    * Do a 1-to-4 tile split: for every tile in the well, add four
+    * new tiles at a higher zoom level, and remove the original.
+    * Double the row & column count.
+    */
+    private function splitTiles():Void
+    {
+        var newTiles:/*Tile*/Array = [];
+        var oldTile:Tile;
+        var newTile:Tile;
+        var xOffset:Number, yOffset:Number;
+        
+        while(tiles.length) {
+            oldTile = Tile(tiles.pop());
+            
+            for(var q:Number = 0; q < 4; q += 1) {
+                // two-bit value into two one-bit values
+                xOffset = q & 1;
+                yOffset = (q >> 1) & 1;
+                
+                newTile = createTile(oldTile);
+                newTile.coord = newTile.coord.zoomBy(1);
+                
+                if(xOffset)
+                    newTile.coord = newTile.coord.right();
+                
+                if(yOffset)
+                    newTile.coord = newTile.coord.down();
+
+                newTile._x = oldTile._x + (xOffset * tileWidth / 2);
+                newTile._y = oldTile._y + (yOffset * tileHeight / 2);
+
+                newTile._xscale = newTile._yscale = oldTile._xscale / 2;
+                newTiles.push(newTile);
+                newTile.redraw();
+            }
+
+            destroyTile(oldTile);
+        }
+        
+        rows *= 2;
+        columns *= 2;
+        
+        tiles = newTiles;
+    }
+    
+    private function mergeTiles():Void
+    {
+        var newTiles:/*Tile*/Array = [];
+        var oldTile:Tile;
+        var newTile:Tile;
+        var rowsMerged:Number, columnsMerged:Number;
+    
+        tiles.sort(compareTileRowColumn);
+
+        if(tiles[0].coord.zoomBy(-1).isRowEdge()) {
+            rowsMerged = Math.ceil(rows / 2);
+            
+        } else {
+            rowsMerged = Math.floor(rows / 2);
+            
+        }
+        
+        if(tiles[0].coord.zoomBy(-1).isColumnEdge()) {
+            columnsMerged = Math.ceil(columns / 2);
+            
+        } else {
+            columnsMerged = Math.floor(columns / 2);
+            
+        }
+
+        while(tiles.length) {
+            oldTile = Tile(tiles.pop());
+            
+            if(oldTile.coord.zoomBy(-1).isEdge()) {
+                // we are only interested in tiles that are edges for this zoom
+                newTile = createTile(oldTile);
+                newTile.coord = newTile.coord.zoomBy(-1);
+                
+                newTile._x = oldTile._x;
+                newTile._y = oldTile._y;
+
+                newTile._xscale = newTile._yscale = oldTile._xscale * 2;
+                newTiles.push(newTile);
+                newTile.redraw();
+            }
+
+            destroyTile(oldTile);
+        }
+        
+        rows = rowsMerged;
+        columns = columnsMerged;
+        
+        tiles = newTiles;
     }
     
    /**
@@ -367,37 +644,35 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var xMax:Number = point.x + (0 + tileBuffer) * tileWidth;
         var yMax:Number = point.y + (0 + tileBuffer) * tileHeight;
         
-        for(var row:Number = 0; row < rows; row += 1) {
-            for(var col:Number = 0; col < columns; col += 1) {
+        for(var i:Number = 0; i < tiles.length; i += 1) {
 
-                tile = Tile(tiles[row][col]);
-                
-                if(tile._y < yMin) {
-                    // too far up
-                    tile.panDown(rows);
-                    tile._y += rows * tileHeight;
+            tile = Tile(tiles[i]);
+            
+            if(tile._y < yMin) {
+                // too far up
+                tile.panDown(rows);
+                tile._y += rows * tileHeight;
 
-                } else if(tile._y > yMax) {
-                    // too far down
-                    if((tile._y - rows * tileHeight) > yMin) {
-                        // moving up wouldn't put us too far
-                        tile.panUp(rows);
-                        tile._y -= rows * tileHeight;
-                    }
+            } else if(tile._y > yMax) {
+                // too far down
+                if((tile._y - rows * tileHeight) > yMin) {
+                    // moving up wouldn't put us too far
+                    tile.panUp(rows);
+                    tile._y -= rows * tileHeight;
                 }
-                
-                if(tile._x < xMin) {
-                    // too far left
-                    tile.panRight(columns);
-                    tile._x += columns * tileWidth;
+            }
+            
+            if(tile._x < xMin) {
+                // too far left
+                tile.panRight(columns);
+                tile._x += columns * tileWidth;
 
-                } else if(tile._x > xMax) {
-                    // too far right
-                    if((tile._x - columns * tileWidth) > xMin) {
-                        // moving left wouldn't put us too far
-                        tile.panLeft(columns);
-                        tile._x -= columns * tileWidth;
-                    }
+            } else if(tile._x > xMax) {
+                // too far right
+                if((tile._x - columns * tileWidth) > xMin) {
+                    // moving left wouldn't put us too far
+                    tile.panLeft(columns);
+                    tile._x -= columns * tileWidth;
                 }
             }
         }
@@ -409,41 +684,22 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private function pushTileRow():Void
     {
         var lastTile:Tile;
-        var wrappedTile:Tile;
         var newTileParams:Object;
-        var newTile:Tile;
+        
+        tiles.sort(compareTileRowColumn);
+        
+        for(var i:Number = tiles.length - columns; i < rows * columns; i += 1) {
+        
+            lastTile = tiles[i];
+        
+            newTileParams = {grid:  lastTile.grid,  coord:  lastTile.coord.down(),
+                             _x:    lastTile._x,    _y:     lastTile._y + lastTile.height,
+                             width: tileWidth,      height: tileHeight};
 
-        var newRow:Array = [];
-        var lastRow:Array = Array(tiles[tiles.length - 1]);
-
-        tiles.push(newRow);
-        rows += 1;
-
-        for(var col:Number = 0; col < columns; col += 1) {
-            lastTile = Tile(lastRow[col]);
-            
-            newTileParams = {grid:  lastTile.grid,      zoom:   lastTile.zoom,
-                             row:   lastTile.row + 1,   column: lastTile.column,
-                             _x:    lastTile._x,        _y:     lastTile._y + lastTile.height,
-                             width: tileWidth,          height: tileHeight};
-            
-            newTile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), newTileParams));
-
-            newRow.push(newTile);
-            
-            // shunt conflicting tiles down in this column, if necessary
-            for(var row:Number = 0; row < tiles.length; row += 1) {
-                wrappedTile = Tile(tiles[row][col]);
-                
-                if(wrappedTile.row < newTile.row) {
-                    break;
-                }
-                
-                wrappedTile.row += 1;
-                wrappedTile._y += newTile.height;
-                wrappedTile.redraw();
-            }
+            tiles.push(createTile(newTileParams));
         }
+        
+        rows += 1;
     }
 
    /**
@@ -451,30 +707,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileRow():Void
     {
-        var wrappedTile:Tile;
-        var oldTile:Tile;
-                                         
-        var oldRow:Array = Array(tiles.pop());
-        rows -= 1;
-        
-        for(var col:Number = 0; col < columns; col += 1) {
-            oldTile = Tile(oldRow[col]);
-            
-            // shunt stranded tiles up in this column, if necessary
-            for(var row:Number = 0; row < tiles.length; row += 1) {
-                wrappedTile = Tile(tiles[row][col]);
-                
-                if(wrappedTile.row < oldTile.row) {
-                    break;
-                }
-                
-                wrappedTile.row -= 1;
-                wrappedTile._y -= oldTile.height;
-                wrappedTile.redraw();
-            }
+        tiles.sort(compareTileRowColumn);
 
-            oldTile.removeMovieClip();
+        while(tiles.length > columns * (rows - 1)) {
+            destroyTile(Tile(tiles.pop()));
         }
+                                         
+        rows -= 1;
     }
 
    /**
@@ -483,39 +722,22 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private function pushTileColumn():Void
     {
         var lastTile:Tile;
-        var wrappedTile:Tile;
         var newTileParams:Object;
-        var newTile:Tile;
-
-        var currentRow:Array;
-        columns += 1;
-    
-        for(var row:Number = 0; row < rows; row += 1) {
-            currentRow = tiles[row];
-            lastTile = Tile(currentRow[currentRow.length - 1]);
         
-            newTileParams = {grid:  lastTile.grid,                  zoom:   lastTile.zoom,
-                             row:   lastTile.row,                   column: lastTile.column + 1,
+        tiles.sort(compareTileColumnRow);
+        
+        for(var i:Number = tiles.length - rows; i < rows * columns; i += 1) {
+        
+            lastTile = tiles[i];
+        
+            newTileParams = {grid:  lastTile.grid,                  coord:  lastTile.coord.right(),
                              _x:    lastTile._x + lastTile.width,   _y:     lastTile._y,
                              width: tileWidth,                      height: tileHeight};
 
-            newTile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), newTileParams));
-            
-            currentRow.push(newTile);
-            
-            // shunt conflicting tiles to the right in this row, if necessary
-            for(var col:Number = 0; col < currentRow.length; col += 1) {
-                wrappedTile = Tile(currentRow[col]);
-            
-                if(wrappedTile.column < newTile.column) {
-                    break;
-                }
-
-                wrappedTile.column += 1;
-                wrappedTile._x += newTile.width;
-                wrappedTile.redraw();
-            }
+            tiles.push(createTile(newTileParams));
         }
+        
+        columns += 1;
     }
 
    /**
@@ -523,34 +745,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileColumn():Void
     {
-        var wrappedTile:Tile;
-        var currentRow:Array;
-        var oldTile:Tile;
-        
-        columns -= 1;
+        tiles.sort(compareTileColumnRow);
 
-        for(var row:Number = 0; row < rows; row += 1) {
-            currentRow = tiles[row];
-            oldTile = Tile(currentRow.pop());
-            
-            // shunt stranded tiles to the left in this row, if necessary
-            for(var col:Number = 0; col < currentRow.length; col += 1) {
-                wrappedTile = Tile(currentRow[col]);
-            
-                if(wrappedTile.column < oldTile.column) {
-                    break;
-                }
-
-                wrappedTile.column -= 1;
-                wrappedTile._x -= oldTile.width;
-                wrappedTile.redraw();
-            }
-
-            oldTile.removeMovieClip();
+        while(tiles.length > rows * (columns - 1)) {
+            destroyTile(Tile(tiles.pop()));
         }
+
+        columns -= 1;
     }
     
-    private static function compareDistanceFrom(p:Point):Function
+   /**
+    * Comparison function for sorting tiles by distance from a point.
+    */
+    private static function compareTileDistanceFrom(p:Point):Function
     {
         return function(a:Tile, b:Tile):Number
         {
@@ -560,47 +767,32 @@ class com.modestmaps.core.TileGrid extends MovieClip
         };
     }
     
-    private static function compareRowColumn(a:Tile, b:Tile):Number
+   /**
+    * Comparison function for sorting tiles by row, then column, i.e. horizontally.
+    */
+    private static function compareTileRowColumn(a:Tile, b:Tile):Number
     {
-        if(a.row == b.row) {
-            return a.column - b.column;
+        if(a.coord.row == b.coord.row) {
+            return a.coord.column - b.coord.column;
             
         } else {
-            return a.row - b.row;
+            return a.coord.row - b.coord.row;
             
         }
     }
     
    /**
-    * Return a flat array of all tiles, ordered by distance from center of well.
+    * Comparison function for sorting tiles by column, then row, i.e. vertically.
     */
-    private function tilesFromCenter():/*Tile*/Array
+    private static function compareTileColumnRow(a:Tile, b:Tile):Number
     {
-        var tiles:/*Tile*/Array = [];
-        
-        for(var row:Number = 0; row < rows; row += 1)
-            for(var col:Number = 0; col < columns; col += 1)
-                tiles.push(this.tiles[row][col]);
-                
-        tiles.sort(compareDistanceFrom(new Point(0, 0)));
-        
-        return tiles;
-    }
-    
-   /**
-    * Return a flat array of all tiles, ordered by row, column.
-    */
-    private function tilesByRowColumn():/*Tile*/Array
-    {
-        var tiles:/*Tile*/Array = [];
-        
-        for(var row:Number = 0; row < rows; row += 1)
-            for(var col:Number = 0; col < columns; col += 1)
-                tiles.push(this.tiles[row][col]);
-                
-        tiles.sort(compareRowColumn);
-        
-        return tiles;
+        if(a.coord.column == b.coord.column) {
+            return a.coord.row - b.coord.row;
+            
+        } else {
+            return a.coord.column - b.coord.column;
+            
+        }
     }
     
     private function redraw()
@@ -625,5 +817,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         label._width = width - 20;
         label._height = height - 20;
+    }
+    
+    // Event Handlers
+    
+    private function handleTileInvalidated( tile : Tile ) : Void
+    {
+        __mapProvider.paintTile( tile );    
     }
 }
