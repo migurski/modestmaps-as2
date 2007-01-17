@@ -1,9 +1,9 @@
 /**
  * @author darren
  */
-import com.modestmaps.core.Tile; 
+import com.modestmaps.core.Coordinate; 
  
 interface com.modestmaps.core.mapproviders.IMapProvider 
 {
-	public function paintTile( tile : Tile ) : Void;
+	public function paint( clip : MovieClip, coord : Coordinate ) : Void;
 }

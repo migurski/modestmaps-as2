@@ -1,5 +1,5 @@
 import com.modestmaps.core.mapproviders.AbstractMapProvider;
-import com.modestmaps.core.Tile;
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.util.BinaryUtil;
 
 /**
@@ -15,35 +15,35 @@ extends AbstractMapProvider
 		super();
 	}
 	
-	public function paintTile( tile : Tile ) : Void 
+	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		super.paintTile( tile );
+		super.paint( clip, coord );
 		
-		__requestThrottler.enqueue( tile.displayClip.image, getTileUrl( tile ) );
+		__requestThrottler.enqueue( clip.image, getTileUrl( coord ) );
 		
-		labelTile( tile, ( tile.origin ? "! " : "" ) + tile.toString() );
+		createLabel( clip, coord.toString() );
 	}
 	
 	/*
 	 * Abstract method, implemented by concrete subclass.
 	 */
-	private function getTileUrl( tile : Tile ) : String
+	private function getTileUrl( coord : Coordinate ) : String
 	{
 		return null;
 	}
 
-	private function getZoomString( tile : Tile ) : String
+	private function getZoomString( coord : Coordinate ) : String
 	{		
 		// convert row + col to zoom string
-		var rowBinaryString : String = BinaryUtil.convertToBinary( tile.coord.row );		
-		rowBinaryString = rowBinaryString.substring( rowBinaryString.length - tile.coord.zoom );
+		var rowBinaryString : String = BinaryUtil.convertToBinary( coord.row );		
+		rowBinaryString = rowBinaryString.substring( rowBinaryString.length - coord.zoom );
 		
-		var colBinaryString : String = BinaryUtil.convertToBinary( tile.coord.column );
-		colBinaryString = colBinaryString.substring( colBinaryString.length - tile.coord.zoom );
+		var colBinaryString : String = BinaryUtil.convertToBinary( coord.column );
+		colBinaryString = colBinaryString.substring( colBinaryString.length - coord.zoom );
 
 		// generate zoom string by combining strings
 		var zoomString : String = "";
-		for ( var i : Number = 0; i < tile.coord.zoom; i++ ) 
+		for ( var i : Number = 0; i < coord.zoom; i++ ) 
 		{
 			zoomString += BinaryUtil.convertToDecimal( rowBinaryString.charAt( i ) + colBinaryString.charAt( i ) ).toString();
 		}

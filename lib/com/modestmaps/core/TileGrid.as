@@ -49,7 +49,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     // Who do we get our Map graphics from?
     public var mapProviderType:Number;
-    private var __mapProvider : IMapProvider;
+    public var mapProvider : IMapProvider;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.TileGrid';
     public static var symbolOwner:Function = TileGrid;
@@ -152,7 +152,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         this.mapProviderType = mapProviderType;
         var mapProviderFactory : MapProviderFactory = MapProviderFactory.getInstance();
-        __mapProvider = MapProviderFactory.getInstance().getMapProvider( mapProviderType ); 
+        mapProvider = MapProviderFactory.getInstance().getMapProvider( mapProviderType ); 
     }
     
    /*
@@ -823,6 +823,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     private function handleTileInvalidated( tile : Tile ) : Void
     {
-        __mapProvider.paintTile( tile );    
+        //mapProvider.paintTile( tile );    
     }
 }

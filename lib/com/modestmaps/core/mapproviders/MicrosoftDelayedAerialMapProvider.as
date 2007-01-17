@@ -1,6 +1,6 @@
 import com.modestmaps.core.mapproviders.IMapProvider;
 import com.modestmaps.core.mapproviders.AbstractMicrosoftMapProvider;
-import com.modestmaps.core.Tile;
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.util.BinaryUtil;
 
 /**
@@ -18,9 +18,9 @@ implements IMapProvider
 		return "MicrosoftDelayedAerialMapProvider[]";
 	}
 	
-	private function getTileUrl( tile : Tile ) : String
+	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		var url : String = BASE_URL + getZoomString( tile ) + ".jpeg";
+		var url : String = BASE_URL + getZoomString( coord ) + ".jpeg?g=45";
 		
 		//trace (this + ": Mapped " + tile.toString() + " to URL: " + url);
 		

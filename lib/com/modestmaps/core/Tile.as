@@ -3,6 +3,7 @@ import org.casaframework.movieclip.DispatchableMovieClip;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.TileGrid;
+import com.modestmaps.core.mapproviders.IMapProvider;
 
 class com.modestmaps.core.Tile 
 extends DispatchableMovieClip
@@ -100,7 +101,18 @@ extends DispatchableMovieClip
 
     public function redraw():Void
     {
+    	paint( grid.mapProvider );
+    	
         dispatchEvent( "invalidated", this );
+    }
+    
+    public function paint( mapProvider : IMapProvider ) : Void
+    {
+    	// set up the proper clip to paint here
+    	
+    	var clip : MovieClip = this.createEmptyMovieClip( "display", this.getNextHighestDepth() );
+   	
+    	mapProvider.paint( clip, coord );
     }
     
 }

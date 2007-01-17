@@ -1,6 +1,6 @@
 import com.modestmaps.core.mapproviders.IMapProvider;
 import com.modestmaps.io.RequestThrottler;
-import com.modestmaps.core.Tile;
+import com.modestmaps.core.Coordinate;
 
 /**
  * @author darren
@@ -14,27 +14,18 @@ class com.modestmaps.core.mapproviders.AbstractMapProvider
 		__requestThrottler = RequestThrottler.getInstance();	
 	}
 
-	public function paintTile(tile : Tile) : Void 
+	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		trace ("called paintTile for " + tile._name );
-		
-		clearTile( tile );
-		
-		tile.displayClip = tile.createEmptyMovieClip( "display" + tile.getNextHighestDepth(), tile.getNextHighestDepth() );
-		tile.displayClip.createEmptyMovieClip( "image", tile.displayClip.getNextHighestDepth() );
+		clip.createEmptyMovieClip( "image", clip.getNextHighestDepth() );
 	}
 
-	public function labelTile( tile : Tile, label : String ) : Void
+	public function createLabel( clip : MovieClip, label : String ) : Void
 	{
-		tile.displayClip.createTextField('labelTF', 1, tile.width/4, tile.height/2, tile.width/1.33, tile.height/2);
-	    var tf : TextField = tile.displayClip["labelTF"];
+		clip.createTextField('labelTF', 1, 0, 0, 1, 1);
+	    var tf : TextField = clip["labelTF"];
+	    tf.autoSize = true;
 	    tf.selectable = false;
 	    tf.textColor = 0xFF0000;
 		tf.text = label;	
-	}
-
-	private function clearTile( tile : Tile ) : Void
-	{
-		tile.displayClip.removeMovieClip();
 	}
 }

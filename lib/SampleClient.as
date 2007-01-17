@@ -13,7 +13,7 @@ class SampleClient
 
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(grid);
+        Stage.addListener(grid); 
         
         var plus:MovieClip = makeButton(clip, 'plus', 'zoom in', Delegate.create(grid, grid.startZoomIn));
         var minus:MovieClip = makeButton(clip, 'minus', 'zoom out', Delegate.create(grid, grid.startZoomOut));
