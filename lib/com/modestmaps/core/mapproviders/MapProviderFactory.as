@@ -55,6 +55,9 @@ class com.modestmaps.core.mapproviders.MapProviderFactory
 			case MapProviders.MICROSOFT_HYBRID :
 				return new MicrosoftAerialMapProvider();
 				
+			case MapProviders.MICROSOFT_DELAYED :
+				return new MicrosoftDelayedAerialMapProvider();
+				
 			default :
 				trace ( this.toString() + ": invalid MapProvider requested: " + mapProviderType);
 				return null;
