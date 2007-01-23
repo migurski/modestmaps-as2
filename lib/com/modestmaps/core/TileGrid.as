@@ -136,7 +136,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var tile:Tile;
 
         tile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), tileParams));
-        tile.addEventObserver(this, "invalidated", "handleTileInvalidated");
         tile.redraw();
         
         return tile;
@@ -147,7 +146,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function destroyTile(tile:Tile):Void
     {
-        tile.removeEventObserver(this, "invalidated", "handleTileInvalidated");
         tile.destroy();
         tile.removeMovieClip();
     }
@@ -858,12 +856,5 @@ class com.modestmaps.core.TileGrid extends MovieClip
         label.textColor = 0xFF6600;
         label._width = width - 20;
         label._height = height - 20;
-    }
-    
-    // Event Handlers
-    
-    private function handleTileInvalidated( tile : Tile ) : Void
-    {
-        //mapProvider.paintTile( tile );    
     }
 }

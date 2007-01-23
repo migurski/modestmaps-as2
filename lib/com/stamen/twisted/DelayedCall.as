@@ -8,6 +8,7 @@ class com.stamen.twisted.DelayedCall
     public var func:Function;
     public var args:Array;
     
+    private var called:Boolean;
     private var cancelled:Boolean;
 
    /**
@@ -19,16 +20,23 @@ class com.stamen.twisted.DelayedCall
         func = f;
         args = a;
         
+        called = false;
         cancelled = false;
     }
     
    /**
-    * Call previously-delated call.
+    * Call previously-delayed call.
     */
     public function call():Void
     {
-        if(!cancelled)
-            func.apply(undefined, args);
+        try {
+            if(pending())
+                func.apply(undefined, args);
+        } catch(e) {
+            // do nothing
+        }
+            
+        called = true;
     }
     
    /**
@@ -37,5 +45,13 @@ class com.stamen.twisted.DelayedCall
     public function cancel():Void
     {
         cancelled = true;
+    }
+    
+   /**
+    * Check if this call is still pending.
+    */
+    public function pending():Boolean
+    {
+        return !called && !cancelled;
     }
 }

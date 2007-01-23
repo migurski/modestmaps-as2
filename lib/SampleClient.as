@@ -8,6 +8,8 @@ class SampleClient
 {
     public static function main(clip:MovieClip):Void
     {
+        Reactor.run(clip, null, 50);
+
         var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
                                            {mapProviderType: MapProviders.MICROSOFT_HYBRID, _x: 128, _y: 128, width: Stage.width - 256, height: Stage.height - 256}))
         
@@ -28,7 +30,6 @@ class SampleClient
         clear._x = minus._x + clear['label']._width + 14;
         clear._y = minus._y;
 
-        Reactor.run(clip, null, 50);
         Reactor.callNextFrame(Delegate.create(map, map.nagAboutBoundsForever));
     }
     

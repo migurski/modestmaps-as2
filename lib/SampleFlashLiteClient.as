@@ -7,6 +7,8 @@ class SampleFlashLiteClient
 {
 	public static function main(clip:MovieClip):Void
     {
+        Reactor.run(clip, null, 50);
+
     	clip._focusRect = false;
     	
         var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
@@ -45,7 +47,5 @@ class SampleFlashLiteClient
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
         Stage.addListener(map);
-        
-        Reactor.run(clip, null, 50);
     }
 }

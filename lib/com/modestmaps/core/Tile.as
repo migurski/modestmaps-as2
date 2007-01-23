@@ -2,10 +2,12 @@ import org.casaframework.movieclip.DispatchableMovieClip;
 
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Coordinate;
+import com.modestmaps.core.TilePaintCall;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.mapproviders.IMapProvider;
 import com.modestmaps.core.mapproviders.AbstractMapProvider;
 import mx.utils.Delegate;
+import com.stamen.twisted.*;
 import com.modestmaps.events.IDispatchable;
 
 class com.modestmaps.core.Tile 
@@ -25,6 +27,8 @@ extends DispatchableMovieClip
 	private var __displayClips : Array;
 
 	private var __paintCompleteDelegate : Function;
+	
+	private var __paintCall:TilePaintCall;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.Tile';
     public static var symbolOwner:Function = Tile;
@@ -106,16 +110,25 @@ extends DispatchableMovieClip
 
     public function redraw():Void
     {
-    	_level0.tile.log("redraw: " + coord.toString());
+    	// any need to repeat ourselves?
+    	if(__paintCall && __paintCall.match(grid.mapProvider, coord.copy()) && __paintCall.pending())
+            return;
     	
-    	IDispatchable( grid.mapProvider ).addEventListener( AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate );
-    	paint( grid.mapProvider );
+    	IDispatchable(grid.mapProvider).addEventListener(AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate);
+
+    	// cancel existing call, if any...
+    	if(__paintCall)
+    	    __paintCall.cancel();
     	
-        dispatchEvent( "invalidated", this );
+    	// fire up a new call for the next frame...
+    	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.mapProvider, coord.copy()),
+    	                                grid.mapProvider, coord.copy());
     }
     
-    public function paint( mapProvider : IMapProvider ) : Void
+    public function paint(mapProvider:IMapProvider, tileCoord:Coordinate):Void
     {
+    	grid.log("Painting tile: " + tileCoord.toString());
+    	
     	// set up the proper clip to paint here
     	
     	var clipId : Number = this.getNextHighestDepth();
@@ -128,9 +141,9 @@ extends DispatchableMovieClip
    			__displayClips[count].clip._visible = false;
    		}
 
-   		__displayClips.push ( { clip : clip, coord : coord } );
+   		__displayClips.push ( { clip : clip, coord : tileCoord } );
    	
-    	mapProvider.paint( clip, coord );
+    	mapProvider.paint( clip, tileCoord );
     }
     
     // Event Handlers
