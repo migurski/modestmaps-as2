@@ -1,7 +1,7 @@
 import mx.utils.Delegate;
 import com.stamen.twisted.Reactor;
 import com.modestmaps.geo.Map;
-import com.modestmaps.core.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.MapProviders;
 
 class SampleFlashLiteClient 
 {

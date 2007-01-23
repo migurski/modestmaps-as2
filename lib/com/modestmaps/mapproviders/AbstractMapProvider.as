@@ -1,6 +1,6 @@
 import mx.events.EventDispatcher;
 
-import com.modestmaps.core.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 import com.modestmaps.io.RequestThrottler;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.events.IDispatchable;
