@@ -1,5 +1,5 @@
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.core.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 import com.stamen.twisted.DelayedCall;
 
 class com.modestmaps.core.TilePaintCall

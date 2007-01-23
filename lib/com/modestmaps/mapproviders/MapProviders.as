@@ -4,7 +4,7 @@
  * @author darren
  */
  
-class com.modestmaps.core.mapproviders.MapProviders 
+class com.modestmaps.mapproviders.MapProviders 
 {
 	public static var VANILLA : Number = 0;
 	public static var MICROSOFT_ROAD : Number = 1;

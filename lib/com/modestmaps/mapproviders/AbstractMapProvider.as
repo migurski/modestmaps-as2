@@ -12,7 +12,7 @@ import com.modestmaps.geo.Location;
 /**
  * @author darren
  */
-class com.modestmaps.core.mapproviders.AbstractMapProvider  
+class com.modestmaps.mapproviders.AbstractMapProvider  
 implements IDispatchable
 {
 	// Event Types

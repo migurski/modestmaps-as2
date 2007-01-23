@@ -1,5 +1,5 @@
-import com.modestmaps.core.mapproviders.IMapProvider;
-import com.modestmaps.core.mapproviders.AbstractMicrosoftMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.AbstractMicrosoftMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.events.IDispatchable;
 
@@ -8,7 +8,7 @@ import com.modestmaps.events.IDispatchable;
  * @author darren
  */
 
-class com.modestmaps.core.mapproviders.MicrosoftRoadMapProvider 
+class com.modestmaps.mapproviders.MicrosoftRoadMapProvider 
 extends AbstractMicrosoftMapProvider
 implements IMapProvider, IDispatchable
 {

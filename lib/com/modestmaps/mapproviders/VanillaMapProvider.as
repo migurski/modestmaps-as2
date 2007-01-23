@@ -2,12 +2,12 @@
  * @author darren
  */
  
-import com.modestmaps.core.mapproviders.IMapProvider;
-import com.modestmaps.core.mapproviders.AbstractMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.events.IDispatchable;
 
-class com.modestmaps.core.mapproviders.VanillaMapProvider 
+class com.modestmaps.mapproviders.VanillaMapProvider 
 extends AbstractMapProvider
 implements IMapProvider, IDispatchable
 {

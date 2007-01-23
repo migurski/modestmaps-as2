@@ -1,4 +1,4 @@
-import com.modestmaps.core.mapproviders.AbstractMapProvider;
+import com.modestmaps.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.util.BinaryUtil;
 import com.modestmaps.io.LoadMovieThrottledRequest;
@@ -9,7 +9,7 @@ import com.modestmaps.geo.Transformation;
 /**
  * @author darren
  */
-class com.modestmaps.core.mapproviders.AbstractMicrosoftMapProvider 
+class com.modestmaps.mapproviders.AbstractMicrosoftMapProvider 
 extends AbstractMapProvider 
 {
 	public static var BASE_URL : String;

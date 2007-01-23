@@ -2,7 +2,7 @@ import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
-import com.modestmaps.core.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 
 import mx.utils.Delegate;
 import com.stamen.twisted.*;

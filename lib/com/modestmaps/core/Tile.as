@@ -4,11 +4,11 @@ import com.modestmaps.core.Point;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.TilePaintCall;
 import com.modestmaps.core.TileGrid;
-import com.modestmaps.core.mapproviders.IMapProvider;
-import com.modestmaps.core.mapproviders.AbstractMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 import mx.utils.Delegate;
 import com.stamen.twisted.*;
 import com.modestmaps.events.IDispatchable;
+import com.modestmaps.mapproviders.AbstractMapProvider;
 
 class com.modestmaps.core.Tile 
 extends DispatchableMovieClip

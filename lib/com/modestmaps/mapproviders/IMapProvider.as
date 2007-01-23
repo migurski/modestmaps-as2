@@ -4,7 +4,7 @@
 import com.modestmaps.core.Coordinate; 
 import com.modestmaps.geo.Location;
  
-interface com.modestmaps.core.mapproviders.IMapProvider 
+interface com.modestmaps.mapproviders.IMapProvider 
 {
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void;
     

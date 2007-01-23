@@ -4,9 +4,9 @@
  * @author darren
  */
  
-import com.modestmaps.core.mapproviders.*; 
+import com.modestmaps.mapproviders.*; 
  
-class com.modestmaps.core.mapproviders.MapProviderFactory 
+class com.modestmaps.mapproviders.MapProviderFactory 
 {
 	private static var __instance : MapProviderFactory;
 	

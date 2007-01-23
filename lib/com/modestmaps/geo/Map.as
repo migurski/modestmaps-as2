@@ -3,9 +3,9 @@ import com.stamen.twisted.Reactor;
 
 import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
-import com.modestmaps.core.mapproviders.IMapProvider;
-import com.modestmaps.core.mapproviders.MapProviderFactory;
-import com.modestmaps.core.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.MapProviderFactory;
+import com.modestmaps.mapproviders.MapProviders;
 
 class com.modestmaps.geo.Map extends MovieClip
 {
