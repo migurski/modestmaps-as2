@@ -1,5 +1,5 @@
 import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.mapproviders.AbstractMicrosoftMapProvider;
+import com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.util.BinaryUtil;
 import com.modestmaps.events.IDispatchable;
