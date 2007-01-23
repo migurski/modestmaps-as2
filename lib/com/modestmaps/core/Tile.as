@@ -4,27 +4,27 @@ import com.modestmaps.core.Point;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.mapproviders.IMapProvider;
+import com.modestmaps.core.mapproviders.AbstractMapProvider;
+import mx.utils.Delegate;
+import com.modestmaps.events.IDispatchable;
 
 class com.modestmaps.core.Tile 
 extends DispatchableMovieClip
 {
     public var grid:TileGrid;
 
-    public var coord:Coordinate;
+    private var __coord : Coordinate;
     
-    /*
-    public var row:Number = 0;
-    public var column:Number = 0;
-    public var zoom:Number = 0;
-    */
-
     public var width:Number;
     public var height:Number;
     
     private var label:TextField;
     public var origin:Boolean;
 
-	public var displayClip : MovieClip;
+	// Keeps track of all clips awaiting painting.
+	private var __displayClips : Array;
+
+	private var __paintCompleteDelegate : Function;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.Tile';
     public static var symbolOwner:Function = Tile;
@@ -33,8 +33,22 @@ extends DispatchableMovieClip
     public function Tile()
     {
     	super();
+    	
+    	__displayClips = new Array();
+    	
+    	__paintCompleteDelegate = Delegate.create( this, this.onPaintComplete );   	
     }
-    
+   
+    public function get coord() : Coordinate
+    {
+    	return __coord;	
+    }
+    public function set coord( coord : Coordinate ) : Void
+    {
+    	__coord = coord;
+    	redraw();	
+    }
+        
     public function center():Point
     {
         return new Point(_x + width / 2, _y + height / 2);
@@ -43,55 +57,46 @@ extends DispatchableMovieClip
     public function zoomOut():Void
     {
         coord = new Coordinate(Math.floor(coord.row / 2), Math.floor(coord.column / 2), coord.zoom + 1);
-        redraw();
     }
 
     public function zoomInTopLeft():Void
     {
         coord = new Coordinate(coord.row * 2, coord.column * 2, coord.zoom - 1);
-        redraw();
     }
 
     public function zoomInTopRight():Void
     {
         coord = new Coordinate(coord.row * 2, coord.column * 2 + 1, coord.zoom - 1);
-        redraw();
     }
 
     public function zoomInBottomLeft():Void
     {
         coord = new Coordinate(coord.row * 2 + 1, coord.column * 2, coord.zoom - 1);
-        redraw();
     }
 
     public function zoomInBottomRight():Void
     {
         coord = new Coordinate(coord.row * 2 + 1, coord.column * 2 + 1, coord.zoom - 1);
-        redraw();
     }
 
     public function panUp(distance:Number):Void
     {
         coord = coord.up(distance);
-        redraw();
     }
 
     public function panRight(distance:Number):Void
     {
         coord = coord.right(distance);
-        redraw();
     }
 
     public function panDown(distance:Number):Void
     {
         coord = coord.down(distance);
-        redraw();
     }
 
     public function panLeft(distance:Number):Void
     {
         coord = coord.left(distance);
-        redraw();
     }
 
     public function toString():String
@@ -101,6 +106,9 @@ extends DispatchableMovieClip
 
     public function redraw():Void
     {
+    	_level0.tile.log("redraw: " + coord.toString());
+    	
+    	IDispatchable( grid.mapProvider ).addEventListener( AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate );
     	paint( grid.mapProvider );
     	
         dispatchEvent( "invalidated", this );
@@ -110,9 +118,45 @@ extends DispatchableMovieClip
     {
     	// set up the proper clip to paint here
     	
-    	var clip : MovieClip = this.createEmptyMovieClip( "display", this.getNextHighestDepth() );
+    	var clipId : Number = this.getNextHighestDepth();
+    	var clip : MovieClip = this.createEmptyMovieClip( "display" + clipId, clipId );
+   		
+   		// hide all other displayClips to avoid weird "repaint" effect
+   		var count : Number = __displayClips.length;
+   		while ( count-- )
+   		{
+   			__displayClips[count].clip._visible = false;
+   		}
+
+   		__displayClips.push ( { clip : clip, coord : coord } );
    	
     	mapProvider.paint( clip, coord );
     }
     
+    // Event Handlers
+    
+    private function onPaintComplete( eventObj : Object ) : Void
+    {
+    	var coord : Coordinate = Coordinate( eventObj.coord );
+    	
+    	if ( this.coord.equalTo( coord ) )
+    	{
+    		IDispatchable( grid.mapProvider ).removeEventListener( AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate );
+    		
+    		// remove all other displayClips /below/ this clip   		
+    		var dcCoord : Coordinate;
+    		for ( var i : Number = 0; i < __displayClips.length; i++ )
+    		{
+    			dcCoord = Coordinate( __displayClips[i].coord );
+    			if ( dcCoord.equalTo( this.coord ) )
+					break;
+    			else
+    			{
+    				__displayClips[i].clip.removeMovieClip();
+    				__displayClips.splice( i, 1 );
+    				i--;
+    			}
+    		}
+    	}   	
+    }   
 }

@@ -1,4 +1,5 @@
-import org.casaframework.time.EnterFrame;
+import com.modestmaps.io.IRequest;
+import mx.utils.Delegate;
 
 /**
  * Used to limit the number of requests per frame.
@@ -10,26 +11,26 @@ class com.modestmaps.io.RequestThrottler
 {
 	private static var __instance : RequestThrottler;
 	
-	private var __queue : /*Object*/Array;
-	
-	private var __frameEventSource : EnterFrame;
-	
-	private var maxActiveConnectionsPerFrame : Number = 5;
+	private var __queue : /*IRequest*/Array;
+		
+	// How often do we want to process requests?
+	private var __throttleSpeedMS : Number = 100;
 
+	// How many requests do we process for each throttle tick?
+	private var __requestsPerCycle : Number = 5;
+	
+	private var __throttleTimer : Number;
+	
 	public var loader : MovieClipLoader;
 	
-		/* 
+	/* 
 	 * Singleton, use getInstance().
 	 */
 	private function RequestThrottler()
 	{
 		__queue = new Array();
 		
-		loader = new MovieClipLoader();
-		loader.addListener( this );
-			
-		__frameEventSource = EnterFrame.getInstance();
-		__frameEventSource.addEventObserver(this, EnterFrame.EVENT_ENTER_FRAME, "handleEnterFrame");
+		__throttleTimer = setInterval( Delegate.create( this, this.onThrottleTimer ), __throttleSpeedMS );	
 	}
 	
 	public function toString() : String
@@ -49,40 +50,26 @@ class com.modestmaps.io.RequestThrottler
 	}
 	
 	
-	public function enqueue( clip : MovieClip, url : String ) : Void
+	public function enqueue( request : IRequest ) : Void
 	{
-		// ensure no pending requests exist for the same clip
-		var count : Number = __queue.length;
-		for ( var i : Number = 0; i < count; i++ )
-		{
-			if ( MovieClip( __queue[i]["clip"] ) == clip )
-			{
-				trace ( this + ": enqueue(): overriding pending request for tile " + clip );
-				__queue.splice( i, 1 );
-				count--;
-				i--;
-			}	
-		}
-		
-		trace ( this + ": enqueue(): queued " + clip );
-		__queue.push( { clip : clip, url : url } );
+		__queue.push( request );
 	}
 	
 	// Private Methods
 
 	private function processQueue() : Void
 	{
-		var count = maxActiveConnectionsPerFrame;
+		var count = __requestsPerCycle;
 		while ( __queue.length > 0 && count-- )
 		{
-			var request : Object = __queue.shift();			
-			request["clip"].loadMovie( request["url"].toString() ); 
+			var request : IRequest = IRequest( __queue.shift() );			
+			request.execute(); 
 		}
 	}
 	
 	// Event Handlers
 	
-	private function handleEnterFrame() : Void
+	private function onThrottleTimer() : Void
 	{
 		processQueue();
 	}

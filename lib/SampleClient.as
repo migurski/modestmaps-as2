@@ -1,26 +1,26 @@
 import mx.utils.Delegate;
 import com.stamen.twisted.Reactor;
+import com.modestmaps.geo.Map;
 import com.modestmaps.core.TileGrid;
-import com.modestmaps.core.Tile;
 import com.modestmaps.core.mapproviders.MapProviders;
 
 class SampleClient
 {
     public static function main(clip:MovieClip):Void
     {
-        var grid:TileGrid = TileGrid(clip.attachMovie(TileGrid.symbolName, 'tile', clip.getNextHighestDepth(),
-                                                      {mapProviderType: MapProviders.MICROSOFT_AERIAL, _x: 128, _y: 128, width: Stage.width - 256, height: Stage.height - 256}));
-
+        var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
+                                           {mapProviderType: MapProviders.MICROSOFT_HYBRID, _x: 128, _y: 128, width: Stage.width - 256, height: Stage.height - 256}))
+        
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(grid); 
+        Stage.addListener(map); 
         
-        var plus:MovieClip = makeButton(clip, 'plus', 'zoom in', Delegate.create(grid, grid.startZoomIn));
-        var minus:MovieClip = makeButton(clip, 'minus', 'zoom out', Delegate.create(grid, grid.startZoomOut));
-        var clear:MovieClip = makeButton(clip, 'clear', 'clear log', Delegate.create(grid, grid.clearLog));
+        var plus:MovieClip = makeButton(clip, 'plus', 'zoom in', Delegate.create(map, map.zoomIn));
+        var minus:MovieClip = makeButton(clip, 'minus', 'zoom out', Delegate.create(map, map.zoomOut));
+        var clear:MovieClip = makeButton(clip, 'clear', 'clear log', Delegate.create(map.grid, map.grid.clearLog));
 
-        plus._x = grid._x;
-        plus._y = grid._y - plus['label']._height - 10;
+        plus._x = map._x;
+        plus._y = map._y - plus['label']._height - 10;
         
         minus._x = plus._x + minus['label']._width + 4;
         minus._y = plus._y;
@@ -29,6 +29,7 @@ class SampleClient
         clear._y = minus._y;
 
         Reactor.run(clip, null, 50);
+        Reactor.callNextFrame(Delegate.create(map, map.nagAboutBoundsForever));
     }
     
     public static function makeButton(clip:MovieClip, name:String, label:String, action:Function):MovieClip

@@ -53,7 +53,7 @@ class com.modestmaps.core.mapproviders.MapProviderFactory
 				return new MicrosoftAerialMapProvider();
 
 			case MapProviders.MICROSOFT_HYBRID :
-				return new MicrosoftAerialMapProvider();
+				return new MicrosoftHybridMapProvider();
 				
 			case MapProviders.MICROSOFT_DELAYED :
 				return new MicrosoftDelayedAerialMapProvider();

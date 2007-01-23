@@ -16,6 +16,11 @@ class com.modestmaps.core.Coordinate
         return '(' + row + ',' + column + ' @' + zoom + ')';
     }
     
+    public function copy():Coordinate
+    {
+        return new Coordinate(row, column, zoom);
+    }
+    
     public function zoomTo(destination:Number):Coordinate
     {
         return new Coordinate(row * Math.pow(2, destination - zoom),
@@ -63,5 +68,13 @@ class com.modestmaps.core.Coordinate
     public function left(distance:Number):Coordinate
     {
         return new Coordinate(row, column - (distance ? distance : 1), zoom);
+    }
+    
+    /*
+     * Returns true if the the two coordinates refer to the same Tile location.
+     */
+    public function equalTo( coord : Coordinate ) : Boolean
+    {
+    	return coord.row == this.row && coord.column == this.column && coord.zoom == this.zoom;
     }
 }

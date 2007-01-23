@@ -1,12 +1,18 @@
-/**
- * @author darren
- */
-import com.modestmaps.core.Coordinate; 
+import com.modestmaps.core.Point;
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.geo.Location;
  
-interface com.modestmaps.core.mapproviders.IMapProvider 
+interface com.modestmaps.geo.IProjection
 {
-	public function paint( clip : MovieClip, coord : Coordinate ) : Void;
+   /*
+    * Return projected and transformed point.
+    */
+    public function project(point:Point):Point;
+    
+   /*
+    * Return untransformed and unprojected point.
+    */
+    public function unproject(point:Point):Point;
     
    /*
     * Return projected and transformed coordinate for a location.

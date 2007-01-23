@@ -1,6 +1,10 @@
 import com.modestmaps.core.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.util.BinaryUtil;
+import com.modestmaps.io.LoadMovieThrottledRequest;
+import mx.utils.Delegate;
+import com.modestmaps.geo.MercatorProjection;
+import com.modestmaps.geo.Transformation;
 
 /**
  * @author darren
@@ -9,26 +13,56 @@ class com.modestmaps.core.mapproviders.AbstractMicrosoftMapProvider
 extends AbstractMapProvider 
 {
 	public static var BASE_URL : String;
+	public static var ASSET_EXTENSION : String;
 	
 	function AbstractMicrosoftMapProvider() 
 	{
 		super();
+
+	    // see: http://track.stamen.com/modestmap/wiki/TileCoordinateComparisons#TileGeolocations
+	    var t:Transformation = new Transformation(1.068070779e7, 0, 3.355443185e7,
+		                                          0, -1.068070890e7, 3.355443057e7);
+		                                          
+        __projection = new MercatorProjection(26, t);
 	}
 	
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
 		super.paint( clip, coord );
 		
-		__requestThrottler.enqueue( clip.image, getTileUrl( coord ) );
+		var request : LoadMovieThrottledRequest = new LoadMovieThrottledRequest( clip.image, getTileUrl( coord ) );
+		request.addEventListener( LoadMovieThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
+		request.addEventListener( LoadMovieThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
+		request.addEventListener( LoadMovieThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.send();
 		
 		createLabel( clip, coord.toString() );
 	}
 	
 	/*
-	 * Abstract method, implemented by concrete subclass.
+	 * Returns the value of BASE_URL for the class.
+	 */
+	public function get baseUrl() : String
+	{
+		throw new Error( "Abstract method not implemented by subclass." );	
+		return null;
+	}
+
+	/*
+	 * Returns the value of ASSET_EXTENSION for the class.
+	 */
+	public function get assetExtension() : String
+	{
+		throw new Error( "Abstract method not implemented by subclass." );	
+		return null;	
+	}
+	
+	/*
+	 * Returns the url needed to get the tile image. 
 	 */
 	private function getTileUrl( coord : Coordinate ) : String
 	{
+		throw new Error( "Abstract method not implemented by subclass." );	
 		return null;
 	}
 
@@ -50,4 +84,54 @@ extends AbstractMapProvider
 		
 		return zoomString; 
 	}
+	
+	/*
+	 * Given a URL, returns the coordinates that the URL refers to.
+	 */
+	private function getCoordinateFromURL( url : String ) : Coordinate
+	{
+		var row, col, zoom : Number;
+		
+		// first locate the meaty bits (i.e. the zoomString).
+		var zoomString : String = url.substring( baseUrl.length );
+		zoomString = zoomString.substring( 0, zoomString.indexOf( assetExtension ) );
+
+		// now work backwards to determine row and col
+		zoom = zoomString.length;
+	
+		var rowStr : String = "";
+		var colStr : String = "";
+		var tempStr : String = "";
+		
+		for ( var i : Number = 0; i < zoom; i++ )
+		{
+			tempStr = BinaryUtil.convertToBinary( parseInt( zoomString.charAt( i ) ) );
+			colStr += tempStr.charAt( tempStr.length-1 );
+			rowStr += tempStr.charAt( tempStr.length-2 );
+		}
+				
+		row = BinaryUtil.convertToDecimal( rowStr );
+		col = BinaryUtil.convertToDecimal( colStr );
+		
+		var coord : Coordinate = new Coordinate( row, col, zoom );
+		return coord;
+	}
+	
+	// Event Handlers
+
+	private function onRequestError( eventObj : Object ) : Void
+	{
+	}
+	
+	private function onResponseComplete( eventObj : Object ) : Void
+	{
+		var clip : MovieClip = MovieClip( eventObj.clip );
+		var url : String = String( eventObj.url );
+		
+		raisePaintComplete( clip, getCoordinateFromURL( url ) );
+	}
+	
+	private function onResponseError( eventObj : Object ) : Void
+	{
+	}	
 }

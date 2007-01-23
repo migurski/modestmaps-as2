@@ -1,7 +1,7 @@
 import mx.utils.Delegate;
 import com.stamen.twisted.Reactor;
-import com.modestmaps.core.TileGrid;
-import com.modestmaps.core.Tile;
+import com.modestmaps.geo.Map;
+import com.modestmaps.core.mapproviders.MapProviders;
 
 class SampleFlashLiteClient 
 {
@@ -9,33 +9,33 @@ class SampleFlashLiteClient
     {
     	clip._focusRect = false;
     	
-        var grid:TileGrid = TileGrid(clip.attachMovie(TileGrid.symbolName, 'tile', clip.getNextHighestDepth(),
-                                                      {_x: 0, _y: 0, width: Stage.width, height: Stage.height} ));
-
+        var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
+                                           {mapProviderType: MapProviders.MICROSOFT_AERIAL, _x: 0, _y: 0, width: Stage.width, height: Stage.height}))
+        
 
    		// Set up key listeners. 
    		// TODO: Ghetto. Make this much cleaner.
     	
     	var myListener:Object = new Object();
-    	myListener.grid = grid;
+    	myListener.map = map;
 		myListener.onKeyDown = function() 
 		{
 			switch ( Key.getCode() )
 			{
 				case Key.RIGHT:
-					grid.panEast( Stage.width );
+					map.panEast( Stage.width );
 					break;	
 				
 				case Key.LEFT:
-					grid.panWest( Stage.width );
+					map.panWest( Stage.width );
 					break;
 
 				case Key.UP:
-					grid.panNorth( Stage.height );
+					map.panNorth( Stage.height );
 					break;	
 				
 				case Key.DOWN:
-					grid.panSouth( Stage.height );
+					map.panSouth( Stage.height );
 					break;
 			}
 		};
@@ -44,7 +44,7 @@ class SampleFlashLiteClient
 
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(grid);
+        Stage.addListener(map);
         
         Reactor.run(clip, null, 50);
     }

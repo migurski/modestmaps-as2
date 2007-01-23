@@ -3,8 +3,6 @@ import com.modestmaps.core.Bounds;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
 import com.modestmaps.core.mapproviders.IMapProvider;
-import com.modestmaps.core.mapproviders.MapProviderFactory;
-import com.modestmaps.core.mapproviders.MapProviders;
 
 import mx.utils.Delegate;
 import com.stamen.twisted.*;
@@ -37,6 +35,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var mask:MovieClip;
     
     // For testing purposes.
+    public var labelContainer:MovieClip;
     public var label:TextField;
     
     // Active when the well is being dragged on the stage.
@@ -48,8 +47,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var tileBuffer:Number = 0;
 
     // Who do we get our Map graphics from?
-    public var mapProviderType:Number;
-    public var mapProvider : IMapProvider;
+    public var mapProvider:IMapProvider;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.TileGrid';
     public static var symbolOwner:Function = TileGrid;
@@ -57,7 +55,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     public function TileGrid()
     {
-        setMapProvider(mapProviderType);
+		this.createEmptyMovieClip( "labelContainer", getNextHighestDepth() );
+        labelContainer.createTextField('label', 1, 10, 10, width-20, height-20);
+        label = labelContainer["label"];
+        label.selectable = false;
+        label.textColor = 0xFF6600;
+                
+        log('FUCK YEAH '+width+'x'+height);
         
         buildWell();
         buildMask();
@@ -86,12 +90,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
         tileBuffer = Math.max(0, tileBuffer);
         
         allocateTiles();
-        redraw();
+        redraw();   
         
-        createTextField('label', getNextHighestDepth(), 10, 10, width-20, height-20);
-        label.selectable = false;
-        
-        log('FUCK YEAH '+width+'x'+height);
+        labelContainer.swapDepths( getNextHighestDepth() );    
     }
     
    /**
@@ -103,6 +104,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well.onPress = Delegate.create(this, this.startWellDrag);
         well.onRelease = Delegate.create(this, this.stopWellDrag);
         well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
+        
+        /*
+        // So the log is visible...
+        var c:Color = new Color(well);
+        var t:Object = c.getTransform();
+        t.ra = 20;
+        t.rb = 204;
+        t.ga = 20;
+        t.gb = 204;
+        t.ba = 20;
+        t.bb = 204;
+        c.setTransform(t);
+        */
     }
     
    /**
@@ -141,18 +155,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public function log(msg:String):Void
     {
         label.text += msg + '\n';
+        label.scroll = label.maxscroll;
     }
     
     public function clearLog():Void
     {
         label.text = '';
-    }
-    
-    private function setMapProvider( mapProviderType : Number ) : Void
-    {
-        this.mapProviderType = mapProviderType;
-        var mapProviderFactory : MapProviderFactory = MapProviderFactory.getInstance();
-        mapProvider = MapProviderFactory.getInstance().getMapProvider( mapProviderType ); 
     }
     
    /*
@@ -213,7 +221,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         return point;
     }
     
-    /*
     private function pointCoordinate(point:Point):Coordinate
     {
         var tile:Tile;
@@ -222,25 +229,44 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         // an arbitrary reference tile, zoomed to the maximum
         tile = tiles[0];
-        tileCoord = new Coordinate(tile.row, tile.column, tile.zoom);
-        tileCoord.zoomTo(Coordinate.MAX_ZOOM);
+        tileCoord = tile.coord.copy();
+        tileCoord = tileCoord.zoomTo(Coordinate.MAX_ZOOM);
         
         // distance in tile widths from reference tile to point
         var xTiles:Number = (point.x - tile._x) / tileWidth;
         var yTiles:Number = (point.y - tile._y) / tileHeight;
-        
+
         // distance in rows & columns at maximum zoom
-        var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.zoom));
-        var yDistance:Number = yTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.zoom));
+        var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.coord.zoom));
+        var yDistance:Number = yTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.coord.zoom));
         
         // new point coordinate reflecting that distance
         pointCoord = new Coordinate(Math.round(tileCoord.row + yDistance),
                                     Math.round(tileCoord.column + xDistance),
                                     tileCoord.zoom);
         
-        return pointCoord;
+        return pointCoord.zoomTo(tile.coord.zoom);
     }
-    */
+    
+    public function topLeftCoordinate():Coordinate
+    {
+        var point:Point = new Point(0, 0);
+        
+        localToGlobal(point);
+        well.globalToLocal(point);
+        
+        return pointCoordinate(point);
+    }
+    
+    public function bottomRightCoordinate():Coordinate
+    {
+        var point:Point = new Point(width, height);
+        
+        localToGlobal(point);
+        well.globalToLocal(point);
+        
+        return pointCoordinate(point);
+    }
     
    /*
     * Start dragging the well with the mouse.
@@ -262,7 +288,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         max.x = well._x - max.x;
         max.y = well._y - max.y;
         
-        log('min/max for drag: '+min+', '+max+' ('+topLeftOutLimit+', '+bottomRightInLimit+')');
+        //log('min/max for drag: '+min+', '+max+' ('+topLeftOutLimit+', '+bottomRightInLimit+')');
         
         // weird negative edge conditions, limit all movement on an axis
         if(min.x > max.x)
@@ -325,13 +351,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
         centerWell(true);
     }
     
-    public function startZoomIn():Void
+    public function zoomIn(amount:Number):Void
     {
         if(zoomLevel >= bottomRightInLimit.zoom && Math.round(well._xscale) >= 100)
             return;
     
-        well._xscale *= Math.pow(2, .25);
-        well._yscale *= Math.pow(2, .25);
+        well._xscale *= Math.pow(2, amount);
+        well._yscale *= Math.pow(2, amount);
         
         normalizeWell();
         allocateTiles();
@@ -340,13 +366,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
         log('New well scale: '+well._xscale.toString());
     }
     
-    public function startZoomOut():Void
+    public function zoomOut(amount:Number):Void
     {
         if(zoomLevel <= topLeftOutLimit.zoom && Math.round(well._xscale) <= 100)
             return;
     
-        well._xscale /= Math.pow(2, .25);
-        well._yscale /= Math.pow(2, .25);
+        well._xscale /= Math.pow(2, amount);
+        well._yscale /= Math.pow(2, amount);
         
         normalizeWell();
         allocateTiles();
@@ -355,14 +381,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
         log('New well scale: '+well._xscale.toString());
     }
 
-   /*
-    * TODO:
-    * Size relative to stage is currently hard-coded, but shouldn't be.
-    */
-    public function onResize():Void
+    public function resizeTo(bottomLeft:Point):Void
     {
-        width = Stage.width - 2 * _x;
-        height = Stage.height - 2 * _y;
+        width = bottomLeft.x;
+        height = bottomLeft.y;
 
         centerWell(false);
         allocateTiles();
@@ -370,33 +392,41 @@ class com.modestmaps.core.TileGrid extends MovieClip
         redraw();
     }
     
-    public function panEast( pixels : Number ) : Void
+    public function panRight(pixels:Number):Void
     {
-    	well._x -= pixels;
-    	positionTiles();
-       centerWell(true);
+        well._x -= pixels;
+        positionTiles();
+        centerWell(true);
     }
  
-    public function panWest( pixels : Number ) : Void
+    public function panLeft(pixels:Number):Void
     {
-    	well._x += pixels;
-    	positionTiles();
+        well._x += pixels;
+        positionTiles();
         centerWell(true);
     } 
-    
-    public function panNorth( pixels : Number ) : Void
-    {
-    	well._y -= pixels;
-    	positionTiles();
-        centerWell(true);
-    }
  
-    public function panSouth( pixels : Number ) : Void
+    public function panUp(pixels:Number):Void
     {
-    	well._y += pixels;
-    	positionTiles();
+        well._y += pixels;
+        positionTiles();
         centerWell(true);
     }      
+    
+    public function panDown(pixels:Number):Void
+    {
+        well._y -= pixels;
+        positionTiles();
+        centerWell(true);
+    }
+
+   /**
+    * Find out whether a tile is at the grid's native zoom level.
+    */
+    private function nativeZoom(tile:Tile):Boolean
+    {
+        return (tile.coord.zoom == zoomLevel);
+    }
 
    /**
     * Determine the number of tiles needed to cover the current grid,
@@ -501,13 +531,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
             log('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
 
             for(var i:Number = 0; i < zoomAdjust; i += 1) {
-                zoomLevel += 1;
                 splitTiles();
+                zoomLevel += 1;
             }
                 
             for(var i:Number = 0; i > zoomAdjust; i -= 1) {
-                zoomLevel -= 1;
                 mergeTiles();
+                zoomLevel -= 1;
             }
                 
             well._xscale /= scaleAdjust;
@@ -532,48 +562,50 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function splitTiles():Void
     {
-        var newTiles:/*Tile*/Array = [];
         var oldTile:Tile;
         var newTile:Tile;
         var xOffset:Number, yOffset:Number;
         
-        while(tiles.length) {
-            oldTile = Tile(tiles.pop());
+        for(var i:Number = tiles.length - 1; i >= 0; i -= 1) {
+            oldTile = tiles[i];
             
-            for(var q:Number = 0; q < 4; q += 1) {
-                // two-bit value into two one-bit values
-                xOffset = q & 1;
-                yOffset = (q >> 1) & 1;
-                
-                newTile = createTile(oldTile);
-                newTile.coord = newTile.coord.zoomBy(1);
-                
-                if(xOffset)
-                    newTile.coord = newTile.coord.right();
-                
-                if(yOffset)
-                    newTile.coord = newTile.coord.down();
+            if(nativeZoom(oldTile)) {
+                for(var q:Number = 0; q < 4; q += 1) {
+                    // two-bit value into two one-bit values
+                    xOffset = q & 1;
+                    yOffset = (q >> 1) & 1;
+                    
+                    newTile = createTile(oldTile);
+                    newTile.coord = newTile.coord.zoomBy(1);
+                    
+                    if(xOffset)
+                        newTile.coord = newTile.coord.right();
+                    
+                    if(yOffset)
+                        newTile.coord = newTile.coord.down();
+    
+                    newTile._x = oldTile._x + (xOffset * tileWidth / 2);
+                    newTile._y = oldTile._y + (yOffset * tileHeight / 2);
+    
+                    newTile._xscale = newTile._yscale = oldTile._xscale / 2;
+                    newTile.redraw();
 
-                newTile._x = oldTile._x + (xOffset * tileWidth / 2);
-                newTile._y = oldTile._y + (yOffset * tileHeight / 2);
+                    // add newTile
+                    tiles.push(newTile);
+                }
 
-                newTile._xscale = newTile._yscale = oldTile._xscale / 2;
-                newTiles.push(newTile);
-                newTile.redraw();
+                // remove oldTile
+                tiles.splice(i, 1);
+                destroyTile(oldTile);
             }
-
-            destroyTile(oldTile);
         }
         
         rows *= 2;
         columns *= 2;
-        
-        tiles = newTiles;
     }
     
     private function mergeTiles():Void
     {
-        var newTiles:/*Tile*/Array = [];
         var oldTile:Tile;
         var newTile:Tile;
         var rowsMerged:Number, columnsMerged:Number;
@@ -596,29 +628,33 @@ class com.modestmaps.core.TileGrid extends MovieClip
             
         }
 
-        while(tiles.length) {
-            oldTile = Tile(tiles.pop());
+        for(var i:Number = tiles.length - 1; i >= 0; i -= 1) {
+            oldTile = tiles[i];
             
-            if(oldTile.coord.zoomBy(-1).isEdge()) {
-                // we are only interested in tiles that are edges for this zoom
-                newTile = createTile(oldTile);
-                newTile.coord = newTile.coord.zoomBy(-1);
-                
-                newTile._x = oldTile._x;
-                newTile._y = oldTile._y;
+            if(nativeZoom(oldTile)) {
+                if(oldTile.coord.zoomBy(-1).isEdge()) {
+                    // we are only interested in tiles that are edges for this zoom
+                    newTile = createTile(oldTile);
+                    newTile.coord = newTile.coord.zoomBy(-1);
+                    
+                    newTile._x = oldTile._x;
+                    newTile._y = oldTile._y;
+    
+                    newTile._xscale = newTile._yscale = oldTile._xscale * 2;
+                    newTile.redraw();
 
-                newTile._xscale = newTile._yscale = oldTile._xscale * 2;
-                newTiles.push(newTile);
-                newTile.redraw();
+                    // add newTile
+                    tiles.push(newTile);
+                }
+
+                // remove oldTile
+                tiles.splice(i, 1);
+                destroyTile(oldTile);
             }
-
-            destroyTile(oldTile);
         }
         
         rows = rowsMerged;
         columns = columnsMerged;
-        
-        tiles = newTiles;
     }
     
    /**
@@ -645,8 +681,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var yMax:Number = point.y + (0 + tileBuffer) * tileHeight;
         
         for(var i:Number = 0; i < tiles.length; i += 1) {
-
-            tile = Tile(tiles[i]);
+        
+            tile = tiles[i];
+            
+            // only interested in moving tiles at the current zoom level
+            if(!nativeZoom(tile))
+                break;
             
             if(tile._y < yMin) {
                 // too far up
@@ -815,6 +855,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         mask.lineTo(0, 0);
         mask.endFill();
         
+        label.textColor = 0xFF6600;
         label._width = width - 20;
         label._height = height - 20;
     }

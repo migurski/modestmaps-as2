@@ -5,10 +5,11 @@
 import com.modestmaps.core.mapproviders.IMapProvider;
 import com.modestmaps.core.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
+import com.modestmaps.events.IDispatchable;
 
 class com.modestmaps.core.mapproviders.VanillaMapProvider 
 extends AbstractMapProvider
-implements IMapProvider 
+implements IMapProvider, IDispatchable
 {
 	public function paintTile( clip : MovieClip, coord : Coordinate ) : Void 
 	{
