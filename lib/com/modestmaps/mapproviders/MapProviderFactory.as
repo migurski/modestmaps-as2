@@ -5,7 +5,8 @@
  */
  
 import com.modestmaps.mapproviders.*; 
- 
+import com.modestmaps.mapproviders.microsoft.*;
+
 class com.modestmaps.mapproviders.MapProviderFactory 
 {
 	private static var __instance : MapProviderFactory;

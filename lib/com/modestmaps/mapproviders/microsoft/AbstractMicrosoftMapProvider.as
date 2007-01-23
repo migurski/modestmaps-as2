@@ -9,7 +9,7 @@ import com.modestmaps.geo.Transformation;
 /**
  * @author darren
  */
-class com.modestmaps.mapproviders.AbstractMicrosoftMapProvider 
+class com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider 
 extends AbstractMapProvider 
 {
 	public static var BASE_URL : String;
