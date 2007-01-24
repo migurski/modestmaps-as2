@@ -80,11 +80,11 @@ class com.modestmaps.geo.Map extends MovieClip
 
     public function zoomIn():Void
     {
-        grid.zoomIn(0.25);
+        grid.zoomIn(1);
     }
     
     public function zoomOut():Void
     {
-        grid.zoomOut(0.25);
+        grid.zoomOut(1);
     }
 }

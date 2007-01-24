@@ -24,6 +24,9 @@ extends AbstractMapProvider
 		                                          0, -1.068070890e7, 3.355443057e7);
 		                                          
         __projection = new MercatorProjection(26, t);
+
+        __topLeftOutLimit = new Coordinate(0, Number.NEGATIVE_INFINITY, 0);
+        __bottomRightInLimit = (new Coordinate(1, Number.POSITIVE_INFINITY, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
 	
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 

@@ -17,4 +17,10 @@ interface com.modestmaps.mapproviders.IMapProvider
     * Return untransformed and unprojected location for a coordinate.
     */
     public function coordinateLocation(coordinate:Coordinate):Location;
+
+   /*
+    * Get top left outer-zoom limit and bottom right inner-zoom limits,
+    * as Coordinates in a two element array.
+    */
+    public function outerLimits():/*Coordinate*/Array;
 }

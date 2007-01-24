@@ -65,11 +65,20 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         buildWell();
         buildMask();
+        redraw();   
         
+		Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
+    }
+    
+   /**
+    * Create the first tiles.
+    */
+    private function initializeTiles():Void
+    {
         // impose some limits
         zoomLevel = 11;
-        topLeftOutLimit = new Coordinate(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, 0);
-        bottomRightInLimit = new Coordinate(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Coordinate.MAX_ZOOM);
+        topLeftOutLimit = mapProvider.outerLimits()[0];
+        bottomRightInLimit = mapProvider.outerLimits()[1];
         
         // initial tile centers the map on the SF Bay Area
         var initObj : Object =
@@ -89,8 +98,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // buffer must not be negative!
         tileBuffer = Math.max(0, tileBuffer);
         
+        centerWell(false);
         allocateTiles();
-        redraw();   
+        positionTiles();
         
         labelContainer.swapDepths( getNextHighestDepth() );    
     }
@@ -351,6 +361,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     public function zoomIn(amount:Number):Void
     {
+        if(!tiles)
+            return;
+        
         if(zoomLevel >= bottomRightInLimit.zoom && Math.round(well._xscale) >= 100)
             return;
     
@@ -366,6 +379,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     public function zoomOut(amount:Number):Void
     {
+        if(!tiles)
+            return;
+        
         if(zoomLevel <= topLeftOutLimit.zoom && Math.round(well._xscale) <= 100)
             return;
     
@@ -381,6 +397,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     public function resizeTo(bottomLeft:Point):Void
     {
+        if(!tiles)
+            return;
+        
         width = bottomLeft.x;
         height = bottomLeft.y;
 
@@ -392,6 +411,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     public function panRight(pixels:Number):Void
     {
+        if(!tiles)
+            return;
+        
         well._x -= pixels;
         positionTiles();
         centerWell(true);
@@ -399,6 +421,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
  
     public function panLeft(pixels:Number):Void
     {
+        if(!tiles)
+            return;
+        
         well._x += pixels;
         positionTiles();
         centerWell(true);
@@ -406,6 +431,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
  
     public function panUp(pixels:Number):Void
     {
+        if(!tiles)
+            return;
+        
         well._y += pixels;
         positionTiles();
         centerWell(true);
@@ -413,6 +441,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     public function panDown(pixels:Number):Void
     {
+        if(!tiles)
+            return;
+        
         well._y -= pixels;
         positionTiles();
         centerWell(true);
@@ -432,6 +463,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function allocateTiles():Void
     {
+        if(!tiles)
+            return;
+        
         // internal pixel dimensions of well, compensating for scale
         var wellWidth:Number  = (100 / well._xscale) * width;
         var wellHeight:Number = (100 / well._yscale) * height;
@@ -473,6 +507,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function centerWell(adjustTiles:Boolean):Void
     {
+        if(!tiles)
+            return;
+        
         var center:Point = new Point((width/2), (height/2));
         
         var xAdjustment:Number = well._x - center.x;
@@ -496,6 +533,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function normalizeWell():Void
     {
+        if(!tiles)
+            return;
+        
         var zoomAdjust:Number, scaleAdjust:Number;
         
         // just in case?
@@ -661,6 +701,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function positionTiles():Void
     {
+        if(!tiles)
+            return;
+        
         var tile:Tile;
         var point:Point;
         

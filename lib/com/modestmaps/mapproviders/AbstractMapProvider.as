@@ -20,6 +20,10 @@ implements IDispatchable
 	
 	private var __requestThrottler : RequestThrottler;
 	private var __projection:IProjection;
+	
+	// boundaries for the current provider
+	private var __topLeftOutLimit:Coordinate;
+	private var __bottomRightInLimit:Coordinate;
 
 	// tracks if we're set up to broadcast events
 	private static var _dispatcherInited : Boolean = false;
@@ -40,6 +44,9 @@ implements IDispatchable
 
 	    var t:Transformation = new Transformation(1, 0, 0, 0, 1, 0);
         __projection = new LinearProjection(Coordinate.MAX_ZOOM, t);
+
+        __topLeftOutLimit = new Coordinate(0, 0, 0);
+        __bottomRightInLimit = (new Coordinate(1, 1, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
 
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
@@ -54,6 +61,20 @@ implements IDispatchable
 	{
         return __projection.toString();
 	}
+
+   /*
+    * Get top left outer-zoom limit and bottom right inner-zoom limits,
+    * as Coordinates in a two element array.
+    */
+    public function outerLimits():/*Coordinate*/Array
+    {
+        var limits:/*Coordinate*/Array = [];
+
+        limits[0] = __topLeftOutLimit.copy();
+        limits[1] = __bottomRightInLimit.copy();
+
+        return limits;
+    }
 
 	public function createLabel( clip : MovieClip, label : String ) : Void
 	{
