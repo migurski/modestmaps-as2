@@ -8,4 +8,12 @@ extends AbstractProjection
     {
         super(zoom, T);
     }
+    
+   /*
+    * String signature of the current projection.
+    */
+    public function toString():String
+    {
+        return 'Linear('+zoom+', '+T.toString()+')';
+    }
 }

@@ -44,7 +44,14 @@ implements IDispatchable
 
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		clip.createEmptyMovieClip( "image", clip.getNextHighestDepth() );
+	}
+
+   /*
+    * String signature of the current map provider's geometric behavior.
+    */
+	public function toString():String
+	{
+        return __projection.toString();
 	}
 
 	public function createLabel( clip : MovieClip, label : String ) : Void

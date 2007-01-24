@@ -24,6 +24,14 @@ implements IProjection
     }
     
    /*
+    * String signature of the current projection.
+    */
+    public function toString():String
+    {
+        return 'Abstract('+zoom+', '+T.toString()+')';
+    }
+    
+   /*
     * Return raw projected point - currently linear.
     */
     private function rawProject(point:Point):Point

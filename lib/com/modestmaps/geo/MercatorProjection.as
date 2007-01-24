@@ -13,6 +13,14 @@ extends AbstractProjection
     }
     
    /*
+    * String signature of the current projection.
+    */
+    public function toString():String
+    {
+        return 'Mercator('+zoom+', '+T.toString()+')';
+    }
+    
+   /*
     * Return raw projected point.
     * See: http://mathworld.wolfram.com/MercatorProjection.html (2)
     */

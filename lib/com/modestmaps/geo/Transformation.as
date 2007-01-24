@@ -20,12 +20,26 @@ class com.modestmaps.geo.Transformation
         this.cy = cy;
 	}
 	
+   /*
+    * String signature of the current transformation.
+    */
+	public function toString():String
+	{
+	    return 'T(['+ax+','+bx+','+cx+']['+ay+','+by+','+cy+'])';
+	}
+	
+   /*
+    * Transform a point.
+    */
 	public function transform(point:Point):Point
 	{
 	    return new Point(ax*point.x + bx*point.y + cx,
 	                     ay*point.x + by*point.y + cy);
 	}
 	
+   /*
+    * Inverse of transform; p = untransform(transform(p))
+    */
 	public function untransform(point:Point):Point
 	{
 	    return new Point((point.x*by - point.y*bx - cx*by + cy*bx) / (ax*by - ay*bx),
