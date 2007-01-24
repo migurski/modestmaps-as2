@@ -44,6 +44,7 @@ implements IDispatchable
 
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
+	    clip.createEmptyMovieClip( "image", clip.getNextHighestDepth() );
 	}
 
    /*
