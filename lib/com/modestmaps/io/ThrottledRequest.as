@@ -9,14 +9,14 @@ class com.modestmaps.io.ThrottledRequest
 implements IRequest
 {
 	// tracks if we're set up to broadcast events
-	private static var _dispatcherInited : Boolean = false;
+	private static var __dispatcherInited : Boolean = false;
 	
 	// Events
 	public static var EVENT_REQUEST_ERROR : String = "onRequestError";
 	public static var EVENT_RESPONSE_COMPLETE : String = "onResponseComplete";
 	public static var EVENT_RESPONSE_ERROR : String = "onResponseError";
 	
-	// stubs for AsBroadcaster
+	// stubs for EventDispatcher
 	public var dispatchEvent : Function;
 	public var addEventListener : Function;
 	public var removeEventListener : Function;
@@ -24,10 +24,10 @@ implements IRequest
 	public function ThrottledRequest()
 	{
 		// only set up broadcasting once, in the prototype
-		if ( !_dispatcherInited )
+		if ( !__dispatcherInited )
 		{		
 			EventDispatcher.initialize( this.__proto__ );
-			_dispatcherInited = true;
+			__dispatcherInited = true;
 		}
 	}
 	

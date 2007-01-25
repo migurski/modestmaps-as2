@@ -1,18 +1,19 @@
-import org.casaframework.movieclip.DispatchableMovieClip;
-
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.TilePaintCall;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.mapproviders.IMapProvider;
 import mx.utils.Delegate;
+import mx.events.EventDispatcher;
 import com.stamen.twisted.*;
 import com.modestmaps.events.IDispatchable;
 import com.modestmaps.mapproviders.AbstractMapProvider;
 
 class com.modestmaps.core.Tile 
-extends DispatchableMovieClip
+extends MovieClip
 {
+	public static var EVENT_PAINT_COMPLETE : String = "onPaintComplete";
+	
     public var grid:TileGrid;
 
     private var __coord : Coordinate;
@@ -28,7 +29,15 @@ extends DispatchableMovieClip
 
 	private var __paintCompleteDelegate : Function;
 	
-	private var __paintCall:TilePaintCall;
+	private var __paintCall : TilePaintCall;
+
+	// tracks if we're set up to broadcast events
+	private static var __dispatcherInited : Boolean = false;
+
+	// stubs for EventDispatcher
+	public var dispatchEvent : Function;
+	public var addEventListener : Function;
+	public var removeEventListener : Function;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.Tile';
     public static var symbolOwner:Function = Tile;
@@ -36,7 +45,12 @@ extends DispatchableMovieClip
 
     public function Tile()
     {
-    	super();
+    	// only set up broadcasting once, in the prototype
+		if ( !__dispatcherInited )
+		{		
+			EventDispatcher.initialize( this.__proto__ );
+			__dispatcherInited = true;
+		}
     	
     	__displayClips = new Array();
     	
@@ -170,6 +184,14 @@ extends DispatchableMovieClip
     				i--;
     			}
     		}
+    		
+    		// notify anyone who's listening
+    		var newEventObj : Object =
+    		{
+    			target : this,
+    			type : EVENT_PAINT_COMPLETE	
+    		};
+    		dispatchEvent( newEventObj );
     	}   	
     }   
 }

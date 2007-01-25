@@ -146,6 +146,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var tile:Tile;
 
         tile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), tileParams));
+        tile.addEventListener( Tile.EVENT_PAINT_COMPLETE, Delegate.create( this, this.onTilePaintComplete ) );
         tile.redraw();
         
         return tile;
@@ -156,7 +157,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function destroyTile(tile:Tile):Void
     {
-        tile.destroy();
         tile.removeMovieClip();
     }
     
@@ -938,4 +938,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
         label._width = width - 20;
         label._height = height - 20;
     }
+
+	// Event Handlers
+	
+	private function onTilePaintComplete( eventObj : Object ) : Void
+	{
+		var tile : Tile = Tile( eventObj.target );
+		
+		log ("received PaintComplete from tile: " + tile.coord.toString() );
+	}
 }
