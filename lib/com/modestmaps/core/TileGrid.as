@@ -458,6 +458,32 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
 
    /**
+    * Get the subset of tiles that match a given zoom level.
+    */
+    private function tilesAtZoom(zoom:Number):/*Tile*/Array
+    {
+        var matches:/*Tile*/Array = [];
+        
+        for(var i:Number = 0; i < tiles.length; i += 1)
+            if(tiles[i].coord.zoom == zoom)
+                matches.push(tiles[i]);
+
+        return matches;
+    }
+
+   /**
+    * Find the given tile in the tiles array.
+    */
+    private function tileIndex(tile:Tile):Number
+    {
+        for(var i:Number = 0; i < tiles.length; i += 1)
+            if(tiles[i] == tile)
+                return i;
+
+        return -1;
+    }
+
+   /**
     * Determine the number of tiles needed to cover the current grid,
     * and add rows and columns if necessary.
     */
@@ -766,12 +792,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         var lastTile:Tile;
         var newTileParams:Object;
+        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
         
-        tiles.sort(compareTileRowColumn);
+        gridTiles.sort(compareTileRowColumn);
         
-        for(var i:Number = tiles.length - columns; i < rows * columns; i += 1) {
+        for(var i:Number = gridTiles.length - columns; i < rows * columns; i += 1) {
         
-            lastTile = tiles[i];
+            lastTile = gridTiles[i];
         
             newTileParams = {grid:  lastTile.grid,  coord:  lastTile.coord.down(),
                              _x:    lastTile._x,    _y:     lastTile._y + lastTile.height,
@@ -788,10 +815,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileRow():Void
     {
-        tiles.sort(compareTileRowColumn);
+        var tile:Tile;
+        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
 
-        while(tiles.length > columns * (rows - 1)) {
-            destroyTile(Tile(tiles.pop()));
+        gridTiles.sort(compareTileRowColumn);
+
+        while(gridTiles.length > columns * (rows - 1)) {
+            tile = Tile(gridTiles.pop());
+            tiles.splice(tileIndex(tile), 1);
+            destroyTile(tile);
         }
                                          
         rows -= 1;
@@ -804,12 +836,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         var lastTile:Tile;
         var newTileParams:Object;
+        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
         
-        tiles.sort(compareTileColumnRow);
+        gridTiles.sort(compareTileColumnRow);
         
-        for(var i:Number = tiles.length - rows; i < rows * columns; i += 1) {
+        for(var i:Number = gridTiles.length - rows; i < rows * columns; i += 1) {
         
-            lastTile = tiles[i];
+            lastTile = gridTiles[i];
         
             newTileParams = {grid:  lastTile.grid,                  coord:  lastTile.coord.right(),
                              _x:    lastTile._x + lastTile.width,   _y:     lastTile._y,
@@ -826,10 +859,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileColumn():Void
     {
-        tiles.sort(compareTileColumnRow);
+        var tile:Tile;
+        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
 
-        while(tiles.length > rows * (columns - 1)) {
-            destroyTile(Tile(tiles.pop()));
+        gridTiles.sort(compareTileColumnRow);
+
+        while(gridTiles.length > rows * (columns - 1)) {
+            tile = Tile(gridTiles.pop());
+            tiles.splice(tileIndex(tile), 1);
+            destroyTile(tile);
         }
 
         columns -= 1;
