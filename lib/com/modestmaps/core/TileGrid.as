@@ -16,7 +16,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var rows:Number;
     private var columns:Number;
     private var tiles:/*Tile*/Array;
-
+    
     // Real maps use 256.
     private var tileWidth:Number = 256;
     private var tileHeight:Number = 256;
@@ -55,7 +55,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     public function TileGrid()
     {
-		this.createEmptyMovieClip( "labelContainer", getNextHighestDepth() );
+        this.createEmptyMovieClip( "labelContainer", getNextHighestDepth() );
         labelContainer.createTextField('label', 1, 10, 10, width-20, height-20);
         label = labelContainer["label"];
         label.selectable = false;
@@ -67,7 +67,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         buildMask();
         redraw();   
         
-		Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
+        Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
     }
     
    /**
@@ -81,7 +81,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         bottomRightInLimit = mapProvider.outerLimits()[1];
         
         // initial tile centers the map on the SF Bay Area
-        var initObj : Object =
+        var initObj:Object =
         { 
             origin: true, 
             grid: this, 
@@ -90,7 +90,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
             coord: new Coordinate(791, 328, zoomLevel)
         };
         
-        tiles = [createTile(initObj)];
+        tiles = [];
+        createTile(initObj);
                                                                   
         rows = 1;
         columns = 1;
@@ -139,25 +140,40 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
     
    /**
-    * Create a new tile and return it, but don't add it to tiles array.
+    * Create a new tile, add it to tiles array, and return it.
     */
     private function createTile(tileParams:Object):Tile
     {
         var tile:Tile;
 
         tile = Tile(well.attachMovie(Tile.symbolName, 'tile'+well.getNextHighestDepth(), well.getNextHighestDepth(), tileParams));
-        tile.addEventListener( Tile.EVENT_PAINT_COMPLETE, Delegate.create( this, this.onTilePaintComplete ) );
         tile.redraw();
+        tiles.push(tile);
         
+        //log('Created tile: '+tile.toString());
         return tile;
     }
-    
+
    /**
-    * Destroy an old tile, but don't remove it from tiles array.
+    * Remove an old tile from the tiles array, then destroy it.
     */
     private function destroyTile(tile:Tile):Void
     {
+        //log('Destroying tile: '+tile.toString());
+        tiles.splice(tileIndex(tile), 1);
+        tile.cancelDraw();
         tile.removeMovieClip();
+    }
+    
+   /*
+    * Slowly mete out destruction to a list of tiles.
+    */
+    private function destroyTiles(tiles:/*Tile*/Array):Void
+    {
+        if(tiles.length) {
+            destroyTile(Tile(tiles.shift()));
+            Reactor.callLater(0, Delegate.create(this, this.destroyTiles), tiles);
+        }
     }
     
     public function log(msg:String):Void
@@ -395,18 +411,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
         log('New well scale: '+well._xscale.toString());
     }
 
-    public function resizeTo(bottomLeft:Point):Void
+    public function resizeTo(bottomRight:Point):Void
     {
+        width = bottomRight.x;
+        height = bottomRight.y;
+
+        redraw();
+
         if(!tiles)
             return;
         
-        width = bottomLeft.x;
-        height = bottomLeft.y;
-
         centerWell(false);
         allocateTiles();
         positionTiles();
-        redraw();
     }
     
     public function panRight(pixels:Number):Void
@@ -450,22 +467,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
 
    /**
-    * Find out whether a tile is at the grid's native zoom level.
+    * Get the subset of still-active tiles.
     */
-    private function nativeZoom(tile:Tile):Boolean
-    {
-        return (tile.coord.zoom == zoomLevel);
-    }
-
-   /**
-    * Get the subset of tiles that match a given zoom level.
-    */
-    private function tilesAtZoom(zoom:Number):/*Tile*/Array
+    private function activeTiles():/*Tile*/Array
     {
         var matches:/*Tile*/Array = [];
         
         for(var i:Number = 0; i < tiles.length; i += 1)
-            if(tiles[i].coord.zoom == zoom)
+            if(tiles[i].isActive())
                 matches.push(tiles[i]);
 
         return matches;
@@ -563,25 +572,28 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
         
         var zoomAdjust:Number, scaleAdjust:Number;
+        var active:/*Tile*/Array;
         
         // just in case?
         centerWell(true);
 
         if(Math.abs(well._xscale - 100) < 1) {
+            active = activeTiles();
+        
             // set to 100% if within 99% - 101%
             well._xscale = well._yscale = 100;
             
-            tiles.sort(compareTileRowColumn);
+            active.sort(compareTileRowColumn);
             
             // lock the tiles back to round-pixel positions
-            tiles[0]._x = Math.round(tiles[0]._x);
-            tiles[0]._y = Math.round(tiles[0]._y);
+            active[0]._x = Math.round(active[0]._x);
+            active[0]._y = Math.round(active[0]._y);
             
-            for(var i:Number = 1; i < tiles.length; i += 1) {
-                tiles[i]._x = tiles[0]._x + (tiles[i].coord.column - tiles[0].coord.column) * tileWidth;
-                tiles[i]._y = tiles[0]._y + (tiles[i].coord.row    - tiles[0].coord.row)    * tileHeight;
+            for(var i:Number = 1; i < active.length; i += 1) {
+                active[i]._x = active[0]._x + (active[i].coord.column - active[0].coord.column) * tileWidth;
+                active[i]._y = active[0]._y + (active[i].coord.row    - active[0].coord.row)    * tileHeight;
             
-                log(tiles[i].toString()+' at '+tiles[i]._x+', '+tiles[i]._y+' vs. '+tiles[0].toString());
+                //log(active[i].toString()+' at '+active[i]._x+', '+active[i]._y+' vs. '+active[0].toString());
             }
 
         } else if(Math.floor(well._xscale) <= 60 || Math.ceil(well._xscale) >= 165) {
@@ -620,105 +632,115 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
     
    /**
-    * Do a 1-to-4 tile split: for every tile in the well, add four
-    * new tiles at a higher zoom level, and remove the original.
-    * Double the row & column count.
+    * How many milliseconds before condemned tiles are destroyed?
+    */
+    private function condemnationDelay():Number
+    {
+        // half a second for each tile, plus five seconds overhead
+        return (5 + .5 * rows * columns) * 1000;
+    }
+    
+   /**
+    * Do a 1-to-4 tile split: pick a reference tile and use it
+    * as a position for four new tiles at a higher zoom level.
+    * Expire all existing tiles, and trust that allocateTiles() and
+    * positionTiles() will take care of filling the remaining space.
     */
     private function splitTiles():Void
     {
-        var oldTile:Tile;
-        var newTile:Tile;
+        var condemnedTiles:/*Tile*/Array = [];
+        var referenceTile:Tile, newTile:Tile;
         var xOffset:Number, yOffset:Number;
         
         for(var i:Number = tiles.length - 1; i >= 0; i -= 1) {
-            oldTile = tiles[i];
-            
-            if(nativeZoom(oldTile)) {
-                for(var q:Number = 0; q < 4; q += 1) {
-                    // two-bit value into two one-bit values
-                    xOffset = q & 1;
-                    yOffset = (q >> 1) & 1;
-                    
-                    newTile = createTile(oldTile);
-                    newTile.coord = newTile.coord.zoomBy(1);
-                    
-                    if(xOffset)
-                        newTile.coord = newTile.coord.right();
-                    
-                    if(yOffset)
-                        newTile.coord = newTile.coord.down();
-    
-                    newTile._x = oldTile._x + (xOffset * tileWidth / 2);
-                    newTile._y = oldTile._y + (yOffset * tileHeight / 2);
-    
-                    newTile._xscale = newTile._yscale = oldTile._xscale / 2;
-                    newTile.redraw();
+            if(tiles[i].isActive()) {
+                // remove old tile
+                tiles[i].expire();
+                condemnedTiles.push(tiles[i]);
 
-                    // add newTile
-                    tiles.push(newTile);
-                }
-
-                // remove oldTile
-                tiles.splice(i, 1);
-                destroyTile(oldTile);
+                // save for later (you only need one)
+                referenceTile = tiles[i];
             }
         }
-        
-        rows *= 2;
-        columns *= 2;
+
+        Reactor.callLater(condemnationDelay(), Delegate.create(this, this.destroyTiles), condemnedTiles);
+    
+        // this should never happen
+        if(!referenceTile)
+            return;
+
+        for(var q:Number = 0; q < 4; q += 1) {
+            // two-bit value into two one-bit values
+            xOffset = q & 1;
+            yOffset = (q >> 1) & 1;
+            
+            newTile = createTile(referenceTile);
+            newTile.coord = newTile.coord.zoomBy(1);
+            
+            if(xOffset)
+                newTile.coord = newTile.coord.right();
+            
+            if(yOffset)
+                newTile.coord = newTile.coord.down();
+
+            newTile._x = referenceTile._x + (xOffset * tileWidth / 2);
+            newTile._y = referenceTile._y + (yOffset * tileHeight / 2);
+
+            newTile._xscale = newTile._yscale = referenceTile._xscale / 2;
+            newTile.redraw();
+        }
+
+        // The remaining tiles get taken care of later
+        rows = 2;
+        columns = 2;
     }
     
+   /**
+    * Do a 4-to-1 tile merge: pick a reference tile and use it
+    * as a position for the upper-left-hand corder of one new tile
+    * at a higher zoom level. Expire all existing tiles, and trust
+    * that allocateTiles() and positionTiles() will take care of
+    * filling the remaining space.
+    */
     private function mergeTiles():Void
     {
-        var oldTile:Tile;
-        var newTile:Tile;
-        var rowsMerged:Number, columnsMerged:Number;
+        var condemnedTiles:/*Tile*/Array = [];
+        var referenceTile:Tile, newTile:Tile;
     
         tiles.sort(compareTileRowColumn);
 
-        if(tiles[0].coord.zoomBy(-1).isRowEdge()) {
-            rowsMerged = Math.ceil(rows / 2);
-            
-        } else {
-            rowsMerged = Math.floor(rows / 2);
-            
-        }
-        
-        if(tiles[0].coord.zoomBy(-1).isColumnEdge()) {
-            columnsMerged = Math.ceil(columns / 2);
-            
-        } else {
-            columnsMerged = Math.floor(columns / 2);
-            
-        }
-
         for(var i:Number = tiles.length - 1; i >= 0; i -= 1) {
-            oldTile = tiles[i];
-            
-            if(nativeZoom(oldTile)) {
-                if(oldTile.coord.zoomBy(-1).isEdge()) {
-                    // we are only interested in tiles that are edges for this zoom
-                    newTile = createTile(oldTile);
-                    newTile.coord = newTile.coord.zoomBy(-1);
-                    
-                    newTile._x = oldTile._x;
-                    newTile._y = oldTile._y;
-    
-                    newTile._xscale = newTile._yscale = oldTile._xscale * 2;
-                    newTile.redraw();
+            if(tiles[i].isActive()) {
+                // remove old tile
+                tiles[i].expire();
+                condemnedTiles.push(tiles[i]);
 
-                    // add newTile
-                    tiles.push(newTile);
+                if(tiles[i].coord.zoomBy(-1).isEdge()) {
+                    // save for later (you only need one)
+                    referenceTile = tiles[i];
                 }
-
-                // remove oldTile
-                tiles.splice(i, 1);
-                destroyTile(oldTile);
             }
         }
+
+        Reactor.callLater(condemnationDelay(), Delegate.create(this, this.destroyTiles), condemnedTiles);
+    
+        // this should never happen
+        if(!referenceTile)
+            return;
+
+        // we are only interested in tiles that are edges for this zoom
+        newTile = createTile(referenceTile);
+        newTile.coord = newTile.coord.zoomBy(-1);
         
-        rows = rowsMerged;
-        columns = columnsMerged;
+        newTile._x = referenceTile._x;
+        newTile._y = referenceTile._y;
+
+        newTile._xscale = newTile._yscale = referenceTile._xscale * 2;
+        newTile.redraw();
+
+        // The remaining tiles get taken care of later
+        rows = 1;
+        columns = 1;
     }
     
    /**
@@ -732,6 +754,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         var tile:Tile;
         var point:Point;
+        var active:/*Tile*/Array = activeTiles();
         
         point = new Point(0, 0);
         this.localToGlobal(point);
@@ -747,12 +770,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var xMax:Number = point.x + (0 + tileBuffer) * tileWidth;
         var yMax:Number = point.y + (0 + tileBuffer) * tileHeight;
         
-        for(var i:Number = 0; i < tiles.length; i += 1) {
+        for(var i:Number = 0; i < active.length; i += 1) {
         
-            tile = tiles[i];
+            tile = active[i];
             
-            // only interested in moving tiles at the current zoom level
-            if(!nativeZoom(tile))
+            // only interested in moving active tiles
+            if(!tile.isActive())
                 break;
             
             if(tile._y < yMin) {
@@ -792,19 +815,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         var lastTile:Tile;
         var newTileParams:Object;
-        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
+        var active:/*Tile*/Array = activeTiles();
         
-        gridTiles.sort(compareTileRowColumn);
+        active.sort(compareTileRowColumn);
         
-        for(var i:Number = gridTiles.length - columns; i < rows * columns; i += 1) {
+        for(var i:Number = active.length - columns; i < rows * columns; i += 1) {
         
-            lastTile = gridTiles[i];
+            lastTile = active[i];
         
             newTileParams = {grid:  lastTile.grid,  coord:  lastTile.coord.down(),
                              _x:    lastTile._x,    _y:     lastTile._y + lastTile.height,
                              width: tileWidth,      height: tileHeight};
 
-            tiles.push(createTile(newTileParams));
+            createTile(newTileParams);
         }
         
         rows += 1;
@@ -815,16 +838,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileRow():Void
     {
-        var tile:Tile;
-        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
+        var active:/*Tile*/Array = activeTiles();
 
-        gridTiles.sort(compareTileRowColumn);
+        active.sort(compareTileRowColumn);
 
-        while(gridTiles.length > columns * (rows - 1)) {
-            tile = Tile(gridTiles.pop());
-            tiles.splice(tileIndex(tile), 1);
-            destroyTile(tile);
-        }
+        while(active.length > columns * (rows - 1))
+            destroyTile(Tile(active.pop()));
                                          
         rows -= 1;
     }
@@ -836,19 +855,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         var lastTile:Tile;
         var newTileParams:Object;
-        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
+        var active:/*Tile*/Array = activeTiles();
         
-        gridTiles.sort(compareTileColumnRow);
+        active.sort(compareTileColumnRow);
         
-        for(var i:Number = gridTiles.length - rows; i < rows * columns; i += 1) {
+        for(var i:Number = active.length - rows; i < rows * columns; i += 1) {
         
-            lastTile = gridTiles[i];
+            lastTile = active[i];
         
             newTileParams = {grid:  lastTile.grid,                  coord:  lastTile.coord.right(),
                              _x:    lastTile._x + lastTile.width,   _y:     lastTile._y,
                              width: tileWidth,                      height: tileHeight};
 
-            tiles.push(createTile(newTileParams));
+            createTile(newTileParams);
         }
         
         columns += 1;
@@ -859,16 +878,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function popTileColumn():Void
     {
-        var tile:Tile;
-        var gridTiles:/*Tile*/Array = tilesAtZoom(zoomLevel);
+        var active:/*Tile*/Array = activeTiles();
 
-        gridTiles.sort(compareTileColumnRow);
+        active.sort(compareTileColumnRow);
 
-        while(gridTiles.length > rows * (columns - 1)) {
-            tile = Tile(gridTiles.pop());
-            tiles.splice(tileIndex(tile), 1);
-            destroyTile(tile);
-        }
+        while(active.length > rows * (columns - 1))
+            destroyTile(Tile(active.pop()));
 
         columns -= 1;
     }
@@ -938,13 +953,4 @@ class com.modestmaps.core.TileGrid extends MovieClip
         label._width = width - 20;
         label._height = height - 20;
     }
-
-	// Event Handlers
-	
-	private function onTilePaintComplete( eventObj : Object ) : Void
-	{
-		var tile : Tile = Tile( eventObj.target );
-		
-		log ("received PaintComplete from tile: " + tile.coord.toString() );
-	}
 }

@@ -48,7 +48,7 @@ class com.modestmaps.geo.Map extends MovieClip
         grid.log('Top left: '+grid.topLeftCoordinate().toString()+', '+mapProvider.coordinateLocation(grid.topLeftCoordinate()).toString());
         grid.log('Bottom right: '+grid.bottomRightCoordinate().toString()+', '+mapProvider.coordinateLocation(grid.bottomRightCoordinate()).toString());
         
-        Reactor.callLater(5000, Delegate.create(this, this.nagAboutBoundsForever));
+        //Reactor.callLater(5000, Delegate.create(this, this.nagAboutBoundsForever));
     }
     
     private function setMapProvider(mapProviderType:Number):Void

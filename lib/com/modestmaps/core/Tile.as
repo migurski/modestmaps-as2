@@ -30,6 +30,8 @@ extends MovieClip
 	private var __paintCompleteDelegate : Function;
 	
 	private var __paintCall : TilePaintCall;
+	
+	private var __active:Boolean;
 
 	// tracks if we're set up to broadcast events
 	private static var __dispatcherInited : Boolean = false;
@@ -52,8 +54,8 @@ extends MovieClip
 			__dispatcherInited = true;
 		}
     	
+    	__active = true;
     	__displayClips = new Array();
-    	
     	__paintCompleteDelegate = Delegate.create( this, this.onPaintComplete );   	
     }
    
@@ -65,6 +67,17 @@ extends MovieClip
     {
     	__coord = coord;
     	redraw();	
+    }
+    
+    public function isActive():Boolean
+    {
+        return __active;
+    }
+        
+    public function expire():Void
+    {
+        cancelDraw();
+        __active = false;
     }
         
     public function center():Point
@@ -134,6 +147,11 @@ extends MovieClip
     	if(__paintCall)
     	    __paintCall.cancel();
     	
+   		// hide all other displayClips to avoid weird "repaint" effect
+   		var count:Number = __displayClips.length;
+   		while(count--)
+   			__displayClips[count].clip._visible = false;
+
     	// fire up a new call for the next frame...
     	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.mapProvider, coord.copy()),
     	                                grid.mapProvider, coord.copy());
@@ -141,23 +159,21 @@ extends MovieClip
     
     public function paint(mapProvider:IMapProvider, tileCoord:Coordinate):Void
     {
-    	grid.log("Painting tile: " + tileCoord.toString());
+    	//grid.log("Painting tile: " + tileCoord.toString());
     	
     	// set up the proper clip to paint here
     	
     	var clipId : Number = this.getNextHighestDepth();
     	var clip : MovieClip = this.createEmptyMovieClip( "display" + clipId, clipId );
    		
-   		// hide all other displayClips to avoid weird "repaint" effect
-   		var count : Number = __displayClips.length;
-   		while ( count-- )
-   		{
-   			__displayClips[count].clip._visible = false;
-   		}
-
    		__displayClips.push ( { clip : clip, coord : tileCoord } );
    	
-    	mapProvider.paint( clip, tileCoord );
+    	mapProvider.paint(clip, tileCoord);
+    }
+    
+    public function cancelDraw():Void
+    {
+        __paintCall.cancel();
     }
     
     // Event Handlers

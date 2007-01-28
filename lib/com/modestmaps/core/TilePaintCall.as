@@ -5,6 +5,9 @@ import com.stamen.twisted.DelayedCall;
 class com.modestmaps.core.TilePaintCall
 extends com.stamen.twisted.DelayedCall
 {
+	// Events
+	public static var EVENT_CANCELLED : String = "TilePaintCall cancelled";
+
     private var __call:DelayedCall;
     private var __mapProvider:IMapProvider;
     private var __tileCoord:Coordinate;
