@@ -375,42 +375,29 @@ class com.modestmaps.core.TileGrid extends MovieClip
         centerWell(true);
     }
     
-    public function zoomIn(amount:Number):Void
+    public function zoomBy(amount:Number, redraw:Boolean):Void
     {
         if(!tiles)
             return;
         
-        if(zoomLevel >= bottomRightInLimit.zoom && Math.round(well._xscale) >= 100)
+        if(amount > 0 && zoomLevel >= bottomRightInLimit.zoom && Math.round(well._xscale) >= 100)
+            return;
+    
+        if(amount < 0 && zoomLevel <= topLeftOutLimit.zoom && Math.round(well._xscale) <= 100)
             return;
     
         well._xscale *= Math.pow(2, amount);
         well._yscale *= Math.pow(2, amount);
         
-        normalizeWell();
-        allocateTiles();
-        positionTiles();
-        
-        log('New well scale: '+well._xscale.toString());
+        if(redraw) {
+            normalizeWell();
+            allocateTiles();
+            positionTiles();
+            
+            log('New well scale: '+well._xscale.toString());
+        }
     }
     
-    public function zoomOut(amount:Number):Void
-    {
-        if(!tiles)
-            return;
-        
-        if(zoomLevel <= topLeftOutLimit.zoom && Math.round(well._xscale) <= 100)
-            return;
-    
-        well._xscale /= Math.pow(2, amount);
-        well._yscale /= Math.pow(2, amount);
-        
-        normalizeWell();
-        allocateTiles();
-        positionTiles();
-        
-        log('New well scale: '+well._xscale.toString());
-    }
-
     public function resizeTo(bottomRight:Point):Void
     {
         width = bottomRight.x;

@@ -1,5 +1,6 @@
 import mx.utils.Delegate;
 import com.stamen.twisted.Reactor;
+import com.stamen.twisted.DelayedCall;
 
 import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
@@ -11,6 +12,15 @@ class com.modestmaps.geo.Map extends MovieClip
 {
     private var width:Number;
     private var height:Number;
+    
+    // pending zoom steps, array of [amount:Number, redraw:Boolean] (see TileGrid.zoomBy)
+    private var __zoomSteps:/*Array*/Array;
+
+    // associated zooming call
+    private var __zoomTask:DelayedCall;
+
+    // frames-per-2x-zoom
+    private static var __zoomFrames:Number = 6;
 
     // das grid
     public var grid:TileGrid;
@@ -25,6 +35,8 @@ class com.modestmaps.geo.Map extends MovieClip
     
     public function Map()
     {
+        __zoomSteps = [];
+
         setMapProvider(mapProviderType);
     
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(),
@@ -80,11 +92,32 @@ class com.modestmaps.geo.Map extends MovieClip
 
     public function zoomIn():Void
     {
-        grid.zoomIn(0.25);
+        for(var i = 1; i <= __zoomFrames; i += 1)
+            __zoomSteps.push([1/__zoomFrames, Boolean(i == __zoomFrames)]);
+            
+        if(!__zoomTask)
+            zoomProcess();
     }
     
     public function zoomOut():Void
     {
-        grid.zoomOut(0.25);
+        for(var i = 1; i <= __zoomFrames; i += 1)
+            __zoomSteps.push([-1/__zoomFrames, Boolean(i == __zoomFrames)]);
+            
+        if(!__zoomTask)
+            zoomProcess();
+    }
+    
+    private function zoomProcess():Void
+    {
+        if(__zoomSteps.length) {
+            var step:Array = Array(__zoomSteps.shift());
+            grid.zoomBy(Number(step[0]), Boolean(step[1]));
+            __zoomTask = Reactor.callNextFrame(Delegate.create(this, this.zoomProcess));
+
+        } else {
+            delete __zoomTask;
+            
+        }
     }
 }
