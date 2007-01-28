@@ -2,8 +2,10 @@ import mx.utils.Delegate;
 import com.stamen.twisted.Reactor;
 import com.stamen.twisted.DelayedCall;
 
+import com.modestmaps.geo.Location;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.modestmaps.mapproviders.MapProviderFactory;
 import com.modestmaps.mapproviders.MapProviders;
@@ -41,6 +43,63 @@ class com.modestmaps.geo.Map extends MovieClip
     
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(),
                                     {mapProvider: mapProvider, _x: 0, _y: 0, width: width, height: height}));
+
+        setInitialExtent(new Location(37.829853, -122.514725),
+                         new Location(37.700121, -122.212601));
+    }
+
+   /*
+    * Based on a north-west and south-east location pair, determine appropriate
+    * map bounds in terms of tile grid, and inform the grid of an initial tile
+    * coordinate and point by calling grid.setInitialTile().
+    */
+    private function setInitialExtent(northWest:Location, southEast:Location):Void
+    {
+        // get initial coordinates for geographical extent
+        var NW:Coordinate = mapProvider.locationCoordinate(northWest);
+        var SE:Coordinate = mapProvider.locationCoordinate(southEast);
+        
+        // get top left and bottom right coordinates for initial coordinates
+        var TL:Coordinate = new Coordinate(Math.min(NW.row, SE.row), Math.min(NW.column, SE.column), Math.min(NW.zoom, SE.zoom));
+        var BR:Coordinate = new Coordinate(Math.max(NW.row, SE.row), Math.max(NW.column, SE.column), Math.max(NW.zoom, SE.zoom));
+
+        // multiplication factor between horizontal span and map width
+        var hFactor:Number = (BR.column - TL.column) / (width / grid.tileWidth);
+        
+        // multiplication factor expressed as base-2 logarithm, for zoom difference
+        var hZoomDiff:Number = Math.log(hFactor) / Math.log(2);
+        
+        // possible horizontal zoom to fit geographical extent in map width
+        var hPossibleZoom:Number = TL.zoom - Math.ceil(hZoomDiff);
+        
+        // multiplication factor between vertical span and map height
+        var vFactor:Number = (BR.row - TL.row) / (height / grid.tileHeight);
+        
+        // multiplication factor expressed as base-2 logarithm, for zoom difference
+        var vZoomDiff:Number = Math.log(vFactor) / Math.log(2);
+        
+        // possible vertical zoom to fit geographical extent in map height
+        var vPossibleZoom:Number = TL.zoom - Math.ceil(vZoomDiff);
+        
+        // initial zoom to fit extent vertically and horizontally
+        var initZoom:Number = Math.min(hPossibleZoom, vPossibleZoom);
+
+        // coordinate of extent center
+        var centerRow:Number = (TL.row + BR.row) / 2;
+        var centerColumn:Number = (TL.column + BR.column) / 2;
+        var centerZoom:Number = (TL.zoom + BR.zoom) / 2;
+        var centerCoord:Coordinate = (new Coordinate(centerRow, centerColumn, centerZoom)).zoomTo(initZoom);
+
+        // initial tile coordinate
+        var initTileCoord:Coordinate = new Coordinate(Math.floor(centerCoord.row), Math.floor(centerCoord.column), Math.floor(centerCoord.zoom));
+
+        // initial tile position, assuming centered tile well in grid
+        var initX:Number = (initTileCoord.column - centerCoord.column) * grid.tileWidth;
+        var initY:Number = (initTileCoord.row - centerCoord.row) * grid.tileHeight;
+        var initPoint:Point = new Point(Math.round(initX), Math.round(initY));
+        
+        // tell grid what the rock is cooking
+        grid.setInitialTile(initTileCoord, initPoint);
     }
 
    /*

@@ -18,8 +18,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var tiles:/*Tile*/Array;
     
     // Real maps use 256.
-    private var tileWidth:Number = 256;
-    private var tileHeight:Number = 256;
+    public var tileWidth:Number = 256;
+    public var tileHeight:Number = 256;
+    
+    // Starting point for the very first tile
+    private var initTilePoint:Point;
+    private var initTileCoord:Coordinate;
     
     // the currently-native zoom level
     private var zoomLevel:Number;
@@ -70,11 +74,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
         Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
     }
     
+    public function setInitialTile(coord:Coordinate, point:Point):Void
+    {
+        initTileCoord = coord;
+        initTilePoint = point;
+    }
+    
    /**
     * Create the first tiles.
     */
     private function initializeTiles():Void
     {
+        var initTile:Tile;
+        
         // impose some limits
         zoomLevel = 11;
         topLeftOutLimit = mapProvider.outerLimits()[0];
@@ -87,19 +99,22 @@ class com.modestmaps.core.TileGrid extends MovieClip
             grid: this, 
             width: tileWidth, 
             height: tileHeight,
-            coord: new Coordinate(791, 328, zoomLevel)
+            coord: initTileCoord
         };
         
         tiles = [];
-        createTile(initObj);
+        initTile = createTile(initObj);
                                                                   
+        centerWell(false);
+        initTile._x = initTilePoint.x;
+        initTile._y = initTilePoint.y;
+
         rows = 1;
         columns = 1;
         
         // buffer must not be negative!
         tileBuffer = Math.max(0, tileBuffer);
         
-        centerWell(false);
         allocateTiles();
         positionTiles();
         
@@ -115,6 +130,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well.onPress = Delegate.create(this, this.startWellDrag);
         well.onRelease = Delegate.create(this, this.stopWellDrag);
         well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
+
+        centerWell(false);
         
         /*
         // So the log is visible...
@@ -529,9 +546,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function centerWell(adjustTiles:Boolean):Void
     {
-        if(!tiles)
-            return;
-        
         var center:Point = new Point((width/2), (height/2));
         
         var xAdjustment:Number = well._x - center.x;
@@ -539,6 +553,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         well._x -= xAdjustment;
         well._y -= yAdjustment;
+        
+        if(!tiles)
+            return;
         
         if(adjustTiles) {
             for(var i:Number = 0; i < tiles.length; i += 1) {
