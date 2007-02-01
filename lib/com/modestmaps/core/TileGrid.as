@@ -74,6 +74,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
         Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
     }
     
+   /**
+    * Set initTileCoord and initTilePoint for use by initializeTiles().
+    */
     public function setInitialTile(coord:Coordinate, point:Point):Void
     {
         initTileCoord = coord;
@@ -81,7 +84,43 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
     
    /**
-    * Create the first tiles.
+    * Reset tile grid with a new initial tile, and expire old tiles in the background.
+    */
+    public function resetTiles(coord:Coordinate, point:Point):Void
+    {
+        var initTile:Tile;
+        var condemnedTiles:/*Tile*/Array = activeTiles();
+
+        for(var i:Number = 0; i < condemnedTiles.length; i += 1)
+            condemnedTiles[i].expire();
+
+        Reactor.callLater(condemnationDelay(), Delegate.create(this, this.destroyTiles), condemnedTiles);
+
+        // initial tile
+        var initObj:Object =
+        { 
+            origin: true, 
+            grid: this, 
+            width: tileWidth, 
+            height: tileHeight,
+            coord: coord
+        };
+
+        initTile = createTile(initObj);
+                                                                  
+        centerWell(true);
+        initTile._x = point.x;
+        initTile._y = point.y;
+
+        rows = 1;
+        columns = 1;
+
+        allocateTiles();
+        positionTiles();
+    }
+    
+   /**
+    * Create the first tiles, based on initTileCoord and initTilePoint.
     */
     private function initializeTiles():Void
     {
@@ -92,7 +131,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         topLeftOutLimit = mapProvider.outerLimits()[0];
         bottomRightInLimit = mapProvider.outerLimits()[1];
         
-        // initial tile centers the map on the SF Bay Area
+        // initial tile
         var initObj:Object =
         { 
             origin: true, 
@@ -268,6 +307,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var tileCoord:Coordinate;
         var pointCoord:Coordinate;
         
+        // point is assumed to be in tile grid local coordinates
+        localToGlobal(point);
+        well.globalToLocal(point);
+
         // an arbitrary reference tile, zoomed to the maximum
         tile = tiles[0];
         tileCoord = tile.coord.copy();
@@ -292,20 +335,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public function topLeftCoordinate():Coordinate
     {
         var point:Point = new Point(0, 0);
-        
-        localToGlobal(point);
-        well.globalToLocal(point);
-        
         return pointCoordinate(point);
     }
     
     public function bottomRightCoordinate():Coordinate
     {
         var point:Point = new Point(width, height);
-        
-        localToGlobal(point);
-        well.globalToLocal(point);
-        
         return pointCoordinate(point);
     }
     
