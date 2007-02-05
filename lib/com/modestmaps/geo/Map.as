@@ -52,6 +52,7 @@ class com.modestmaps.geo.Map extends MovieClip
         // spit out the current extent when the map has had a chance to load
         Reactor.callLater(1000, Delegate.create(this, this.getCurrentExtent));
         
+        /*
         // after 10 seconds, zip over to new york
         Reactor.callLater(10000, Delegate.create(this, this.setNewExtent), [new Location(40.804454, -73.969574), new Location(40.716038, -74.029999), new Location(40.683762, -73.899536)]);
         Reactor.callLater(11000, Delegate.create(this, this.getCurrentExtent));
@@ -59,6 +60,15 @@ class com.modestmaps.geo.Map extends MovieClip
         // later, pay a visit to tokyo
         Reactor.callLater(20000, Delegate.create(this, this.setNewExtent), [new Location(35.804449, 139.597778), new Location(35.550105, 139.938354)]);
         Reactor.callLater(21000, Delegate.create(this, this.getCurrentExtent));
+        */
+        
+        putMarker('Rochdale', new Location(37.865571, -122.259679));
+        putMarker('Parker Ave.', new Location(37.780492, -122.453731));
+        putMarker('Pepper Dr.', new Location(37.623443, -122.426577));
+        putMarker('3rd St.', new Location(37.779297, -122.392877));
+        putMarker('Divisadero St.', new Location(37.771919, -122.437413));
+        putMarker('Market St.', new Location(37.812734, -122.280064));
+        putMarker('17th St.', new Location(37.804274, -122.262940));
     }
 
    /*
@@ -247,5 +257,11 @@ class com.modestmaps.geo.Map extends MovieClip
             delete __zoomTask;
             
         }
+    }
+    
+    public function putMarker(name:String, location:Location):Void
+    {
+        grid.log('Marker '+name+': '+location.toString());
+        grid.putMarker(name, mapProvider.locationCoordinate(location));
     }
 }

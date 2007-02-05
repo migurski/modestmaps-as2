@@ -1,5 +1,7 @@
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
+import com.modestmaps.core.MarkerSet;
+import com.modestmaps.core.Marker;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
 import com.modestmaps.mapproviders.IMapProvider;
@@ -16,6 +18,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var rows:Number;
     private var columns:Number;
     private var tiles:/*Tile*/Array;
+    
+    // overlay markers
+    private var markers:MarkerSet;
     
     // Real maps use 256.
     public var tileWidth:Number = 256;
@@ -70,6 +75,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         buildWell();
         buildMask();
         redraw();   
+        
+        markers = new MarkerSet(this);
         
         Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
     }
@@ -158,6 +165,33 @@ class com.modestmaps.core.TileGrid extends MovieClip
         positionTiles();
         
         labelContainer.swapDepths( getNextHighestDepth() );    
+
+        // this starts a recurring process
+        updateMarkerBounds();
+    }
+    
+    public function putMarker(name:String, coord:Coordinate):Void
+    {
+        log('Marker '+name+': '+coord.toString());
+        markers.put(name, new Marker(coord));
+    }
+    
+    public function deleteMarker(name:String):Void
+    {
+        markers.remove(name);
+    }
+    
+    private function updateMarkerBounds():Void
+    {
+        if(tiles) {
+            var farTopLeft:Coordinate = pointCoordinate(new Point(-tileWidth, -tileHeight));
+            var farBottomRight:Coordinate = pointCoordinate(new Point(width + tileWidth, height + tileHeight));
+
+            markers.updateActive(farTopLeft, farBottomRight);
+            markers.updateVisible(topLeftCoordinate(), bottomRightCoordinate());
+        }
+
+        Reactor.callLater(4000, Delegate.create(this, this.updateMarkerBounds));
     }
     
    /**
@@ -312,7 +346,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well.globalToLocal(point);
 
         // an arbitrary reference tile, zoomed to the maximum
-        tile = tiles[0];
+        tile = activeTiles()[0];
         tileCoord = tile.coord.copy();
         tileCoord = tileCoord.zoomTo(Coordinate.MAX_ZOOM);
         
