@@ -26,13 +26,8 @@ class com.modestmaps.core.MarkerSet
 
     function MarkerSet(grid:TileGrid)
     {
-        lastZoom = 0;
-
-        markers = {};
-        tileMarkers = {};
-        /*markerTiles = {};*/
-
         this.grid = grid;
+        initializeIndex();
     }
     
     public function put(name:String, marker:Marker):Void
@@ -41,6 +36,15 @@ class com.modestmaps.core.MarkerSet
         indexMarker(name);
     }
     
+    public function initializeIndex():Void
+    {
+        lastZoom = 0;
+
+        markers = {};
+        tileMarkers = {};
+        /*markerTiles = {};*/
+    }
+
     public function indexAtZoom(level:Number):Void
     {
         lastZoom = level;

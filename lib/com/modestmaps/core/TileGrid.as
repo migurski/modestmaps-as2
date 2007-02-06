@@ -212,9 +212,18 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         return __mapProvider; 
     }
+
     public function set mapProvider(mapProvider:IMapProvider):Void
     {
+        var previousGeometry:String = __mapProvider.geometry();
+
         __mapProvider = mapProvider; 
+
+        if(__mapProvider.geometry() != previousGeometry) {
+            markers.initializeIndex();
+            markers.indexAtZoom(zoomLevel);
+            updateMarkers();
+        }
     }
     
     
@@ -1037,10 +1046,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         clear();
         moveTo(0, 0);
         lineStyle(2, 0x990099, 100);
+        beginFill(0x666666, 100);
         lineTo(0, height);
         lineTo(width, height);
         lineTo(width, 0);
         lineTo(0, 0);
+        endFill();
         
         mask.clear();
         mask.moveTo(0, 0);
