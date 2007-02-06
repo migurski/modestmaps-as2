@@ -89,7 +89,7 @@ class com.modestmaps.geo.Map extends MovieClip
     * using calculateMapExtent(), and forcefully move the grid to cover
     * those bounds using grid.resetTiles().
     */
-    private function setNewExtent(locations:/*Location*/Array):Void
+    public function setNewExtent(locations:/*Location*/Array):Void
     {
         var extent:Object = calculateMapExtent(locations);
         grid.resetTiles(Coordinate(extent['coord']), Point(extent['point']));
@@ -159,7 +159,7 @@ class com.modestmaps.geo.Map extends MovieClip
    /*
     * Return the current coverage area of the map, as four locations.
     */
-    private function getCurrentExtent():/*Location*/Array
+    public function getCurrentExtent():/*Location*/Array
     {
         var corners:/*Location*/Array = [];
 
@@ -201,11 +201,12 @@ class com.modestmaps.geo.Map extends MovieClip
         //Reactor.callLater(5000, Delegate.create(this, this.nagAboutBoundsForever));
     }
     
-    private function setMapProvider(mapProviderType:Number):Void
+    public function setMapProvider(mapProviderType:Number):Void
     {
         this.mapProviderType = mapProviderType;
         var mapProviderFactory:MapProviderFactory = MapProviderFactory.getInstance();
         mapProvider = MapProviderFactory.getInstance().getMapProvider(mapProviderType); 
+        grid.mapProvider = mapProvider;
     }
     
     public function panEast(pixels:Number):Void

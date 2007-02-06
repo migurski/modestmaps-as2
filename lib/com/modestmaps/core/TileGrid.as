@@ -56,7 +56,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var tileBuffer:Number = 0;
 
     // Who do we get our Map graphics from?
-    public var mapProvider:IMapProvider;
+    private var __mapProvider:IMapProvider;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.TileGrid';
     public static var symbolOwner:Function = TileGrid;
@@ -133,8 +133,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         // impose some limits
         zoomLevel = initTileCoord.zoom;
-        topLeftOutLimit = mapProvider.outerLimits()[0];
-        bottomRightInLimit = mapProvider.outerLimits()[1];
+        topLeftOutLimit = __mapProvider.outerLimits()[0];
+        bottomRightInLimit = __mapProvider.outerLimits()[1];
         
         // initial tile
         var initObj:Object =
@@ -175,7 +175,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
    /**
     * Create the well clip, assign event handlers.
     */
-    public function buildWell():Void
+    private function buildWell():Void
     {
         well = createEmptyMovieClip('well', 1);
         well.onPress = Delegate.create(this, this.startWellDrag);
@@ -201,11 +201,22 @@ class com.modestmaps.core.TileGrid extends MovieClip
    /**
     * Create the mask clip.
     */
-    public function buildMask():Void
+    private function buildMask():Void
     {
         mask = createEmptyMovieClip('mask', getNextHighestDepth());
         well.setMask(mask);
     }
+    
+    
+    public function get mapProvider():IMapProvider
+    {
+        return __mapProvider; 
+    }
+    public function set mapProvider(mapProvider:IMapProvider):Void
+    {
+        __mapProvider = mapProvider; 
+    }
+    
     
    /**
     * Create a new tile, add it to tiles array, and return it.

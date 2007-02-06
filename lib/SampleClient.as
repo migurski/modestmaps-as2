@@ -3,35 +3,76 @@ import com.stamen.twisted.Reactor;
 import com.modestmaps.geo.Map;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.mapproviders.MapProviders;
+import com.modestmaps.geo.Location;
 
 class SampleClient
 {
+	private static var __map : Map;
+	
     public static function main(clip:MovieClip):Void
     {
         Reactor.run(clip, null, 50);
 
-        var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
-                                           {mapProviderType: MapProviders.MICROSOFT_HYBRID, _x: 128, _y: 128, width: Stage.width - 256, height: Stage.height - 256}))
+		var initObj : Object =
+		{
+			mapProviderType: MapProviders.MICROSOFT_ROAD, 
+			_x: 128, 
+			_y: 128, 
+			width: Stage.width - 256, 
+			height: Stage.height - 256
+		};
+
+        __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(), initObj ));
         
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(map); 
+        Stage.addListener(__map); 
         
-        var plus:MovieClip = makeButton(clip, 'plus', 'zoom in', Delegate.create(map, map.zoomIn));
-        var minus:MovieClip = makeButton(clip, 'minus', 'zoom out', Delegate.create(map, map.zoomOut));
-        var clear:MovieClip = makeButton(clip, 'clear', 'clear log', Delegate.create(map.grid, map.grid.clearLog));
+        var buttons : Array = new Array();
+        
+        buttons.push( makeButton(clip, 'plus', 'zoom in', Delegate.create(__map, __map.zoomIn)));
+        buttons.push( makeButton(clip, 'minus', 'zoom out', Delegate.create(__map, __map.zoomOut)));
+        buttons.push( makeButton(clip, 'clear', 'clear log', Delegate.create(__map.grid, __map.grid.clearLog)));
 
-        plus._x = map._x;
-        plus._y = map._y - plus['label']._height - 10;
-        
-        minus._x = plus._x + minus['label']._width + 4;
-        minus._y = plus._y;
-        
-        clear._x = minus._x + clear['label']._width + 14;
-        clear._y = minus._y;
+        buttons.push( makeButton(clip, 'road', 'road', Delegate.create(SampleClient, SampleClient.showRoad)));
+        buttons.push( makeButton(clip, 'aerial', 'aerial', Delegate.create(SampleClient, SampleClient.showAerial)));
+        buttons.push( makeButton(clip, 'hybrid', 'hybrid', Delegate.create(SampleClient, SampleClient.showHybrid)));
 
-        Reactor.callNextFrame(Delegate.create(map, map.nagAboutBoundsForever));
+		var nextX : Number = __map._x;
+		var nextY : Number = __map._y - buttons[0]['label']._height - 10;
+		
+		for ( var i : Number = 0; i < buttons.length; i++ )
+		{
+			buttons[i]._x = nextX;
+			buttons[i]._y = nextY;
+			nextX += buttons[i]['label']._width + 5;	
+		}
+
+        Reactor.callNextFrame(Delegate.create(__map, __map.nagAboutBoundsForever));
     }
+    
+    
+    private static function showRoad() : Void
+    {
+    	var extent : /*Location*/Array = __map.getCurrentExtent();
+    	__map.setMapProvider( MapProviders.MICROSOFT_ROAD );
+    	__map.setNewExtent( extent );
+    }
+ 
+    private static function showAerial() : Void
+    {
+    	var extent : /*Location*/Array = __map.getCurrentExtent();
+    	__map.setMapProvider( MapProviders.MICROSOFT_AERIAL );
+    	__map.setNewExtent( extent );
+    }
+ 
+    private static function showHybrid() : Void
+    {
+    	var extent : /*Location*/Array = __map.getCurrentExtent();
+    	__map.setMapProvider( MapProviders.MICROSOFT_HYBRID );
+    	__map.setNewExtent( extent );
+    }
+    
     
     public static function makeButton(clip:MovieClip, name:String, label:String, action:Function):MovieClip
     {
