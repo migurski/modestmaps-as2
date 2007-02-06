@@ -22,7 +22,6 @@ extends MovieClip
     public var height:Number;
     
     private var label:TextField;
-    public var origin:Boolean;
 
 	// Keeps track of all clips awaiting painting.
 	private var __displayClips : Array;

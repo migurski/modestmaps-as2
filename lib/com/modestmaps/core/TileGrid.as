@@ -106,7 +106,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // initial tile
         var initObj:Object =
         { 
-            origin: true, 
             grid: this, 
             width: tileWidth, 
             height: tileHeight,
@@ -140,7 +139,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // initial tile
         var initObj:Object =
         { 
-            origin: true, 
             grid: this, 
             width: tileWidth, 
             height: tileHeight,
