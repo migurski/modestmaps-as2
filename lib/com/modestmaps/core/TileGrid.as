@@ -1024,6 +1024,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
         }
     }
     
+    public function repaintTiles():Void
+    {
+        var active:/*Tile*/Array = activeTiles();
+        
+        for(var i:Number = 0; i < active.length; i += 1)
+            active[i].paint(mapProvider, active[i].coord);
+    }
+    
     private function redraw()
     {
         clear();

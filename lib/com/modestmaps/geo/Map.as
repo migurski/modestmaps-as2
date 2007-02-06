@@ -91,6 +91,9 @@ class com.modestmaps.geo.Map extends MovieClip
     */
     public function setNewExtent(locations:/*Location*/Array):Void
     {
+        if(!locations)
+            return;
+    
         var extent:Object = calculateMapExtent(locations);
         grid.resetTiles(Coordinate(extent['coord']), Point(extent['point']));
     }
@@ -162,6 +165,9 @@ class com.modestmaps.geo.Map extends MovieClip
     public function getCurrentExtent():/*Location*/Array
     {
         var corners:/*Location*/Array = [];
+        
+        if(!mapProvider)
+            return corners;
 
         var TL:Coordinate = grid.topLeftCoordinate();
         var BR:Coordinate = grid.bottomRightCoordinate();
@@ -201,12 +207,22 @@ class com.modestmaps.geo.Map extends MovieClip
         //Reactor.callLater(5000, Delegate.create(this, this.nagAboutBoundsForever));
     }
     
-    public function setMapProvider(mapProviderType:Number):Void
+    public function setMapProvider(providerType:Number):Void
     {
-        this.mapProviderType = mapProviderType;
-        var mapProviderFactory:MapProviderFactory = MapProviderFactory.getInstance();
-        mapProvider = MapProviderFactory.getInstance().getMapProvider(mapProviderType); 
+        var previousGeometry:String = mapProvider.geometry();
+    	var extent:/*Location*/Array = getCurrentExtent();
+    	
+        mapProviderType = providerType;
+        mapProvider = MapProviderFactory.getInstance().getMapProvider(mapProviderType);
         grid.mapProvider = mapProvider;
+        
+        if(mapProvider.geometry() == previousGeometry) {
+        	grid.repaintTiles();
+        	
+        } else {
+        	setNewExtent(extent);
+        	
+        }
     }
     
     public function panEast(pixels:Number):Void

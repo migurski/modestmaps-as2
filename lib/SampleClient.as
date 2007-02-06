@@ -54,23 +54,17 @@ class SampleClient
     
     private static function showRoad() : Void
     {
-    	var extent : /*Location*/Array = __map.getCurrentExtent();
     	__map.setMapProvider( MapProviders.MICROSOFT_ROAD );
-    	__map.setNewExtent( extent );
     }
  
     private static function showAerial() : Void
     {
-    	var extent : /*Location*/Array = __map.getCurrentExtent();
     	__map.setMapProvider( MapProviders.MICROSOFT_AERIAL );
-    	__map.setNewExtent( extent );
     }
  
     private static function showHybrid() : Void
     {
-    	var extent : /*Location*/Array = __map.getCurrentExtent();
     	__map.setMapProvider( MapProviders.MICROSOFT_HYBRID );
-    	__map.setNewExtent( extent );
     }
     
     

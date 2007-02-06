@@ -23,4 +23,9 @@ interface com.modestmaps.mapproviders.IMapProvider
     * as Coordinates in a two element array.
     */
     public function outerLimits():/*Coordinate*/Array;
+
+   /*
+    * A string which describes the projection and transformation of a map provider.
+    */
+    public function geometry():String;
 }

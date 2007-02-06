@@ -57,7 +57,7 @@ implements IDispatchable
    /*
     * String signature of the current map provider's geometric behavior.
     */
-	public function toString():String
+	public function geometry():String
 	{
         return __projection.toString();
 	}
