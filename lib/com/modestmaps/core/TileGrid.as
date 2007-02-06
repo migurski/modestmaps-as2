@@ -123,7 +123,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         columns = 1;
 
         allocateTiles();
-        positionTiles();
     }
     
    /**
@@ -134,7 +133,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var initTile:Tile;
         
         // impose some limits
-        zoomLevel = 11;
+        zoomLevel = initTileCoord.zoom;
         topLeftOutLimit = mapProvider.outerLimits()[0];
         bottomRightInLimit = mapProvider.outerLimits()[1];
         
@@ -162,36 +161,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
         tileBuffer = Math.max(0, tileBuffer);
         
         allocateTiles();
-        positionTiles();
         
         labelContainer.swapDepths( getNextHighestDepth() );    
 
-        // this starts a recurring process
-        updateMarkerBounds();
+        // let 'em know we're coming
+        markers.indexAtZoom(zoomLevel);
     }
     
     public function putMarker(name:String, coord:Coordinate):Void
     {
         log('Marker '+name+': '+coord.toString());
         markers.put(name, new Marker(coord));
-    }
-    
-    public function deleteMarker(name:String):Void
-    {
-        markers.remove(name);
-    }
-    
-    private function updateMarkerBounds():Void
-    {
-        if(tiles) {
-            var farTopLeft:Coordinate = pointCoordinate(new Point(-tileWidth, -tileHeight));
-            var farBottomRight:Coordinate = pointCoordinate(new Point(width + tileWidth, height + tileHeight));
-
-            markers.updateActive(farTopLeft, farBottomRight);
-            markers.updateVisible(topLeftCoordinate(), bottomRightCoordinate());
-        }
-
-        Reactor.callLater(4000, Delegate.create(this, this.updateMarkerBounds));
     }
     
    /**
@@ -282,7 +262,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function onWellDrag():Void
     {
-        positionTiles();
+        if(positionTiles())
+            updateMarkers();
+
         wellDragTask = Reactor.callNextFrame(Delegate.create(this, this.onWellDrag));
     }
     
@@ -457,7 +439,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         wellDragTask.cancel();
         well.stopDrag();
-        positionTiles();
+
+        if(positionTiles())
+            updateMarkers();
+
         centerWell(true);
     }
     
@@ -478,8 +463,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         if(redraw) {
             normalizeWell();
             allocateTiles();
-            positionTiles();
-            
             log('New well scale: '+well._xscale.toString());
         }
     }
@@ -496,7 +479,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         centerWell(false);
         allocateTiles();
-        positionTiles();
     }
     
     public function panRight(pixels:Number):Void
@@ -505,7 +487,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
         
         well._x -= pixels;
-        positionTiles();
+
+        if(positionTiles())
+            updateMarkers();
+
         centerWell(true);
     }
  
@@ -515,7 +500,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
         
         well._x += pixels;
-        positionTiles();
+
+        if(positionTiles())
+            updateMarkers();
+
         centerWell(true);
     } 
  
@@ -525,7 +513,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
         
         well._y += pixels;
-        positionTiles();
+
+        if(positionTiles())
+            updateMarkers();
+
         centerWell(true);
     }      
     
@@ -535,7 +526,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
         
         well._y -= pixels;
-        positionTiles();
+
+        if(positionTiles())
+            updateMarkers();
+
         centerWell(true);
     }
 
@@ -567,7 +561,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
    /**
     * Determine the number of tiles needed to cover the current grid,
-    * and add rows and columns if necessary.
+    * and add rows and columns if necessary. Finally, position new tiles.
     */
     private function allocateTiles():Void
     {
@@ -606,6 +600,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
             }
         }
+
+        if(positionTiles())
+            updateMarkers();
     }
     
    /**
@@ -701,6 +698,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             }
         
             log('Scaled to '+zoomLevel+', '+well._xscale+'%');
+            markers.indexAtZoom(zoomLevel);
         }
     }
     
@@ -819,15 +817,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
    /**
     * Determine if any tiles have wandered too far to the right, left,
     * top, or bottom, and shunt them to the opposite side if needed.
+    * Return true if any tiles have been repositioned.
     */
-    private function positionTiles():Void
+    private function positionTiles():Boolean
     {
         if(!tiles)
-            return;
+            return false;
         
         var tile:Tile;
         var point:Point;
         var active:/*Tile*/Array = activeTiles();
+        
+        // if any tile is moved...
+        var touched:Boolean = false;
         
         point = new Point(0, 0);
         this.localToGlobal(point);
@@ -855,6 +857,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 // too far up
                 tile.panDown(rows);
                 tile._y += rows * tileHeight;
+                touched = true;
 
             } else if(tile._y > yMax) {
                 // too far down
@@ -862,6 +865,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                     // moving up wouldn't put us too far
                     tile.panUp(rows);
                     tile._y -= rows * tileHeight;
+                    touched = true;
                 }
             }
             
@@ -869,6 +873,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 // too far left
                 tile.panRight(columns);
                 tile._x += columns * tileWidth;
+                touched = true;
 
             } else if(tile._x > xMax) {
                 // too far right
@@ -876,9 +881,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
                     // moving left wouldn't put us too far
                     tile.panLeft(columns);
                     tile._x -= columns * tileWidth;
+                    touched = true;
                 }
             }
         }
+        
+        return touched;
+    }
+    
+    private function updateMarkers():Void
+    {
+        markers.overlapping(activeTiles());
     }
     
    /**

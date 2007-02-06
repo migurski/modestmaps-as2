@@ -21,6 +21,14 @@ class com.modestmaps.core.Coordinate
         return new Coordinate(row, column, zoom);
     }
     
+   /**
+    * Return a new coordinate that corresponds to that of the tile containing this one
+    */
+    public function container():Coordinate
+    {
+        return new Coordinate(Math.floor(row), Math.floor(column), zoom);
+    }
+    
     public function zoomTo(destination:Number):Coordinate
     {
         return new Coordinate(row * Math.pow(2, destination - zoom),

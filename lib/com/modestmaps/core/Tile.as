@@ -132,6 +132,11 @@ extends MovieClip
 
     public function toString():String
     {
+        return id();
+    }
+
+    public function id():String
+    {
         return 'Tile' + coord.toString();
     }
 
