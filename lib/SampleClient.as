@@ -29,6 +29,7 @@ class SampleClient
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
         Stage.addListener(__map); 
+        Stage.addListener( SampleClient );
         
         var buttons : Array = new Array();
         
@@ -63,7 +64,7 @@ class SampleClient
 
 		buttons.push( makeButton(__mpButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
         buttons.push( makeButton(__mpButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-//        buttons.push( makeButton(__mpButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+        buttons.push( makeButton(__mpButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 
 		__mpButtons._x = 128 + __map._x + __map._width;
 		__mpButtons._y = __map._y + 10;
@@ -119,5 +120,12 @@ class SampleClient
     {
     	trace( str );	
     }
+    
+    // Event Handlers
+    
+    private static function onResize() : Void
+    {
+		__mpButtons._x = __map._x + __map._width - __mpButtons._width - 10;    
+	}
     
 }
