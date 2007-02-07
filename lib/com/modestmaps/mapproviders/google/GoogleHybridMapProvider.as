@@ -3,6 +3,9 @@ import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.google.AbstractGoogleMapProvider;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.modestmaps.events.IDispatchable;
+import com.modestmaps.io.MapProviderPaintThrottledRequest;
+import mx.utils.Delegate;
+import com.modestmaps.mapproviders.google.GoogleAerialMapProvider;
 
 /**
  * @author darren
@@ -11,54 +14,56 @@ class com.modestmaps.mapproviders.google.GoogleHybridMapProvider
 extends AbstractGoogleMapProvider 
 implements IMapProvider, IDispatchable 
 {
-	private static var BASE_URL : String = "http://mt1.google.com/mt?n=404&v=w2t.38";
-	private static var ASSET_EXTENSION : String = "";
-
+	private var __gamp : GoogleAerialMapProvider;
+	
+	public function GoogleHybridMapProvider()
+	{
+		super();
+		__gamp = new GoogleAerialMapProvider();
+	}
+	
 	public function toString() : String
 	{
 		return "GoogleHybridMapProvider[]";
 	}
 
-	public function get baseUrl() : String
+	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		return BASE_URL;	
-	}
+		clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
+		clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
+		
+		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.send();
 
-	public function get assetExtension() : String
-	{
-		return ASSET_EXTENSION;	
-	}
-			
-	private function getTileUrl( coord : Coordinate ) : String
-	{		
-		var url : String = BASE_URL + getZoomString( coord );
+		request = new MapProviderPaintThrottledRequest( clip.overlay, getOverlayTileUrl( coord ), coord );
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.send();
 		
-		_level0.map.grid.log(this + ": Mapped " + coord.toString() + " to URL: " + url);
-		
-		return url; 
-	}
-	
-	private function getZoomString( coord : Coordinate ) : String
-	{		
-		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + coord.zoom;
-		return zoomString; 
+		//createLabel( clip, coord.toString() );
 	}	
 
+	private function getBGTileUrl( coord : Coordinate ) : String
+	{		
+		return __gamp.getTileUrl( coord );
+	}
+
+	private function getOverlayTileUrl( coord : Coordinate ) : String
+	{		
+		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + ( 17 - coord.zoom );
+		return "http://mt1.google.com/mt?n=404&v=w2t.38" + zoomString;	
+	}
+
+
+	// Event Handlers
 	
-	/*
-	 * Given a URL, returns the coordinates that the URL refers to.
-	 */
-	private function getCoordinateFromURL( url : String ) : Coordinate
+	private function onResponseComplete( eventObj : Object ) : Void
 	{
-		var row, col, zoom : Number;
-		
-		var zoombits : Array = url.split( "&" );
-		
-		col = parseInt( zoombits[2].split( '=' )[1] ); 
-		row = parseInt( zoombits[3].split( '=' )[1] ); 
-		zoom = parseInt( zoombits[4].split( '=' )[1] ); 
-			
-		var coord : Coordinate = new Coordinate( row, col, zoom );
-		return coord;
+		if ( eventObj.clip.bg._loaded && eventObj.clip.overlay._loaded )
+			raisePaintComplete( eventObj.clip._parent, eventObj.coord );
 	}
 }

@@ -17,7 +17,7 @@ implements IMapProvider, IDispatchable
 		return "GoogleAerialMapProvider[]";
 	}
 
-	private function getTileUrl( coord : Coordinate ) : String
+	public function getTileUrl( coord : Coordinate ) : String
 	{
 		return "http://kh0.google.com/kh?n=404&v=14&t=" + getZoomString(coord);		
 	}
