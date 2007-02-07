@@ -7,6 +7,7 @@
 import com.modestmaps.mapproviders.*; 
 import com.modestmaps.mapproviders.microsoft.*;
 import com.modestmaps.mapproviders.google.*;
+import com.modestmaps.mapproviders.yahoo.*;
 
 class com.modestmaps.mapproviders.MapProviderFactory 
 {
@@ -70,13 +71,13 @@ class com.modestmaps.mapproviders.MapProviderFactory
 				return new GoogleHybridMapProvider();
 
 			case MapProviders.YAHOO_ROAD :
-			//	return new YahooRoadMapProvider();
+				return new YahooRoadMapProvider();
 
 			case MapProviders.YAHOO_AERIAL :
-			//	return new YahooAerialMapProvider();
+				return new YahooAerialMapProvider();
 
 			case MapProviders.YAHOO_HYBRID :
-			//	return new YahooHybridMapProvider();
+				return new YahooHybridMapProvider();
 
 			case MapProviders.ZOOMIFY :
 			//	return new ZoomifyMapProvider();

@@ -61,8 +61,8 @@ class SampleClient
         buttons.push( makeButton(__mpButtons, 'GOOGLE_AERIAL', 'google aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 //        buttons.push( makeButton(__mpButtons, 'GOOGLE_HYBRID', 'google hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 
-//		buttons.push( makeButton(__mpButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-//        buttons.push( makeButton(__mpButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+		buttons.push( makeButton(__mpButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+        buttons.push( makeButton(__mpButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 //        buttons.push( makeButton(__mpButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 
 		__mpButtons._x = 128 + __map._x + __map._width;

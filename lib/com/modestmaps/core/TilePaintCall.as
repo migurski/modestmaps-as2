@@ -37,6 +37,6 @@ extends com.stamen.twisted.DelayedCall
     
     public function cancel():Void
     {
-        return __call.cancel();
+        __call.cancel();
     }
 }

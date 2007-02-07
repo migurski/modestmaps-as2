@@ -16,16 +16,6 @@ implements IMapProvider, IDispatchable
 		return "GoogleRoadMapProvider[]";
 	}
 
-	public function get baseUrl() : String
-	{
-		return BASE_URL;	
-	}
-
-	public function get assetExtension() : String
-	{
-		return ASSET_EXTENSION;	
-	}
-			
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
 		var url : String = "http://mt1.google.com/mt?n=404&v=w2.38" + getZoomString( coord );		

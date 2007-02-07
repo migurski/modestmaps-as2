@@ -41,7 +41,7 @@ implements IMapProvider, IDispatchable
 
 		for(var i:Number = 0; i < gCoord.zoom; i += 1)
 		    zoomString += urlChars.charAt(BinaryUtil.convertToDecimal(rowBinaryString.charAt(i) + colBinaryString.charAt(i)));
-                                    
+                         
 		return zoomString; 
 	}
 }
