@@ -28,4 +28,6 @@ interface com.modestmaps.mapproviders.IMapProvider
     * A string which describes the projection and transformation of a map provider.
     */
     public function geometry():String;
+    
+    public function toString() : String;
 }

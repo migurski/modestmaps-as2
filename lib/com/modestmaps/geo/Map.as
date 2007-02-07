@@ -41,8 +41,16 @@ class com.modestmaps.geo.Map extends MovieClip
 
         setMapProvider(mapProviderType);
     
-        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(),
-                                    {mapProvider: mapProvider, _x: 0, _y: 0, width: width, height: height}));
+    	var initObj : Object = 
+    	{
+    		mapProvider: mapProvider, 
+    		_x: 0, 
+    		_y: 0, 
+    		width: width, 
+    		height: height
+    	};
+    		
+        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj ));
 
         var extent:/*Location*/Array = [new Location(37.829853, -122.514725),
                                         new Location(37.700121, -122.212601)];

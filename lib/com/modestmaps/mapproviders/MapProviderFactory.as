@@ -6,6 +6,7 @@
  
 import com.modestmaps.mapproviders.*; 
 import com.modestmaps.mapproviders.microsoft.*;
+import com.modestmaps.mapproviders.google.*;
 
 class com.modestmaps.mapproviders.MapProviderFactory 
 {
@@ -58,6 +59,27 @@ class com.modestmaps.mapproviders.MapProviderFactory
 				
 			case MapProviders.MICROSOFT_DELAYED :
 				return new MicrosoftDelayedAerialMapProvider();
+
+			case MapProviders.GOOGLE_ROAD :
+				return new GoogleRoadMapProvider();
+
+			case MapProviders.GOOGLE_AERIAL :
+				return new GoogleAerialMapProvider();
+
+			case MapProviders.GOOGLE_HYBRID :
+				return new GoogleHybridMapProvider();
+
+			case MapProviders.YAHOO_ROAD :
+			//	return new YahooRoadMapProvider();
+
+			case MapProviders.YAHOO_AERIAL :
+			//	return new YahooAerialMapProvider();
+
+			case MapProviders.YAHOO_HYBRID :
+			//	return new YahooHybridMapProvider();
+
+			case MapProviders.ZOOMIFY :
+			//	return new ZoomifyMapProvider();
 				
 			default :
 				trace ( this.toString() + ": invalid MapProvider requested: " + mapProviderType);
