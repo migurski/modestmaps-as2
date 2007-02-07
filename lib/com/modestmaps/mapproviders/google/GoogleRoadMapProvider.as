@@ -11,9 +11,6 @@ class com.modestmaps.mapproviders.google.GoogleRoadMapProvider
 extends AbstractGoogleMapProvider 
 implements IMapProvider, IDispatchable 
 {
-	private static var BASE_URL : String = "http://mt1.google.com/mt?n=404&v=w2.38";
-	private static var ASSET_EXTENSION : String = "";
-
 	public function toString() : String
 	{
 		return "GoogleRoadMapProvider[]";
@@ -31,7 +28,7 @@ implements IMapProvider, IDispatchable
 			
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		var url : String = BASE_URL + getZoomString( coord );		
+		var url : String = "http://mt1.google.com/mt?n=404&v=w2.38" + getZoomString( coord );		
 		return url; 
 	}
 	
@@ -40,22 +37,4 @@ implements IMapProvider, IDispatchable
 		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + ( 17 - coord.zoom );
 		return zoomString; 
 	}	
-
-	
-	/*
-	 * Given a URL, returns the coordinates that the URL refers to.
-	 */
-	private function getCoordinateFromURL( url : String ) : Coordinate
-	{
-		var row, col, zoom : Number;
-		
-		var zoombits : Array = url.split( "&" );
-		
-		col = parseInt( zoombits[2].split( '=' )[1] ); 
-		row = parseInt( zoombits[3].split( '=' )[1] ); 
-		zoom = parseInt( zoombits[4].split( '=' )[1] ); 
-			
-		var coord : Coordinate = new Coordinate( row, col, ( 17 - zoom ) );
-		return coord;
-	}
 }

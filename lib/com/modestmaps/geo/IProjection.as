@@ -23,4 +23,6 @@ interface com.modestmaps.geo.IProjection
     * Return untransformed and unprojected location for a coordinate.
     */
     public function coordinateLocation(coordinate:Coordinate):Location;
+    
+    public function toString():String;
 }

@@ -21,7 +21,7 @@ extends com.stamen.twisted.DelayedCall
     
     public function toString():String
     {
-        return __mapProvider.toString() + ', ' + __tileCoord.toString();
+        return __mapProvider.toString() + ', ' + __tileCoord.toString(); 
     }
     
     public function match(provider:IMapProvider, coord:Coordinate):Boolean

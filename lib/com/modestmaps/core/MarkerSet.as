@@ -69,7 +69,7 @@ class com.modestmaps.core.MarkerSet
         markerTiles[markerName][tileKey] = true;
         */
         
-        grid.log('Marker '+markerName+' in '+tileKey);
+        //grid.log('Marker '+markerName+' in '+tileKey);
     }
     
     public function overlapping(tiles:/*Tile*/Array):/*Marker*/Array
@@ -84,7 +84,7 @@ class com.modestmaps.core.MarkerSet
                     touched.push(markers[markerName]);
                 }
         
-        grid.log('Touched markers: '+names.toString());
+        //grid.log('Touched markers: '+names.toString());
         return touched;
     }
 }

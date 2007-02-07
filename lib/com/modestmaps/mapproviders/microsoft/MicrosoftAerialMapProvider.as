@@ -12,29 +12,15 @@ class com.modestmaps.mapproviders.microsoft.MicrosoftAerialMapProvider
 extends AbstractMicrosoftMapProvider
 implements IMapProvider, IDispatchable
 {
-	private static var BASE_URL : String = "http://a0.ortho.tiles.virtualearth.net/tiles/a";
-	private static var ASSET_EXTENSION : String = ".jpeg";
-		
 	public function toString() : String
 	{
 		return "MicrosoftAerialMapProvider[]";
 	}
 	
-	public function get baseUrl() : String
-	{
-		return BASE_URL;	
-	}
-	
-	public function get assetExtension() : String
-	{
-		return ASSET_EXTENSION;	
-	}
-		
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		var url : String = BASE_URL + getZoomString( coord ) + ASSET_EXTENSION + "?g=45";
-		
-		//trace (this + ": Mapped " + coord.toString() + " to URL: " + url);
+		var url : String = "http://a0.ortho.tiles.virtualearth.net/tiles/a" + 
+			getZoomString( coord ) + ".jpeg?g=45";
 		
 		return url; 
 	}

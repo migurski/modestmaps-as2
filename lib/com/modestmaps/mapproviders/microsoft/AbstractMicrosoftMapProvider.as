@@ -10,9 +10,6 @@ import com.modestmaps.geo.Transformation;
 class com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider 
 extends AbstractImageBasedMapProvider 
 {
-	public static var BASE_URL : String;
-	public static var ASSET_EXTENSION : String;
-	
 	function AbstractMicrosoftMapProvider() 
 	{
 		super();
@@ -44,37 +41,5 @@ extends AbstractImageBasedMapProvider
 		}
 		
 		return zoomString; 
-	}
-	
-	/*
-	 * Given a URL, returns the coordinates that the URL refers to.
-	 */
-	private function getCoordinateFromURL( url : String ) : Coordinate
-	{
-		var row, col, zoom : Number;
-		
-		// first locate the meaty bits (i.e. the zoomString).
-		var zoomString : String = url.substring( baseUrl.length );
-		zoomString = zoomString.substring( 0, zoomString.indexOf( assetExtension ) );
-
-		// now work backwards to determine row and col
-		zoom = zoomString.length;
-	
-		var rowStr : String = "";
-		var colStr : String = "";
-		var tempStr : String = "";
-		
-		for ( var i : Number = 0; i < zoom; i++ )
-		{
-			tempStr = BinaryUtil.convertToBinary( parseInt( zoomString.charAt( i ) ) );
-			colStr += tempStr.charAt( tempStr.length-1 );
-			rowStr += tempStr.charAt( tempStr.length-2 );
-		}
-				
-		row = BinaryUtil.convertToDecimal( rowStr );
-		col = BinaryUtil.convertToDecimal( colStr );
-		
-		var coord : Coordinate = new Coordinate( row, col, zoom );
-		return coord;
 	}
 }

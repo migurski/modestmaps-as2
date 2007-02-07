@@ -28,7 +28,4 @@ extends AbstractImageBasedMapProvider
         __topLeftOutLimit = new Coordinate(0, Number.NEGATIVE_INFINITY, 0);
         __bottomRightInLimit = (new Coordinate(1, Number.POSITIVE_INFINITY, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
-	
-	
-
 }

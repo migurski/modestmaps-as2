@@ -2,6 +2,7 @@ import com.modestmaps.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.io.LoadMovieThrottledRequest;
 import mx.utils.Delegate;
+import com.modestmaps.io.MapProviderPaintThrottledRequest;
 
 /**
  * @author darren
@@ -18,10 +19,10 @@ extends AbstractMapProvider
 	{
 		super.paint( clip, coord );
 		
-		var request : LoadMovieThrottledRequest = new LoadMovieThrottledRequest( clip.image, getTileUrl( coord ) );
-		request.addEventListener( LoadMovieThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
-		request.addEventListener( LoadMovieThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
-		request.addEventListener( LoadMovieThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.image, getTileUrl( coord ), coord );
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
+		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
 		request.send();
 		
 		//createLabel( clip, coord.toString() );
@@ -72,10 +73,7 @@ extends AbstractMapProvider
 	
 	private function onResponseComplete( eventObj : Object ) : Void
 	{
-		var clip : MovieClip = MovieClip( eventObj.clip );
-		var url : String = String( eventObj.url );
-		
-		raisePaintComplete( clip, getCoordinateFromURL( url ) );
+		raisePaintComplete( eventObj.clip, eventObj.coord );
 	}
 	
 	private function onResponseError( eventObj : Object ) : Void
