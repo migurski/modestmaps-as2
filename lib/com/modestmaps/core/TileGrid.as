@@ -1084,6 +1084,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
         mask.lineTo(0, 0);
         mask.endFill();
         
+        // note that well (0, 0) is grid center.
+        well.clear();
+        well.moveTo(width/-2, height/-2);
+        well.lineStyle();
+        well.beginFill(0x666666, 100);
+        well.lineTo(width/-2, height/2);
+        well.lineTo(width/2, height/2);
+        well.lineTo(width/2, height/-2);
+        well.lineTo(width/-2, height/-2);
+        well.endFill();
+        
         label.textColor = 0xFF6600;
         label._width = width - 20;
         label._height = height - 20;
