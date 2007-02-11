@@ -275,10 +275,12 @@ class com.modestmaps.geo.Map extends MovieClip
     {
         if(__zoomSteps.length) {
             var step:Array = Array(__zoomSteps.shift());
+            grid.allowPainting(__zoomSteps.length <= 1);
             grid.zoomBy(Number(step[0]), Boolean(step[1]));
             __zoomTask = Reactor.callNextFrame(Delegate.create(this, this.zoomProcess));
 
         } else {
+            grid.allowPainting(true);
             delete __zoomTask;
             
         }

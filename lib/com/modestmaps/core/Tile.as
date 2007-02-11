@@ -145,6 +145,10 @@ extends MovieClip
     	if(__paintCall && __paintCall.match(grid.mapProvider, coord.copy()) && __paintCall.pending())
             return;
     	
+        // are we even allowed to paint ourselves?
+        if(!grid.paintingAllowed())
+            return;
+
     	IDispatchable(grid.mapProvider).addEventListener(AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate);
 
     	// cancel existing call, if any...
@@ -155,7 +159,7 @@ extends MovieClip
    		var count:Number = __displayClips.length;
    		while(count--)
    			__displayClips[count].clip._visible = false;
-
+   			
     	// fire up a new call for the next frame...
     	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.mapProvider, coord.copy()),
     	                                grid.mapProvider, coord.copy());

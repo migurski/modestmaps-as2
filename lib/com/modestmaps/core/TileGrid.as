@@ -26,6 +26,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public var tileWidth:Number = 256;
     public var tileHeight:Number = 256;
     
+    // Allow (true) or prevent (false) tiles to paint themselves.
+    private var __paintingAllowed:Boolean;
+    
     // Starting point for the very first tile
     private var initTilePoint:Point;
     private var initTileCoord:Coordinate;
@@ -158,6 +161,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // buffer must not be negative!
         tileBuffer = Math.max(0, tileBuffer);
         
+        allowPainting(true);
         allocateTiles();
         
         labelContainer.swapDepths( getNextHighestDepth() );    
@@ -1039,6 +1043,23 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         for(var i:Number = 0; i < active.length; i += 1)
             active[i].paint(mapProvider, active[i].coord);
+    }
+    
+   /**
+    * Allow (true) or prevent (false) tiles to paint themselves.
+    * See Tile.redraw().
+    */
+    public function allowPainting(allow:Boolean):Void
+    {
+        __paintingAllowed = allow;
+    }
+    
+   /**
+    * Can tiles paint themselves? See Tile.redraw().
+    */
+    public function paintingAllowed():Boolean
+    {
+        return __paintingAllowed;
     }
     
     private function redraw()
