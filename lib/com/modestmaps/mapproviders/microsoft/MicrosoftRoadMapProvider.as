@@ -19,9 +19,6 @@ implements IMapProvider, IDispatchable
 	
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		var url : String = "http://r3.ortho.tiles.virtualearth.net/tiles/r" + 
-			getZoomString( coord ) + ".png?g=45";
-		
-		return url; 
+        return "http://r" + Math.floor(Math.random() * 4) + ".ortho.tiles.virtualearth.net/tiles/r" + getZoomString( coord ) + ".png?g=45";
 	}
 }

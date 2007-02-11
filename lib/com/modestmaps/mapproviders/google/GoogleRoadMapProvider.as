@@ -18,8 +18,7 @@ implements IMapProvider, IDispatchable
 
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		var url : String = "http://mt1.google.com/mt?n=404&v=w2.37" + getZoomString( coord );		
-		return url; 
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2.39" + getZoomString( coord );		
 	}
 	
 	private function getZoomString( coord : Coordinate ) : String

@@ -55,7 +55,7 @@ implements IMapProvider, IDispatchable
 	private function getOverlayTileUrl( coord : Coordinate ) : String
 	{		
 		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + ( 17 - coord.zoom );
-		return "http://mt1.google.com/mt?n=404&v=w2t.38" + zoomString;	
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.39" + zoomString;	
 	}
 
 
