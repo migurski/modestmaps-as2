@@ -300,7 +300,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         // pick a reference tile, an arbitrary choice
         // but known to exist regardless of grid size.
-        var tile:Tile = tiles[0];
+        var tile:Tile = activeTiles()[0];
     
         // get the position of the reference tile.
         var point:Point = new Point(tile._x, tile._y);
@@ -448,6 +448,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
                             : ((bounds.max.y == Number.NEGATIVE_INFINITY)
                                 ? -100000
                                 : bounds.max.y);
+                                
+        //log('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
         
         well.startDrag(false, xMin, yMin, xMax, yMax);
         onWellDrag();
