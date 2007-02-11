@@ -77,6 +77,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         buildWell();
         buildMask();
+        allowPainting(true);
         redraw();   
         
         markers = new MarkerSet(this);
@@ -161,7 +162,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // buffer must not be negative!
         tileBuffer = Math.max(0, tileBuffer);
         
-        allowPainting(true);
         allocateTiles();
         
         labelContainer.swapDepths( getNextHighestDepth() );    
