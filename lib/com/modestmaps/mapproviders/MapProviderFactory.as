@@ -49,6 +49,12 @@ class com.modestmaps.mapproviders.MapProviderFactory
 			case MapProviders.VANILLA :
 				return new VanillaMapProvider();
 
+			case MapProviders.BLUE_MARBLE :
+				return new BlueMarbleMapProvider();
+
+			case MapProviders.OPEN_STREET_MAP :
+				return new OpenStreetMapProvider();
+
 			case MapProviders.MICROSOFT_ROAD :
 				return new MicrosoftRoadMapProvider();
 

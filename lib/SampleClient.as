@@ -66,6 +66,9 @@ class SampleClient
         buttons.push( makeButton(__mpButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
         buttons.push( makeButton(__mpButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
 
+        buttons.push( makeButton(__mpButtons, 'BLUE_MARBLE', 'blue marble', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+        buttons.push( makeButton(__mpButtons, 'OPEN_STREET_MAP', 'open street map', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+
 		__mpButtons._x = 128 + __map._x + __map._width;
 		__mpButtons._y = __map._y + 10;
 		

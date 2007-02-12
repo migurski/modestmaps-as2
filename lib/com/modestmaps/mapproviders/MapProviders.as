@@ -22,4 +22,7 @@ class com.modestmaps.mapproviders.MapProviders
 	public static var YAHOO_HYBRID : Number = 10;
 	
 	public static var ZOOMIFY : Number = 11;
+
+	public static var BLUE_MARBLE : Number = 12;
+	public static var OPEN_STREET_MAP : Number = 13;
 }
