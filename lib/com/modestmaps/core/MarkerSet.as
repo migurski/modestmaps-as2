@@ -10,14 +10,14 @@ class com.modestmaps.core.MarkerSet
 {
     private var lastZoom:Number;
     
-    // markers hashed by name
+    // markers hashed by id
     private var markers:Object;
     
     // marker lists hashed by containing tile id
     private var tileMarkers:Object;
     
     /*
-    // tile id's hashed by marker name
+    // tile id's hashed by marker id
     private var markerTiles:Object;
     */
     
@@ -30,10 +30,10 @@ class com.modestmaps.core.MarkerSet
         initializeIndex();
     }
     
-    public function put(name:String, marker:Marker):Void
+    public function put(marker:Marker):Void
     {
-        markers[name] = marker;
-        indexMarker(name);
+        markers[marker.id] = marker;
+        indexMarker(marker.id);
     }
     
     public function initializeIndex():Void
@@ -49,32 +49,37 @@ class com.modestmaps.core.MarkerSet
     {
         lastZoom = level;
     
-        for(var markerName:String in markers)
-            indexMarker(markerName);
+        for(var markerId:String in markers)
+            indexMarker(markerId);
     }
 
-    private function indexMarker(markerName:String):Void
+   /**
+    * Add a new marker to the internal index.
+    */
+    private function indexMarker(markerId:String):Void
     {
-        var tileKey:String = markers[markerName].coord.zoomTo(lastZoom).container().toString();
+        var tileKey:String = markers[markerId].coord.zoomTo(lastZoom).container().toString();
         
         if(tileMarkers[tileKey] == undefined)
             tileMarkers[tileKey] = {};
             
-        tileMarkers[tileKey][markerName] = true;
+        tileMarkers[tileKey][markerId] = true;
         
         /*
-        if(markerTiles[markerName] == undefined)
-            markerTiles[markerName] = {};
+        if(markerTiles[markerId] == undefined)
+            markerTiles[markerId] = {};
             
-        markerTiles[markerName][tileKey] = true;
+        markerTiles[markerId][tileKey] = true;
         */
         
-        //grid.log('Marker '+markerName+' in '+tileKey);
+        //grid.log('Marker '+markerId+' in '+tileKey);
     }
-    
+   /**
+    * Fetch a list of markers within currently-visible tiles.
+    */
     public function overlapping(tiles:/*Tile*/Array):/*Marker*/Array
     {
-        var names:Array = [];
+        var ids:Array = [];
         var touched:/*Marker*/Array = [];
         var sourceCoord:Coordinate;
         
@@ -82,13 +87,13 @@ class com.modestmaps.core.MarkerSet
             sourceCoord = grid.mapProvider.sourceCoordinate(tiles[i].coord);
         
             if(tileMarkers[sourceCoord.toString()] != undefined)
-                for(var markerName:String in tileMarkers[sourceCoord.toString()]) {
-                    names.push(markerName);
-                    touched.push(markers[markerName]);
+                for(var markerId:String in tileMarkers[sourceCoord.toString()]) {
+                    ids.push(markerId);
+                    touched.push(markers[markerId]);
                 }
         }
         
-        //grid.log('Touched markers: '+names.toString());
+        //grid.log('Touched markers: '+ids.toString());
         return touched;
     }
 }

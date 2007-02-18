@@ -25,6 +25,14 @@ class SampleClient
 		};
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(), initObj ));
+
+        __map.putMarker('Rochdale', new Location(37.865571, -122.259679));
+        __map.putMarker('Parker Ave.', new Location(37.780492, -122.453731));
+        __map.putMarker('Pepper Dr.', new Location(37.623443, -122.426577));
+        __map.putMarker('3rd St.', new Location(37.779297, -122.392877));
+        __map.putMarker('Divisadero St.', new Location(37.771919, -122.437413));
+        __map.putMarker('Market St.', new Location(37.812734, -122.280064));
+        __map.putMarker('17th St.', new Location(37.804274, -122.262940));
         
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
@@ -83,6 +91,8 @@ class SampleClient
 		
 
         Reactor.callNextFrame(Delegate.create(__map, __map.nagAboutBoundsForever));
+        
+        _root.createEmptyMovieClip('marks', _root.getNextHighestDepth());
     }
     
     

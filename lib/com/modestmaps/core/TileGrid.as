@@ -168,12 +168,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         // let 'em know we're coming
         markers.indexAtZoom(zoomLevel);
+        
+        updateMarkers();
     }
     
     public function putMarker(name:String, coord:Coordinate):Void
     {
-        log('Marker '+name+': '+coord.toString());
-        markers.put(name, new Marker(coord));
+        //log('Marker '+name+': '+coord.toString());
+        markers.put(new Marker(name, coord));
     }
     
    /**
@@ -915,7 +917,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     private function updateMarkers():Void
     {
-        markers.overlapping(activeTiles());
+        var visible:/*Marker*/Array = markers.overlapping(activeTiles());
+        var ids:/*String*/Array = [];
+
+        for(var i:Number = 0; i < visible.length; i += 1)
+            ids.push(visible[i].id);
+        
+        log('Touched markers: '+ids.toString());
     }
     
    /**
