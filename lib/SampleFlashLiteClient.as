@@ -13,7 +13,7 @@ class SampleFlashLiteClient
     	clip._focusRect = false;
     	
         var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
-                                           {mapProviderType: MapProviders.MICROSOFT_AERIAL, _x: 0, _y: 0, width: Stage.width, height: Stage.height}));
+                                           {mapProviderType: MapProviders.MICROSOFT_AERIAL, _x: 0, _y: 0, width: Stage.width, height: Stage.height, draggable: true}));
         
 
         var extent:/*Location*/Array = [new Location(37.829853, -122.514725),

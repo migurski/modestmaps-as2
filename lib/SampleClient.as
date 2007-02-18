@@ -21,7 +21,8 @@ class SampleClient
 			_x: 128, 
 			_y: 128, 
 			width: Stage.width - 256, 
-			height: Stage.height - 256
+			height: Stage.height - 256,
+			draggable: true
 		};
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(), initObj ));
