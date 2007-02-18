@@ -1,5 +1,4 @@
 import com.modestmaps.core.Point;
-import com.modestmaps.geo.Transformation;
  
 class com.modestmaps.geo.Transformation
 {
