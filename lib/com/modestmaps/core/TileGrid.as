@@ -137,8 +137,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         // impose some limits
         zoomLevel = initTileCoord.zoom;
-        topLeftOutLimit = __mapProvider.outerLimits()[0];
-        bottomRightInLimit = __mapProvider.outerLimits()[1];
+        topLeftOutLimit = mapProvider.outerLimits()[0];
+        bottomRightInLimit = mapProvider.outerLimits()[1];
         
         // initial tile
         var initObj:Object =

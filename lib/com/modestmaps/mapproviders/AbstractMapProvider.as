@@ -64,7 +64,7 @@ implements IDispatchable
 
     public function sourceCoordinate(coord:Coordinate):Coordinate
     {
-        return coord;
+        return coord.copy();
     }
 
    /*
