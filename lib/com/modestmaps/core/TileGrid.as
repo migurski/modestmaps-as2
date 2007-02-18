@@ -14,6 +14,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
 {
     private var width:Number;
     private var height:Number;
+    private var draggable:Boolean;
 
     // Row and column counts are kept up-to-date.
     private var rows:Number;
@@ -191,9 +192,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private function buildWell():Void
     {
         well = createEmptyMovieClip('well', 1);
-        well.onPress = Delegate.create(this, this.startWellDrag);
-        well.onRelease = Delegate.create(this, this.stopWellDrag);
-        well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
+        
+        if(draggable) {
+            well.onPress = Delegate.create(this, this.startWellDrag);
+            well.onRelease = Delegate.create(this, this.stopWellDrag);
+            well.onReleaseOutside = Delegate.create(this, this.stopWellDrag);
+        }
 
         centerWell(false);
         

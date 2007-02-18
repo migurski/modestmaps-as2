@@ -14,6 +14,7 @@ class com.modestmaps.geo.Map extends MovieClip
 {
     private var width:Number;
     private var height:Number;
+    private var draggable:Boolean;
     
     // pending zoom steps, array of [amount:Number, redraw:Boolean] (see TileGrid.zoomBy)
     private var __zoomSteps:/*Array*/Array;
@@ -47,7 +48,8 @@ class com.modestmaps.geo.Map extends MovieClip
     		_x: 0, 
     		_y: 0, 
     		width: width, 
-    		height: height
+    		height: height, 
+    		draggable: draggable
     	};
     		
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj ));
@@ -130,7 +132,10 @@ class com.modestmaps.geo.Map extends MovieClip
         var vPossibleZoom:Number = TL.zoom - Math.ceil(vZoomDiff);
         
         // initial zoom to fit extent vertically and horizontally
+        // additionally, make sure it's not outside the boundaries set by provider limits
         var initZoom:Number = Math.min(hPossibleZoom, vPossibleZoom);
+        initZoom = Math.min(initZoom, mapProvider.outerLimits()[1].zoom);
+        initZoom = Math.max(initZoom, mapProvider.outerLimits()[0].zoom);
 
         // coordinate of extent center
         var centerRow:Number = (TL.row + BR.row) / 2;
