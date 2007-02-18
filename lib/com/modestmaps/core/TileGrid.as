@@ -23,6 +23,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
     // overlay markers
     private var markers:MarkerSet;
     
+    // Markers overlapping the currently-included set of tiles, hash of booleans
+    private var __overlappingMarkers:Object;
+
     // Real maps use 256.
     public var tileWidth:Number = 256;
     public var tileHeight:Number = 256;
@@ -81,6 +84,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         allowPainting(true);
         redraw();   
         
+        __overlappingMarkers = {};
         markers = new MarkerSet(this);
         
         Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
@@ -921,12 +925,33 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private function updateMarkers():Void
     {
         var visible:/*Marker*/Array = markers.overlapping(activeTiles());
-        var ids:/*String*/Array = [];
-
-        for(var i:Number = 0; i < visible.length; i += 1)
-            ids.push(visible[i].id);
+        var newOverlappingMarkers:Object = {};
         
-        log('Touched markers: '+ids.toString());
+        for(var i:Number = 0; i < visible.length; i += 1)
+            newOverlappingMarkers[visible[i].id] = visible[i];
+
+        // check for newly-visible markers
+        for(var id:String in newOverlappingMarkers) {
+            if(newOverlappingMarkers[id] && !__overlappingMarkers[id]) {
+                /*
+                TODO:
+                Throw an event here indicating that newOverlappingMarkers[id]
+                now overlaps the tile grid, and should be tracked externally.
+                */
+                __overlappingMarkers[id] = true;
+            }
+        }
+        
+        for(var id:String in __overlappingMarkers) {
+            if(!newOverlappingMarkers[id] && __overlappingMarkers[id]) {
+                /*
+                TODO:
+                Throw an event here indicating that newOverlappingMarkers[id]
+                no longer overlaps the tile grid, and should be ignored.
+                */
+                delete __overlappingMarkers[id];
+            }
+        }
     }
     
    /**
