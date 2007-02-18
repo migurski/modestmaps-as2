@@ -26,6 +26,11 @@ class SampleClient
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(), initObj ));
 
+        var extent:/*Location*/Array = [new Location(37.829853, -122.514725),
+                                        new Location(37.700121, -122.212601)];
+        
+        __map.setInitialExtent(extent);
+        
         __map.putMarker('Rochdale', new Location(37.865571, -122.259679));
         __map.putMarker('Parker Ave.', new Location(37.780492, -122.453731));
         __map.putMarker('Pepper Dr.', new Location(37.623443, -122.426577));

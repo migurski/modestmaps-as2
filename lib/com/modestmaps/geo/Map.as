@@ -52,8 +52,8 @@ class com.modestmaps.geo.Map extends MovieClip
     		
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj ));
 
-        var extent:/*Location*/Array = [new Location(37.829853, -122.514725),
-                                        new Location(37.700121, -122.212601)];
+        var extent:/*Location*/Array = [new Location(80, -180),
+                                        new Location(-80, 180)];
         
         setInitialExtent(extent);
         
@@ -66,7 +66,7 @@ class com.modestmaps.geo.Map extends MovieClip
     * using calculateMapExtent(), and inform the grid of an initial tile
     * coordinate and point by calling grid.setInitialTile().
     */
-    private function setInitialExtent(locations:/*Location*/Array):Void
+    public function setInitialExtent(locations:/*Location*/Array):Void
     {
         var extent:Object = calculateMapExtent(locations);
     
