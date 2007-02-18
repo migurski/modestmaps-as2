@@ -1,3 +1,4 @@
+import com.modestmaps.geo.Location;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
 import com.modestmaps.core.MarkerSet;
@@ -172,10 +173,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         updateMarkers();
     }
     
-    public function putMarker(name:String, coord:Coordinate):Void
+    public function putMarker(name:String, coord:Coordinate, location:Location):Void
     {
         //log('Marker '+name+': '+coord.toString());
-        markers.put(new Marker(name, coord));
+        markers.put(new Marker(name, coord, location));
+
+        updateMarkers();
     }
     
    /**

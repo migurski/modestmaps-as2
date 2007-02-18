@@ -273,6 +273,6 @@ class com.modestmaps.geo.Map extends MovieClip
     public function putMarker(name:String, location:Location):Void
     {
         //grid.log('Marker '+name+': '+location.toString());
-        grid.putMarker(name, mapProvider.locationCoordinate(location));
+        grid.putMarker(name, mapProvider.locationCoordinate(location), location);
     }
 }
