@@ -34,6 +34,17 @@ implements IMapProvider, IDispatchable
 
     private function getTileUrl(coord:Coordinate):String
     {
-        return 'http://s3.amazonaws.com/com.modestmaps.bluemarble/'+(coord.zoom)+'-r'+(coord.row)+'-c'+(coord.column)+'.jpg';
+        var sourceCoord:Coordinate = sourceCoordinate(coord);
+        return 'http://s3.amazonaws.com/com.modestmaps.bluemarble/'+(sourceCoord.zoom)+'-r'+(sourceCoord.row)+'-c'+(sourceCoord.column)+'.jpg';
+    }
+
+    public function sourceCoordinate(coord:Coordinate):Coordinate
+    {
+	    var wrappedColumn:Number = coord.column % Math.pow(2, coord.zoom);
+
+	    while(wrappedColumn < 0)
+	        wrappedColumn += Math.pow(2, coord.zoom);
+	        
+        return new Coordinate(coord.row, wrappedColumn, coord.zoom);
     }
 }

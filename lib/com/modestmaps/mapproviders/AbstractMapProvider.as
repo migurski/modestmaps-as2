@@ -62,6 +62,11 @@ implements IDispatchable
         return __projection.toString();
 	}
 
+    public function sourceCoordinate(coord:Coordinate):Coordinate
+    {
+        return coord;
+    }
+
    /*
     * Get top left outer-zoom limit and bottom right inner-zoom limits,
     * as Coordinates in a two element array.

@@ -15,12 +15,9 @@ implements IMapProvider, IDispatchable
 		return "YahooAerialMapProvider[]";
 	}
 
-	private function getTileUrl( coord : Coordinate ) : String
+	private function getTileUrl(coord:Coordinate):String
 	{		
-		var url : String = "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" 
-			+ getZoomString( coord );	
-			
-		return url; 
+        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" + getZoomString(sourceCoordinate(coord));	
 	}
 	
 	private function getZoomString( coord : Coordinate ) : String

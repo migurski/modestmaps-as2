@@ -52,12 +52,12 @@ implements IMapProvider, IDispatchable
 		return __gamp.getTileUrl( coord );
 	}
 
-	private function getOverlayTileUrl( coord : Coordinate ) : String
+	private function getOverlayTileUrl(coord:Coordinate):String
 	{		
-		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + ( 17 - coord.zoom );
-		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.39" + zoomString;	
+        var sourceCoord:Coordinate = sourceCoordinate(coord);
+        var zoomString:String = "&x=" + sourceCoord.column + "&y=" + sourceCoord.row + "&zoom=" + (17 - sourceCoord.zoom);
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.39" + zoomString;
 	}
-
 
 	// Event Handlers
 	

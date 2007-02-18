@@ -18,12 +18,11 @@ implements IMapProvider, IDispatchable
 
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
-		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2.39" + getZoomString( coord );		
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2.39" + getZoomString(sourceCoordinate(coord));		
 	}
 	
 	private function getZoomString( coord : Coordinate ) : String
-	{		
-		var zoomString : String = "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + ( 17 - coord.zoom );
-		return zoomString; 
+	{
+        return "&x=" + coord.column + "&y=" + coord.row + "&zoom=" + (17 - coord.zoom);
 	}	
 }

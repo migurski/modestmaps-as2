@@ -16,12 +16,9 @@ implements IMapProvider, IDispatchable
 		return "YahooRoadMapProvider[]";
 	}
 
-	private function getTileUrl( coord : Coordinate ) : String
+	private function getTileUrl(coord:Coordinate):String
 	{		
-		var url : String = "http://us.maps1.yimg.com/us.tile.maps.yimg.com/tile?md=200608221700" 
-			+ getZoomString( coord );	
-			
-		return url; 
+        return "http://us.maps1.yimg.com/us.tile.maps.yimg.com/tile?md=200608221700" + getZoomString(sourceCoordinate(coord));	
 	}
 	
 	private function getZoomString( coord : Coordinate ) : String

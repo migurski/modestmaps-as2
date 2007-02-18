@@ -24,22 +24,33 @@ extends AbstractImageBasedMapProvider
         __bottomRightInLimit = (new Coordinate(1, Number.POSITIVE_INFINITY, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
 	
-	private function getZoomString( coord : Coordinate ) : String
-	{		
+	private function getZoomString(coord:Coordinate):String
+	{
+        var sourceCoord:Coordinate = sourceCoordinate(coord);
+	    
 		// convert row + col to zoom string
-		var rowBinaryString : String = BinaryUtil.convertToBinary( coord.row );		
-		rowBinaryString = rowBinaryString.substring( rowBinaryString.length - coord.zoom );
+		var rowBinaryString : String = BinaryUtil.convertToBinary(sourceCoord.row);		
+		rowBinaryString = rowBinaryString.substring(rowBinaryString.length - sourceCoord.zoom);
 		
-		var colBinaryString : String = BinaryUtil.convertToBinary( coord.column );
-		colBinaryString = colBinaryString.substring( colBinaryString.length - coord.zoom );
+		var colBinaryString : String = BinaryUtil.convertToBinary(sourceCoord.column);
+		colBinaryString = colBinaryString.substring(colBinaryString.length - sourceCoord.zoom);
 
 		// generate zoom string by combining strings
 		var zoomString : String = "";
-		for ( var i : Number = 0; i < coord.zoom; i++ ) 
-		{
+
+		for(var i:Number = 0; i < sourceCoord.zoom; i += 1)
 			zoomString += BinaryUtil.convertToDecimal( rowBinaryString.charAt( i ) + colBinaryString.charAt( i ) ).toString();
-		}
 		
 		return zoomString; 
 	}
+
+    public function sourceCoordinate(coord:Coordinate):Coordinate
+    {
+	    var wrappedColumn:Number = coord.column % Math.pow(2, coord.zoom);
+
+	    while(wrappedColumn < 0)
+	        wrappedColumn += Math.pow(2, coord.zoom);
+	        
+        return new Coordinate(coord.row, wrappedColumn, coord.zoom);
+    }
 }

@@ -23,4 +23,14 @@ extends AbstractImageBasedMapProvider
         __topLeftOutLimit = new Coordinate(0, Number.NEGATIVE_INFINITY, 0);
         __bottomRightInLimit = (new Coordinate(1, Number.POSITIVE_INFINITY, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
+
+    public function sourceCoordinate(coord:Coordinate):Coordinate
+    {
+	    var wrappedColumn:Number = coord.column % Math.pow(2, coord.zoom);
+
+	    while(wrappedColumn < 0)
+	        wrappedColumn += Math.pow(2, coord.zoom);
+	        
+        return new Coordinate(coord.row, wrappedColumn, coord.zoom);
+    }
 }

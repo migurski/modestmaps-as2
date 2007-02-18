@@ -37,20 +37,14 @@ implements IMapProvider, IDispatchable
 		//createLabel( clip, coord.toString() );
 	}	
 
-	private function getBGTileUrl( coord : Coordinate ) : String
+	private function getBGTileUrl(coord:Coordinate):String
 	{		
-		var url : String = "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" 
-			+ getZoomString( coord ) + "&v=1.5&t=a";	
-			
-		return url; 
+		return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" + getZoomString(sourceCoordinate(coord)) + "&v=1.5&t=a";
 	}
 
-	private function getOverlayTileUrl( coord : Coordinate ) : String
+	private function getOverlayTileUrl(coord:Coordinate):String
 	{		
-		var url : String = "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200608221700&v=2.0&t=h" 
-			+ getZoomString( coord );	
-			
-		return url; 
+        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200608221700&v=2.0&t=h" + getZoomString(sourceCoordinate(coord));
 	}
 	
 	

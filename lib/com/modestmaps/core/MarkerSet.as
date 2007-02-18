@@ -76,13 +76,17 @@ class com.modestmaps.core.MarkerSet
     {
         var names:Array = [];
         var touched:/*Marker*/Array = [];
+        var sourceCoord:Coordinate;
         
-        for(var i:Number = 0; i < tiles.length; i += 1)
-            if(tileMarkers[tiles[i].coord.toString()] != undefined)
-                for(var markerName:String in tileMarkers[tiles[i].coord.toString()]) {
+        for(var i:Number = 0; i < tiles.length; i += 1) {
+            sourceCoord = grid.mapProvider.sourceCoordinate(tiles[i].coord);
+        
+            if(tileMarkers[sourceCoord.toString()] != undefined)
+                for(var markerName:String in tileMarkers[sourceCoord.toString()]) {
                     names.push(markerName);
                     touched.push(markers[markerName]);
                 }
+        }
         
         //grid.log('Touched markers: '+names.toString());
         return touched;

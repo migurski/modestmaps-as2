@@ -30,4 +30,10 @@ interface com.modestmaps.mapproviders.IMapProvider
     public function geometry():String;
     
     public function toString() : String;
+    
+   /*
+    * Munge coordinate for purposes of image selection and marker containment.
+    * E.g., useful for cylindical projections with infinite horizontal scroll.
+    */
+    public function sourceCoordinate(coord:Coordinate):Coordinate;
 }

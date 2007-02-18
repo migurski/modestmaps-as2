@@ -34,6 +34,17 @@ implements IMapProvider, IDispatchable
 
     private function getTileUrl(coord:Coordinate):String
     {
-        return 'http://tile.openstreetmap.org/'+(coord.zoom)+'/'+(coord.column)+'/'+(coord.row)+'.png';
+        var sourceCoord:Coordinate = sourceCoordinate(coord);
+        return 'http://tile.openstreetmap.org/'+(sourceCoord.zoom)+'/'+(sourceCoord.column)+'/'+(sourceCoord.row)+'.png';
+    }
+
+    public function sourceCoordinate(coord:Coordinate):Coordinate
+    {
+	    var wrappedColumn:Number = coord.column % Math.pow(2, coord.zoom);
+
+	    while(wrappedColumn < 0)
+	        wrappedColumn += Math.pow(2, coord.zoom);
+	        
+        return new Coordinate(coord.row, wrappedColumn, coord.zoom);
     }
 }
