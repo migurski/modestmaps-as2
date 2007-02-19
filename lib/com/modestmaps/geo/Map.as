@@ -222,6 +222,18 @@ class com.modestmaps.geo.Map extends MovieClip
         }
     }
     
+    public function locationPoint(location:Location, context:MovieClip):Point
+    {
+        var coord:Coordinate = mapProvider.locationCoordinate(location);
+        return grid.coordinatePoint(coord, context);
+    }
+    
+    public function pointLocation(point:Point, context:MovieClip):Location
+    {
+        var coord:Coordinate = grid.pointCoordinate(point, context);
+        return mapProvider.coordinateLocation(coord);
+    }
+    
     public function panEast(pixels:Number):Void
     {
         grid.panRight(pixels);

@@ -309,7 +309,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     *
     * Respect infinite rows or columns, to bind movement on one (or no) axis.
     */
-    private function coordinatePoint(coord:Coordinate, context:MovieClip):Point
+    public function coordinatePoint(coord:Coordinate, context:MovieClip):Point
     {
         // pick a reference tile, an arbitrary choice
         // but known to exist regardless of grid size.
@@ -352,7 +352,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         return point;
     }
     
-    private function pointCoordinate(point:Point):Coordinate
+    public function pointCoordinate(point:Point):Coordinate
     {
         var tile:Tile;
         var tileCoord:Coordinate;
