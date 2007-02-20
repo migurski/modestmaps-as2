@@ -78,8 +78,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         label.selectable = false;
         label.textColor = 0xFF6600;
                 
-        log('FUCK YEAH '+width+'x'+height);
-        
         buildWell();
         buildMask();
         allowPainting(true);
