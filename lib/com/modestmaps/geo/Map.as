@@ -7,8 +7,6 @@ import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.mapproviders.MapProviderFactory;
-import com.modestmaps.mapproviders.MapProviders;
 
 class com.modestmaps.geo.Map extends MovieClip
 {
@@ -29,7 +27,6 @@ class com.modestmaps.geo.Map extends MovieClip
     public var grid:TileGrid;
 
     // Who do we get our Map graphics from?
-    public var mapProviderType:Number;
     public var mapProvider:IMapProvider;
 
     public static var symbolName:String = '__Packages.com.modestmaps.geo.Map';
@@ -40,7 +37,7 @@ class com.modestmaps.geo.Map extends MovieClip
     {
         __zoomSteps = [];
 
-        setMapProvider(mapProviderType);
+        setMapProvider(mapProvider);
     
     	var initObj : Object = 
     	{
@@ -204,14 +201,12 @@ class com.modestmaps.geo.Map extends MovieClip
         //Reactor.callLater(5000, Delegate.create(this, this.nagAboutBoundsForever));
     }
     
-    public function setMapProvider(providerType:Number):Void
+    public function setMapProvider(newProvider:IMapProvider):Void
     {
         var previousGeometry:String = mapProvider.geometry();
     	var extent:/*Location*/Array = getCurrentExtent();
     	
-        mapProviderType = providerType;
-        mapProvider = MapProviderFactory.getInstance().getMapProvider(mapProviderType);
-        grid.mapProvider = mapProvider;
+        grid.mapProvider = newProvider;
         
         if(mapProvider.geometry() == previousGeometry) {
         	grid.repaintTiles();

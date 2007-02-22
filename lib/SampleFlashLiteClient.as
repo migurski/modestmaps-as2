@@ -3,6 +3,7 @@ import com.stamen.twisted.Reactor;
 import com.modestmaps.geo.Map;
 import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.MapProviderFactory;
 
 class SampleFlashLiteClient 
 {
@@ -13,7 +14,9 @@ class SampleFlashLiteClient
     	clip._focusRect = false;
     	
         var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
-                                           {mapProviderType: MapProviders.MICROSOFT_AERIAL, _x: 0, _y: 0, width: Stage.width, height: Stage.height, draggable: true}));
+                                           {mapProvider: MapProviderFactory.getInstance().getMapProvider(MapProviders.MICROSOFT_AERIAL),
+                                            _x: 0, _y: 0, width: Stage.width, height: Stage.height,
+                                            draggable: true}));
         
 
         var extent:/*Location*/Array = [new Location(37.829853, -122.514725),

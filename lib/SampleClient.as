@@ -3,6 +3,7 @@ import com.stamen.twisted.Reactor;
 import com.modestmaps.geo.Map;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.MapProviderFactory;
 import com.modestmaps.geo.Location;
 
 class SampleClient
@@ -17,7 +18,7 @@ class SampleClient
 
 		var initObj : Object =
 		{
-			mapProviderType: MapProviders.GOOGLE_ROAD, 
+			mapProvider: MapProviderFactory.getInstance().getMapProvider(MapProviders.GOOGLE_ROAD), 
 			_x: 128, 
 			_y: 128, 
 			width: Stage.width - 256, 
@@ -104,7 +105,7 @@ class SampleClient
     
     private static function switchMapProvider( button : MovieClip ) : Void
     {
-    	__map.setMapProvider( MapProviders[button._name] );
+    	__map.setMapProvider(MapProviderFactory.getInstance().getMapProvider(MapProviders[button._name]));
     }
     
     
