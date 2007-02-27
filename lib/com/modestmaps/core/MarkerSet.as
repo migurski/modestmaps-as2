@@ -1,3 +1,8 @@
+/*
+ * vim:et sts=4 sw=4 cindent:
+ * $Id$
+ */
+
 import mx.utils.Delegate;
 import com.stamen.twisted.*;
 
@@ -30,12 +35,24 @@ class com.modestmaps.core.MarkerSet
         initializeIndex();
     }
     
+    /**
+     * Put a marker on the grid.
+     */
     public function put(marker:Marker):Void
     {
         markers[marker.id] = marker;
         indexMarker(marker.id);
     }
     
+    /**
+     * Remove a marker added via put().
+     */
+	public function remove(marker:Marker):Void
+	{
+        unIndexMarker(marker.id);
+        delete markers[marker.id];
+	}
+
     public function initializeIndex():Void
     {
         lastZoom = 0;
@@ -65,14 +82,24 @@ class com.modestmaps.core.MarkerSet
             
         tileMarkers[tileKey][markerId] = true;
         
-        /*
         if(markerTiles[markerId] == undefined)
             markerTiles[markerId] = {};
             
         markerTiles[markerId][tileKey] = true;
-        */
         
         //grid.log('Marker '+markerId+' in '+tileKey);
+    }
+
+    /**
+     * Remove a marker from the internal index.
+     */
+    private function unIndexMarker(markerId:String):Void
+    {
+        for (var tileKey:String in markerTiles[markerId])
+        {
+            delete tileMarkers[tileKey][markerId];
+        }
+        delete markerTiles[markerId];
     }
 
    /**

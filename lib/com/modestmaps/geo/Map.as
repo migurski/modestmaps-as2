@@ -1,3 +1,8 @@
+/*
+ * vim:et sts=4 sw=4 cindent:
+ * $Id$
+ */
+
 import mx.utils.Delegate;
 import mx.events.EventDispatcher;
 import com.stamen.twisted.Reactor;
@@ -302,6 +307,11 @@ class com.modestmaps.geo.Map extends MovieClip
     {
         //grid.log('Marker '+name+': '+location.toString());
         grid.putMarker(name, mapProvider.locationCoordinate(location), location);
+    }
+
+    public function removeMarker(name:String):Void
+    {
+        grid.removeMarker(name);
     }
     
    /**

@@ -1,3 +1,8 @@
+/*
+ * vim:et sts=4 sw=4 cindent:
+ * $Id$
+ */
+
 import com.modestmaps.geo.Map;
 import com.modestmaps.geo.Location;
 import com.modestmaps.core.Coordinate;
@@ -179,14 +184,25 @@ class com.modestmaps.core.TileGrid extends MovieClip
         updateMarkers();
     }
     
-    public function putMarker(name:String, coord:Coordinate, location:Location):Void
+    public function putMarker(name:String, coord:Coordinate, location:Location):Marker
     {
+        var marker:Marker = new Marker(name, coord, location);
         //log('Marker '+name+': '+coord.toString());
-        markers.put(new Marker(name, coord, location));
+        markers.put(marker);
 
         updateMarkers();
+        return marker;
     }
-    
+
+    public function removeMarker(name:String):Void
+    {
+        var marker:Marker = markers.getMarker(name);
+        if (marker)
+        {
+            markers.remove(marker);
+        }
+    }
+	
    /**
     * Create the well clip, assign event handlers.
     */
