@@ -1,6 +1,5 @@
 /*
  * vim:et sts=4 sw=4 cindent:
- * $Id$
  */
 
 import mx.utils.Delegate;
@@ -21,10 +20,8 @@ class com.modestmaps.core.MarkerSet
     // marker lists hashed by containing tile id
     private var tileMarkers:Object;
     
-    /*
     // tile id's hashed by marker id
     private var markerTiles:Object;
-    */
     
     // for use of TileGrid.log()
     private var grid:TileGrid;
@@ -47,11 +44,11 @@ class com.modestmaps.core.MarkerSet
     /**
      * Remove a marker added via put().
      */
-	public function remove(marker:Marker):Void
-	{
+    public function remove(marker:Marker):Void
+    {
         unIndexMarker(marker.id);
         delete markers[marker.id];
-	}
+    }
 
     public function initializeIndex():Void
     {
