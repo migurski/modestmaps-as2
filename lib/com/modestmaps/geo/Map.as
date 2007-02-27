@@ -38,6 +38,10 @@ class com.modestmaps.geo.Map extends MovieClip
 
     public static var EVENT_MARKER_ENTERS:String = 'Marker enters';
     public static var EVENT_MARKER_LEAVES:String = 'Marker leaves';
+    public static var EVENT_LEAVE_ZOOMLEVEL:String = 'Leave zoom level';
+    public static var EVENT_ENTER_ZOOMLEVEL:String = 'Enter zoom level';
+    public static var EVENT_START_PANNING:String = 'Start panning';
+    public static var EVENT_STOP_PANNING:String = 'Stop panning';
 
     public static var symbolName:String = '__Packages.com.modestmaps.geo.Map';
     public static var symbolOwner:Function = Map;
@@ -267,8 +271,10 @@ class com.modestmaps.geo.Map extends MovieClip
         for(var i = 1; i <= __zoomFrames; i += 1)
             __zoomSteps.push([1/__zoomFrames, Boolean(i == __zoomFrames)]);
             
-        if(!__zoomTask)
+        if(!__zoomTask) {
+            onLeaveZoom(grid.zoomLevel);
             zoomProcess();
+        }
     }
     
     public function zoomOut():Void
@@ -276,8 +282,10 @@ class com.modestmaps.geo.Map extends MovieClip
         for(var i = 1; i <= __zoomFrames; i += 1)
             __zoomSteps.push([-1/__zoomFrames, Boolean(i == __zoomFrames)]);
             
-        if(!__zoomTask)
+        if(!__zoomTask) {
+            onLeaveZoom(grid.zoomLevel);
             zoomProcess();
+        }
     }
     
     private function zoomProcess():Void
@@ -291,7 +299,7 @@ class com.modestmaps.geo.Map extends MovieClip
         } else {
             grid.allowPainting(true);
             delete __zoomTask;
-            
+            onEnterZoom(grid.zoomLevel);
         }
     }
     
@@ -301,15 +309,57 @@ class com.modestmaps.geo.Map extends MovieClip
         grid.putMarker(name, mapProvider.locationCoordinate(location), location);
     }
     
+   /**
+    * Dispatches EVENT_MARKER_ENTERS when a given marker enters the tile coverage area.
+    */
     public function onMarkerEnters(marker:Marker):Void
     {
         //grid.log('+ '+marker.toString());
         dispatchEvent({target: this, type: EVENT_MARKER_ENTERS, marker: marker});
     }
     
+   /**
+    * Dispatches EVENT_MARKER_LEAVES when a given marker leaves the tile coverage area.
+    */
     public function onMarkerLeaves(marker:Marker):Void
     {
         //grid.log('- '+marker.toString());
         dispatchEvent({target: this, type: EVENT_MARKER_LEAVES, marker: marker});
+    }
+    
+   /**
+    * Dispatches EVENT_LEAVE_ZOOMLEVEL when the map leaves the given zoom.
+    */
+    public function onLeaveZoom(zoomLevel:Number):Void
+    {
+        //grid.log('Leaving zoom level '+zoomLevel+'...');
+        dispatchEvent({target: this, type: EVENT_LEAVE_ZOOMLEVEL, level: zoomLevel});
+    }
+    
+   /**
+    * Dispatches EVENT_ENTER_ZOOMLEVEL when the map enters the given zoom.
+    */
+    public function onEnterZoom(zoomLevel:Number):Void
+    {
+        //grid.log('...Entering zoom level '+zoomLevel);
+        dispatchEvent({target: this, type: EVENT_ENTER_ZOOMLEVEL, level: zoomLevel});
+    }
+    
+   /**
+    * Dispatches EVENT_START_PANNING when the map starts to be panned.
+    */
+    public function onStartDrag():Void
+    {
+        //grid.log('Starting drag...');
+        dispatchEvent({target: this, type: EVENT_START_PANNING});
+    }
+    
+   /**
+    * Dispatches EVENT_STOP_PANNING when the map stops being panned.
+    */
+    public function onStopDrag():Void
+    {
+        //grid.log('...Stopping drag');
+        dispatchEvent({target: this, type: EVENT_STOP_PANNING});
     }
 }

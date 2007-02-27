@@ -42,7 +42,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private var initTileCoord:Coordinate;
     
     // the currently-native zoom level
-    private var zoomLevel:Number;
+    public var zoomLevel:Number;
     
     // some limits on scrolling distance, initially set to none
     private var topLeftOutLimit:Coordinate;
@@ -465,6 +465,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                                 
         //log('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
         
+        map.onStartDrag();
         well.startDrag(false, xMin, yMin, xMax, yMax);
         onWellDrag();
     }
@@ -475,6 +476,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function stopWellDrag():Void
     {
+        map.onStopDrag();
         wellDragTask.cancel();
         well.stopDrag();
 
