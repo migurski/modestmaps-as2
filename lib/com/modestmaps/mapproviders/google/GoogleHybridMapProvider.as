@@ -56,7 +56,7 @@ implements IMapProvider, IDispatchable
 	{		
         var sourceCoord:Coordinate = sourceCoordinate(coord);
         var zoomString:String = "&x=" + sourceCoord.column + "&y=" + sourceCoord.row + "&zoom=" + (17 - sourceCoord.zoom);
-		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.39" + zoomString;
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.43" + zoomString;
 	}
 
 	// Event Handlers
