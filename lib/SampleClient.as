@@ -46,8 +46,7 @@ class SampleClient
         
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(__map); 
-        Stage.addListener( SampleClient );
+        Stage.addListener(SampleClient);
         
         var buttons : Array = new Array();
         
@@ -148,7 +147,8 @@ class SampleClient
     
     private static function onResize() : Void
     {
-		__mpButtons._x = __map._x + __map._width - __mpButtons._width - 10;    
+        __map.setSize(Stage.width - 2*__map._x, Stage.height - 2*__map._y);
+		__mpButtons._x = __map._x + (Stage.width - 2*__map._x) - __mpButtons._width - 10;    
 	}
     
     private static function onMarkerEnters(event:Object):Void

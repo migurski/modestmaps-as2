@@ -198,15 +198,10 @@ class com.modestmaps.geo.Map extends MovieClip
         return corners;
     }
 
-   /*
-    * TODO:
-    * Size relative to stage is currently hard-coded, but shouldn't be.
-    */
-    public function onResize():Void
+    public function setSize(width:Number, height:Number):Void
     {
-        width = Stage.width - 2 * _x;
-        height = Stage.height - 2 * _y;
-        
+        this.width = width;
+        this.height = height;
         grid.resizeTo(new Point(width, height));
     }
     

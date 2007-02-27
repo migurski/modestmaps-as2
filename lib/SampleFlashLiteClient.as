@@ -7,28 +7,31 @@ import com.modestmaps.mapproviders.MapProviderFactory;
 
 class SampleFlashLiteClient 
 {
+	private static var __map:Map;
+	
 	public static function main(clip:MovieClip):Void
     {
         Reactor.run(clip, null, 50);
 
     	clip._focusRect = false;
     	
-        var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
-                                           {mapProvider: MapProviderFactory.getInstance().getMapProvider(MapProviders.MICROSOFT_AERIAL),
-                                            _x: 0, _y: 0, width: Stage.width, height: Stage.height,
-                                            draggable: true}));
+        __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth(),
+                                     {mapProvider: MapProviderFactory.getInstance().getMapProvider(MapProviders.MICROSOFT_AERIAL),
+                                      _x: 0, _y: 0, width: Stage.width, height: Stage.height,
+                                      draggable: true}));
         
 
         var extent:/*Location*/Array = [new Location(37.829853, -122.514725),
                                         new Location(37.700121, -122.212601)];
         
-        map.setInitialExtent(extent);
+        __map.setInitialExtent(extent);
         
    		// Set up key listeners. 
    		// TODO: Ghetto. Make this much cleaner.
     	
+    	var map:Map = __map;
+
     	var myListener:Object = new Object();
-    	myListener.map = map;
 		myListener.onKeyDown = function() 
 		{
 			switch ( Key.getCode() )
@@ -55,6 +58,11 @@ class SampleFlashLiteClient
 
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(map);
+        Stage.addListener(SampleFlashLiteClient);
     }
+    
+    private static function onResize() : Void
+    {
+        __map.setSize(Stage.width, Stage.height);
+	}
 }
