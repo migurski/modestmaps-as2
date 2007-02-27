@@ -33,6 +33,9 @@ class SampleClient
         
         __map.setInitialExtent(extent);
         
+        __map.addEventListener(Map.EVENT_MARKER_ENTERS, onMarkerEnters);
+        __map.addEventListener(Map.EVENT_MARKER_LEAVES, onMarkerLeaves);
+        
         __map.putMarker('Rochdale', new Location(37.865571, -122.259679));
         __map.putMarker('Parker Ave.', new Location(37.780492, -122.453731));
         __map.putMarker('Pepper Dr.', new Location(37.623443, -122.426577));
@@ -148,4 +151,13 @@ class SampleClient
 		__mpButtons._x = __map._x + __map._width - __mpButtons._width - 10;    
 	}
     
+    private static function onMarkerEnters(event:Object):Void
+    {
+        __map.grid.log('+ '+event.marker.toString()+' =)');
+    }
+    
+    private static function onMarkerLeaves(event:Object):Void
+    {
+        __map.grid.log('- '+event.marker.toString()+' =(');
+    }
 }

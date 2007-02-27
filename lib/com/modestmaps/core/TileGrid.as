@@ -1,3 +1,4 @@
+import com.modestmaps.geo.Map;
 import com.modestmaps.geo.Location;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
@@ -12,6 +13,8 @@ import com.stamen.twisted.*;
 
 class com.modestmaps.core.TileGrid extends MovieClip
 {
+    private var map:Map;
+
     private var width:Number;
     private var height:Number;
     private var draggable:Boolean;
@@ -935,22 +938,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // check for newly-visible markers
         for(var id:String in newOverlappingMarkers) {
             if(newOverlappingMarkers[id] && !__overlappingMarkers[id]) {
-                /*
-                TODO:
-                Throw an event here indicating that newOverlappingMarkers[id]
-                now overlaps the tile grid, and should be tracked externally.
-                */
+                map.onMarkerEnters(markers.getMarker(id));
                 __overlappingMarkers[id] = true;
             }
         }
         
         for(var id:String in __overlappingMarkers) {
             if(!newOverlappingMarkers[id] && __overlappingMarkers[id]) {
-                /*
-                TODO:
-                Throw an event here indicating that newOverlappingMarkers[id]
-                no longer overlaps the tile grid, and should be ignored.
-                */
+                map.onMarkerLeaves(markers.getMarker(id));
                 delete __overlappingMarkers[id];
             }
         }

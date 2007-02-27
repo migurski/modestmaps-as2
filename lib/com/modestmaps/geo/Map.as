@@ -1,9 +1,11 @@
 import mx.utils.Delegate;
+import mx.events.EventDispatcher;
 import com.stamen.twisted.Reactor;
 import com.stamen.twisted.DelayedCall;
 
 import com.modestmaps.geo.Location;
 import com.modestmaps.core.Point;
+import com.modestmaps.core.Marker;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.mapproviders.IMapProvider;
@@ -29,18 +31,29 @@ class com.modestmaps.geo.Map extends MovieClip
     // Who do we get our Map graphics from?
     public var mapProvider:IMapProvider;
 
+    // stubs for EventDispatcher
+    public var dispatchEvent:Function;
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
+
+    public static var EVENT_MARKER_ENTERS:String = 'Marker enters';
+    public static var EVENT_MARKER_LEAVES:String = 'Marker leaves';
+
     public static var symbolName:String = '__Packages.com.modestmaps.geo.Map';
     public static var symbolOwner:Function = Map;
     public static var symbolLink:Boolean = Object.registerClass(symbolName, symbolOwner);
     
     public function Map()
     {
+        EventDispatcher.initialize(this);
+
         __zoomSteps = [];
 
         setMapProvider(mapProvider);
     
     	var initObj : Object = 
     	{
+    	    map: this,
     		mapProvider: mapProvider, 
     		_x: 0, 
     		_y: 0, 
@@ -49,7 +62,7 @@ class com.modestmaps.geo.Map extends MovieClip
     		draggable: draggable
     	};
     		
-        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj ));
+        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj));
 
         var extent:/*Location*/Array = [new Location(80, -180),
                                         new Location(-80, 180)];
@@ -286,5 +299,17 @@ class com.modestmaps.geo.Map extends MovieClip
     {
         //grid.log('Marker '+name+': '+location.toString());
         grid.putMarker(name, mapProvider.locationCoordinate(location), location);
+    }
+    
+    public function onMarkerEnters(marker:Marker):Void
+    {
+        //grid.log('+ '+marker.toString());
+        dispatchEvent({target: this, type: EVENT_MARKER_ENTERS, marker: marker});
+    }
+    
+    public function onMarkerLeaves(marker:Marker):Void
+    {
+        //grid.log('- '+marker.toString());
+        dispatchEvent({target: this, type: EVENT_MARKER_LEAVES, marker: marker});
     }
 }

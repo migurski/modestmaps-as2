@@ -74,6 +74,15 @@ class com.modestmaps.core.MarkerSet
         
         //grid.log('Marker '+markerId+' in '+tileKey);
     }
+
+   /**
+    * Fetch a single marker by ID.
+    */
+    public function getMarker(id:String):Marker
+    {
+        return markers[id];
+    }
+
    /**
     * Fetch a list of markers within currently-visible tiles.
     */
