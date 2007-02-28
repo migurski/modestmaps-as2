@@ -25,21 +25,14 @@ implements IDispatchable
 	private var __topLeftOutLimit:Coordinate;
 	private var __bottomRightInLimit:Coordinate;
 
-	// tracks if we're set up to broadcast events
-	private static var _dispatcherInited : Boolean = false;
+	// decorate the AbstractMapProvider prototype with event dispatching methods
+	private static var _dispatcherInited = EventDispatcher.initialize(AbstractMapProvider.prototype);
 
 	/*
 	 * Constructor.
 	 */
 	private function AbstractMapProvider()
 	{
-		// only set up broadcasting once, in the prototype
-		if ( !_dispatcherInited )
-		{		
-			EventDispatcher.initialize( this.__proto__ );
-			_dispatcherInited = true;
-		}
-
 		__requestThrottler = RequestThrottler.getInstance();
 
 	    var t:Transformation = new Transformation(1, 0, 0, 0, 1, 0);

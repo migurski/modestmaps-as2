@@ -320,7 +320,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onMarkerEnters(marker:Marker):Void
     {
         //grid.log('+ '+marker.toString());
-        dispatchEvent({target: this, type: EVENT_MARKER_ENTERS, marker: marker});
+        dispatchEvent({type: EVENT_MARKER_ENTERS, marker: marker});
     }
     
    /**
@@ -329,7 +329,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onMarkerLeaves(marker:Marker):Void
     {
         //grid.log('- '+marker.toString());
-        dispatchEvent({target: this, type: EVENT_MARKER_LEAVES, marker: marker});
+        dispatchEvent({type: EVENT_MARKER_LEAVES, marker: marker});
     }
     
    /**
@@ -338,7 +338,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onLeaveZoom(zoomLevel:Number):Void
     {
         //grid.log('Leaving zoom level '+zoomLevel+'...');
-        dispatchEvent({target: this, type: EVENT_LEAVE_ZOOMLEVEL, level: zoomLevel});
+        dispatchEvent({type: EVENT_LEAVE_ZOOMLEVEL, level: zoomLevel});
     }
     
    /**
@@ -347,7 +347,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onEnterZoom(zoomLevel:Number):Void
     {
         //grid.log('...Entering zoom level '+zoomLevel);
-        dispatchEvent({target: this, type: EVENT_ENTER_ZOOMLEVEL, level: zoomLevel});
+        dispatchEvent({type: EVENT_ENTER_ZOOMLEVEL, level: zoomLevel});
     }
     
    /**
@@ -356,7 +356,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onStartDrag():Void
     {
         //grid.log('Starting drag...');
-        dispatchEvent({target: this, type: EVENT_START_PANNING});
+        dispatchEvent({type: EVENT_START_PANNING});
     }
     
    /**
@@ -365,6 +365,6 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onStopDrag():Void
     {
         //grid.log('...Stopping drag');
-        dispatchEvent({target: this, type: EVENT_STOP_PANNING});
+        dispatchEvent({type: EVENT_STOP_PANNING});
     }
 }

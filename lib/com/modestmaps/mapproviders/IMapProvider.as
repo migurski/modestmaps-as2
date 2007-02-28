@@ -6,7 +6,7 @@ import com.modestmaps.geo.Location;
  
 interface com.modestmaps.mapproviders.IMapProvider 
 {
-	public function paint( clip : MovieClip, coord : Coordinate ) : Void;
+	public function paint(clip:MovieClip, coord:Coordinate):Void;
     
    /*
     * Return projected and transformed coordinate for a location.
@@ -29,7 +29,7 @@ interface com.modestmaps.mapproviders.IMapProvider
     */
     public function geometry():String;
     
-    public function toString() : String;
+    public function toString():String;
     
    /*
     * Munge coordinate for purposes of image selection and marker containment.
