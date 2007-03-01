@@ -487,7 +487,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         //log('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
         
         __startingWellPosition = new Point(well._x, well._y);
-        log('Starting well position: '+__startingWellPosition.toString());
+        //log('Starting well position: '+__startingWellPosition.toString());
         
         map.onStartDrag();
         well.startDrag(false, xMin, yMin, xMax, yMax);
@@ -527,7 +527,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         if(redraw) {
             normalizeWell();
             allocateTiles();
-            log('New well scale: '+well._xscale.toString());
+            //log('New well scale: '+well._xscale.toString());
         }
     }
     
@@ -738,7 +738,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             zoomAdjust = Math.round(Math.log(well._xscale / 100) / Math.log(2));
             scaleAdjust = Math.pow(2, zoomAdjust);
         
-            log('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
+            //log('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
 
             for(var i:Number = 0; i < zoomAdjust; i += 1) {
                 splitTiles();
@@ -761,7 +761,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 tiles[i]._yscale *= scaleAdjust;
             }
         
-            log('Scaled to '+zoomLevel+', '+well._xscale+'%');
+            //log('Scaled to '+zoomLevel+', '+well._xscale+'%');
             markers.indexAtZoom(zoomLevel);
         }
     }
