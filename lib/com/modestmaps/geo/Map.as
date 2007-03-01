@@ -111,9 +111,53 @@ class com.modestmaps.geo.Map extends MovieClip
     }
     
    /*
+    * Based on a location and zoom level, determine appropriate initial
+    * tile coordinate and point using calculateMapCenter(), and inform the
+    * grid of an initial tile coordinate and point by calling grid.setInitialTile().
+    */
+    public function setInitialCenter(location:Location, zoom:Number):Void
+    {
+        var center:Object = calculateMapCenter(mapProvider.locationCoordinate(location).zoomTo(zoom));
+        
+        // tell grid what the rock is cooking
+        grid.setInitialTile(Coordinate(center['coord']), Point(center['point']));
+    }
+    
+   /*
+    * Based on a location and zoom level, determine appropriate initial
+    * tile coordinate and point using calculateMapCenter(), and forcefully
+    * move the grid to cover those bounds using grid.resetTiles().
+    */
+    public function setNewCenter(location:Location, zoom:Number):Void
+    {
+        if(!location)
+            return;
+    
+        var center:Object = calculateMapCenter(mapProvider.locationCoordinate(location).zoomTo(zoom));
+        grid.resetTiles(Coordinate(center['coord']), Point(center['point']));
+    }
+    
+   /*
+    * Based on a coordinate, determine appropriate starting tile and position,
+    * and return a two-element object with a coord and a point.
+    */
+    private function calculateMapCenter(centerCoord:Coordinate):Object
+    {
+        // initial tile coordinate
+        var initTileCoord:Coordinate = new Coordinate(Math.floor(centerCoord.row), Math.floor(centerCoord.column), Math.floor(centerCoord.zoom));
+
+        // initial tile position, assuming centered tile well in grid
+        var initX:Number = (initTileCoord.column - centerCoord.column) * grid.tileWidth;
+        var initY:Number = (initTileCoord.row - centerCoord.row) * grid.tileHeight;
+        var initPoint:Point = new Point(Math.round(initX), Math.round(initY));
+        
+        return {coord: initTileCoord, point: initPoint};
+    }
+    
+   /*
     * Based on an array of locations, determine appropriate map bounds
     * in terms of tile grid, and return a two-element object with a coord
-    * and a point.
+    * and a point from calculateMapCenter().
     */
     private function calculateMapExtent(locations:/*Location*/Array):Object
     {
@@ -162,16 +206,8 @@ class com.modestmaps.geo.Map extends MovieClip
         var centerColumn:Number = (TL.column + BR.column) / 2;
         var centerZoom:Number = (TL.zoom + BR.zoom) / 2;
         var centerCoord:Coordinate = (new Coordinate(centerRow, centerColumn, centerZoom)).zoomTo(initZoom);
-
-        // initial tile coordinate
-        var initTileCoord:Coordinate = new Coordinate(Math.floor(centerCoord.row), Math.floor(centerCoord.column), Math.floor(centerCoord.zoom));
-
-        // initial tile position, assuming centered tile well in grid
-        var initX:Number = (initTileCoord.column - centerCoord.column) * grid.tileWidth;
-        var initY:Number = (initTileCoord.row - centerCoord.row) * grid.tileHeight;
-        var initPoint:Point = new Point(Math.round(initX), Math.round(initY));
         
-        return {coord: initTileCoord, point: initPoint};
+        return calculateMapCenter(centerCoord);
     }
     
    /*

@@ -32,6 +32,8 @@ class SampleClient
                                         new Location(37.700121, -122.212601)];
         
         __map.setInitialExtent(extent);
+
+        //Reactor.callLater(2000, Delegate.create(__map, __map.setNewCenter), new Location(37.811411, -122.360916), 14);
         
         __map.addEventListener(Map.EVENT_MARKER_ENTERS, onMarkerEnters);
         __map.addEventListener(Map.EVENT_MARKER_LEAVES, onMarkerLeaves);
