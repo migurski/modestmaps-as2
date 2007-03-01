@@ -320,7 +320,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             updateMarkers();
 
         if(previousPosition.x != well._x || previousPosition.y != well._y)
-            map.onWellPanned(new Point(well._x - previousPosition.x, well._y - previousPosition.y));
+            map.onWellPanned(new Point(well._x - __startingWellPosition.x, well._y - __startingWellPosition.y));
         
         wellDragTask = Reactor.callNextFrame(Delegate.create(this, this.onWellDrag), new Point(well._x, well._y));
     }
