@@ -8,6 +8,11 @@ class com.modestmaps.core.Point
         this.y = y;
     }
     
+    public function copy():Point
+    {
+        return new Point(x, y);
+    }
+    
     public function toString():String
     {
         return '(' + x + ',' + y + ')';

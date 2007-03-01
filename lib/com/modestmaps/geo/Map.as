@@ -47,6 +47,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public static var EVENT_ENTER_ZOOMLEVEL:String = 'Enter zoom level';
     public static var EVENT_START_PANNING:String = 'Start panning';
     public static var EVENT_STOP_PANNING:String = 'Stop panning';
+    public static var EVENT_PANNED_BY:String = 'Panned by...';
 
     public static var symbolName:String = '__Packages.com.modestmaps.geo.Map';
     public static var symbolOwner:Function = Map;
@@ -320,7 +321,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onMarkerEnters(marker:Marker):Void
     {
         //grid.log('+ '+marker.toString());
-        dispatchEvent({type: EVENT_MARKER_ENTERS, marker: marker});
+        dispatchEvent({type: EVENT_MARKER_ENTERS, markerID: marker.id, markerLocation: marker.location});
     }
     
    /**
@@ -329,7 +330,7 @@ class com.modestmaps.geo.Map extends MovieClip
     public function onMarkerLeaves(marker:Marker):Void
     {
         //grid.log('- '+marker.toString());
-        dispatchEvent({type: EVENT_MARKER_LEAVES, marker: marker});
+        dispatchEvent({type: EVENT_MARKER_LEAVES, markerID: marker.id, markerLocation: marker.location});
     }
     
    /**
@@ -366,5 +367,14 @@ class com.modestmaps.geo.Map extends MovieClip
     {
         //grid.log('...Stopping drag');
         dispatchEvent({type: EVENT_STOP_PANNING});
+    }
+    
+   /**
+    * Dispatches EVENT_PANNED_BY when the map is panned.
+    */
+    public function onWellPanned(delta:Point):Void
+    {
+        //grid.log('Current well offset from start: '+delta.toString());
+        dispatchEvent({type: EVENT_PANNED_BY, delta: delta});
     }
 }

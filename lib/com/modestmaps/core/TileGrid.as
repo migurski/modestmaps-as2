@@ -52,6 +52,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
     // some limits on scrolling distance, initially set to none
     private var topLeftOutLimit:Coordinate;
     private var bottomRightInLimit:Coordinate;
+    
+    private var __startingWellPosition:Point;
 
     // Tiles attach to the well.
     private var well:MovieClip;
@@ -312,12 +314,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
    /*
     * Reposition tiles and schedule a recursive call for the next frame.
     */
-    private function onWellDrag():Void
+    private function onWellDrag(previousPosition:Point):Void
     {
         if(positionTiles())
             updateMarkers();
 
-        wellDragTask = Reactor.callNextFrame(Delegate.create(this, this.onWellDrag));
+        if(previousPosition.x != well._x || previousPosition.y != well._y)
+            map.onWellPanned(new Point(well._x - previousPosition.x, well._y - previousPosition.y));
+        
+        wellDragTask = Reactor.callNextFrame(Delegate.create(this, this.onWellDrag), new Point(well._x, well._y));
     }
     
    /*
@@ -481,9 +486,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
                                 
         //log('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
         
+        __startingWellPosition = new Point(well._x, well._y);
+        log('Starting well position: '+__startingWellPosition.toString());
+        
         map.onStartDrag();
         well.startDrag(false, xMin, yMin, xMax, yMax);
-        onWellDrag();
+        onWellDrag(__startingWellPosition.copy());
     }
     
    /*

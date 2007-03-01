@@ -153,11 +153,11 @@ class SampleClient
     
     private static function onMarkerEnters(event:Object):Void
     {
-        __map.grid.log('+ '+event.marker.toString()+' =)');
+        __map.grid.log('+ '+event.markerID.toString()+' =)');
     }
     
     private static function onMarkerLeaves(event:Object):Void
     {
-        __map.grid.log('- '+event.marker.toString()+' =(');
+        __map.grid.log('- '+event.markerID.toString()+' =(');
     }
 }
