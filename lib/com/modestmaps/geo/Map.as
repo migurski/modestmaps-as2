@@ -164,9 +164,9 @@ class com.modestmaps.geo.Map extends MovieClip
         // my kingdom for a decent map() function in AS2
         var coordinates:/*Coordinate*/Array = [];
         
-        while(locations.length)
-            coordinates.push(mapProvider.locationCoordinate(Location(locations.pop())));
-    
+        for(var i:Number = 0; i < locations.length; i += 1)
+            coordinates.unshift(mapProvider.locationCoordinate(locations[i]));
+
         // get outermost top left and bottom right coordinates to cover all locations
         var TL:Coordinate = new Coordinate(coordinates[0].row, coordinates[0].column, coordinates[0].zoom);
         var BR:Coordinate = new Coordinate(coordinates[0].row, coordinates[0].column, coordinates[0].zoom);
