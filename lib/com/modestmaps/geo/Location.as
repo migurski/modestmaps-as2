@@ -11,6 +11,9 @@ class com.modestmaps.geo.Location
     
     public function toString():String
     {
-        return '(' + lat + ',' + lon + ')';
+        var roundLat:Number = Math.round(lat * 10000) / 10000;
+        var roundLon:Number = Math.round(lon * 10000) / 10000;
+
+        return '('+roundLat+','+roundLon+')';
     }
 }

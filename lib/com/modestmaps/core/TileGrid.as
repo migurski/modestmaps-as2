@@ -3,7 +3,7 @@
  * $Id$
  */
 
-import com.modestmaps.geo.Map;
+import com.modestmaps.Map;
 import com.modestmaps.geo.Location;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Bounds;
@@ -113,6 +113,11 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     public function resetTiles(coord:Coordinate, point:Point):Void
     {
+        if(!tiles) {
+            setInitialTile(coord, point);
+            return;
+        }
+    
         var initTile:Tile;
         var condemnedTiles:/*Tile*/Array = activeTiles();
 
@@ -186,23 +191,21 @@ class com.modestmaps.core.TileGrid extends MovieClip
         updateMarkers();
     }
     
-    public function putMarker(name:String, coord:Coordinate, location:Location):Marker
+    public function putMarker(id:String, coord:Coordinate, location:Location):Marker
     {
-        var marker:Marker = new Marker(name, coord, location);
-        //log('Marker '+name+': '+coord.toString());
+        var marker:Marker = new Marker(id, coord, location);
+        //log('Marker '+id+': '+coord.toString());
         markers.put(marker);
 
         updateMarkers();
         return marker;
     }
 
-    public function removeMarker(name:String):Void
+    public function removeMarker(id:String):Void
     {
-        var marker:Marker = markers.getMarker(name);
-        if (marker)
-        {
+        var marker:Marker = markers.getMarker(id);
+        if(marker)
             markers.remove(marker);
-        }
     }
 	
    /**
@@ -320,7 +323,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             updateMarkers();
 
         if(previousPosition.x != well._x || previousPosition.y != well._y)
-            map.onWellPanned(new Point(well._x - __startingWellPosition.x, well._y - __startingWellPosition.y));
+            map.onPanned(new Point(well._x - __startingWellPosition.x, well._y - __startingWellPosition.y));
         
         wellDragTask = Reactor.callNextFrame(Delegate.create(this, this.onWellDrag), new Point(well._x, well._y));
     }
@@ -411,6 +414,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
         return pointCoordinate(point);
     }
     
+    public function centerCoordinate():Coordinate
+    {
+        var point:Point = new Point(width/2, height/2);
+        return pointCoordinate(point);
+    }
+    
     public function bottomRightCoordinate():Coordinate
     {
         var point:Point = new Point(width, height);
@@ -489,7 +498,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         __startingWellPosition = new Point(well._x, well._y);
         //log('Starting well position: '+__startingWellPosition.toString());
         
-        map.onStartDrag();
+        map.onStartPan();
         well.startDrag(false, xMin, yMin, xMax, yMax);
         onWellDrag(__startingWellPosition.copy());
     }
@@ -500,7 +509,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function stopWellDrag():Void
     {
-        map.onStopDrag();
+        map.onStopPan();
         wellDragTask.cancel();
         well.stopDrag();
 
@@ -964,14 +973,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // check for newly-visible markers
         for(var id:String in newOverlappingMarkers) {
             if(newOverlappingMarkers[id] && !__overlappingMarkers[id]) {
-                map.onMarkerEnters(markers.getMarker(id));
+                map.onMarkerEnters(id, markers.getMarker(id).location);
                 __overlappingMarkers[id] = true;
             }
         }
         
         for(var id:String in __overlappingMarkers) {
             if(!newOverlappingMarkers[id] && __overlappingMarkers[id]) {
-                map.onMarkerLeaves(markers.getMarker(id));
+                map.onMarkerLeaves(id, markers.getMarker(id).location);
                 delete __overlappingMarkers[id];
             }
         }
