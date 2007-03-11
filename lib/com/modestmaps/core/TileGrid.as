@@ -334,7 +334,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     *
     * Respect infinite rows or columns, to bind movement on one (or no) axis.
     */
-    public function coordinatePoint(coord:Coordinate, context:MovieClip):Point
+    public function coordinatePoint(coord:Coordinate, context:MovieClip, fearBigNumbers:Boolean):Point
     {
         // pick a reference tile, an arbitrary choice
         // but known to exist regardless of grid size.
@@ -365,9 +365,23 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         }
         
+        if(fearBigNumbers) {
+            if(point.x < -1e6)
+                force.x = Number.NEGATIVE_INFINITY;
+            
+            if(point.x > 1e6)
+                force.x = Number.POSITIVE_INFINITY;
+            
+            if(point.y < -1e6)
+                force.y = Number.NEGATIVE_INFINITY;
+            
+            if(point.y > 1e6)
+                force.y = Number.POSITIVE_INFINITY;
+        }
+        
         well.localToGlobal(point);
         context.globalToLocal(point);
-        
+
         if(force.x)
             point.x = force.x;
         
@@ -430,19 +444,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
     * Start dragging the well with the mouse.
     * Calls onWellDrag().
     */
-    private function getWellBounds():Bounds
+    private function getWellBounds(fearBigNumbers:Boolean):Bounds
     {
         var min:Point, max:Point;
 
         // "min" = furthest well position left & up,
         // use the location of the bottom-right limit
-        min = coordinatePoint(bottomRightInLimit, this);
+        min = coordinatePoint(bottomRightInLimit, this, fearBigNumbers);
         min.x = well._x - min.x + width;
         min.y = well._y - min.y + height;
         
         // "max" = furthest well position right & down,
         // use the location of the top-left limit
-        max = coordinatePoint(topLeftOutLimit, this);
+        max = coordinatePoint(topLeftOutLimit, this, fearBigNumbers);
         max.x = well._x - max.x;
         max.y = well._y - max.y;
         
@@ -464,7 +478,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function startWellDrag():Void
     {
-        var bounds:Bounds = getWellBounds();
+        var bounds:Bounds = getWellBounds(true);
         
         // MovieClip.startDrag seems to hate the infinities,
         // so we'll fudge it with some implausibly large numbers.

@@ -88,7 +88,8 @@ implements IRequest
 			target : this,
 			type : ThrottledRequest.EVENT_RESPONSE_ERROR,
 			errorCode : errorCode,
-			httpStatus : httpStatus
+			httpStatus : httpStatus,
+			clip: clip
 		};
 		dispatchEvent( eventObj );
 		

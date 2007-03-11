@@ -78,5 +78,39 @@ extends AbstractMapProvider
 	
 	private function onResponseError( eventObj : Object ) : Void
 	{
+	    // length of 'X' side, padding from edge, weight of 'X' symbol
+	    var size:Number = 32;
+	    var padding:Number = 4;
+	    var weight:Number = 4;
+
+	    var clip:MovieClip = eventObj.clip;
+	    
+	    with(clip) {
+	        clear();
+	        
+	        moveTo(0, 0);
+	        beginFill(0x444444, 100);
+	        lineTo(size, 0);
+	        lineTo(size, size);
+	        lineTo(0, size);
+	        lineTo(0, 0);
+	        endFill();
+	        
+	        moveTo(weight+padding, padding);
+	        beginFill(0x888888, 100);
+	        lineTo(padding, weight+padding);
+	        lineTo(size-weight-padding, size-padding);
+	        lineTo(size-padding, size-weight-padding);
+	        lineTo(weight+padding, padding);
+	        endFill();
+	        
+	        moveTo(size-weight-padding, padding);
+	        beginFill(0x888888, 100);
+	        lineTo(size-padding, weight+padding);
+	        lineTo(weight+padding, size-padding);
+	        lineTo(padding, size-weight-padding);
+	        lineTo(size-weight-padding, padding);
+	        endFill();
+	    }
 	}		
 }
