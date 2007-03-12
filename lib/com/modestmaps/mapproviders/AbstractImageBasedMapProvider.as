@@ -29,25 +29,6 @@ extends AbstractMapProvider
 	}
 
 	/*
-	 * Returns the value of BASE_URL for the class.
-	 */
-	public function get baseUrl() : String
-	{
-		throw new Error( "Abstract method not implemented by subclass." );	
-		return null;
-	}
-
-	/*
-	 * Returns the value of ASSET_EXTENSION for the class.
-	 */
-	public function get assetExtension() : String
-	{
-		throw new Error( "Abstract method not implemented by subclass." );	
-		return null;	
-	}
-
-	
-	/*
 	 * Returns the url needed to get the tile image. 
 	 */
 	private function getTileUrl( coord : Coordinate ) : String
@@ -56,19 +37,11 @@ extends AbstractMapProvider
 		return null;
 	}
 
-	/*
-	 * Given a URL, returns the coordinates that the URL refers to.
-	 */
-	private function getCoordinateFromURL( url : String ) : Coordinate
-	{
-		throw new Error( "Abstract method not implemented by subclass." );	
-		return null;
-	}
-	
 	// Event Handlers
 
 	private function onRequestError( eventObj : Object ) : Void
 	{
+	    paintFailure(eventObj.clip);
 	}
 	
 	private function onResponseComplete( eventObj : Object ) : Void
@@ -78,12 +51,15 @@ extends AbstractMapProvider
 	
 	private function onResponseError( eventObj : Object ) : Void
 	{
+	    paintFailure(eventObj.clip);
+	}		
+	
+	private function paintFailure(clip:MovieClip):Void
+	{
 	    // length of 'X' side, padding from edge, weight of 'X' symbol
 	    var size:Number = 32;
 	    var padding:Number = 4;
 	    var weight:Number = 4;
-
-	    var clip:MovieClip = eventObj.clip;
 	    
 	    with(clip) {
 	        clear();

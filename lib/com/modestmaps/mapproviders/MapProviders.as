@@ -11,7 +11,6 @@ class com.modestmaps.mapproviders.MapProviders
 	public static var MICROSOFT_ROAD : Number = 1;
 	public static var MICROSOFT_AERIAL : Number = 2;
 	public static var MICROSOFT_HYBRID : Number = 3;
-	public static var MICROSOFT_DELAYED : Number = 4;
 
 	public static var GOOGLE_ROAD : Number = 5;
 	public static var GOOGLE_AERIAL : Number = 6;

@@ -64,9 +64,6 @@ class com.modestmaps.mapproviders.MapProviderFactory
 			case MapProviders.MICROSOFT_HYBRID :
 				return new MicrosoftHybridMapProvider();
 				
-			case MapProviders.MICROSOFT_DELAYED :
-				return new MicrosoftDelayedAerialMapProvider();
-
 			case MapProviders.GOOGLE_ROAD :
 				return new GoogleRoadMapProvider();
 
