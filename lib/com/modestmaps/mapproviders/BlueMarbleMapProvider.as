@@ -17,7 +17,7 @@ implements IMapProvider, IDispatchable
     {
         super();
 
-	    // see: http://track.stamen.com/modestmap/wiki/TileCoordinateComparisons#TileGeolocations
+	    // see: http://modestmaps.mapstraction.com/trac/wiki/TileCoordinateComparisons#TileGeolocations
 	    var t:Transformation = new Transformation(1.068070779e7, 0, 3.355443185e7,
 		                                          0, -1.068070890e7, 3.355443057e7);
 		                                          
