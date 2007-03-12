@@ -1,3 +1,4 @@
+import com.modestmaps.core.Point;
 import com.modestmaps.geo.Transformation;
 import com.modestmaps.geo.AbstractProjection; 
  
@@ -15,5 +16,21 @@ extends AbstractProjection
     public function toString():String
     {
         return 'Linear('+zoom+', '+T.toString()+')';
+    }
+    
+   /*
+    * Return raw projected point.
+    */
+    private function rawProject(point:Point):Point
+    {
+        return new Point(point.x, point.y);
+    }
+    
+   /*
+    * Return raw unprojected point.
+    */
+    private function rawUnproject(point:Point):Point
+    {
+        return new Point(point.x, point.y);
     }
 }

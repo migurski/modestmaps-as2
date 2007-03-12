@@ -28,23 +28,26 @@ implements IProjection
     */
     public function toString():String
     {
-        return 'Abstract('+zoom+', '+T.toString()+')';
+        throw new Error("Abstract method not implemented by subclass.");
+        return null;
     }
     
    /*
-    * Return raw projected point - currently linear.
+    * Return raw projected point.
     */
     private function rawProject(point:Point):Point
     {
-        return new Point(point.x, point.y);
+        throw new Error("Abstract method not implemented by subclass.");
+        return null;
     }
     
    /*
-    * Return raw unprojected point - currently linear.
+    * Return raw unprojected point.
     */
     private function rawUnproject(point:Point):Point
     {
-        return new Point(point.x, point.y);
+        throw new Error("Abstract method not implemented by subclass.");
+        return null;
     }
     
    /*
