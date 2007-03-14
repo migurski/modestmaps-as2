@@ -51,7 +51,8 @@ class SampleClient
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
         Stage.addListener(SampleClient);
-        onResize();
+        
+        Reactor.callNextFrame(onResize);
         
         var buttons:Array = new Array();
         
