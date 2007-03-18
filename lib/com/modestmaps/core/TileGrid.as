@@ -476,7 +476,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     * Start dragging the well with the mouse.
     * Calls onWellDrag().
     */
-    private function startWellDrag():Void
+    public function startWellDrag():Void
     {
         var bounds:Bounds = getWellBounds(true);
         
@@ -521,7 +521,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     * Stop dragging the well with the mouse.
     * Halts wellDragTask.
     */
-    private function stopWellDrag():Void
+    public function stopWellDrag():Void
     {
         map.onStopPan();
         wellDragTask.cancel();
