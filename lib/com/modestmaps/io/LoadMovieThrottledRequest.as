@@ -29,13 +29,7 @@ implements IRequest
 	{
 		if ( clip == undefined || url == undefined || url == "" )
 		{
-			var eventObj : Object =
-			{
-				target : this,
-				type : ThrottledRequest.EVENT_REQUEST_ERROR,
-				clip : this.clip
-			};
-			dispatchEvent( eventObj );
+			dispatchEvent( ThrottledRequest.EVENT_REQUEST_ERROR, clip );
 			
 			cleanup();
 		}
@@ -69,29 +63,14 @@ implements IRequest
 	
 	private function onLoadComplete( clip : MovieClip, httpStatus : Number ) : Void
 	{
-		var eventObj : Object =
-		{
-			target : this,
-			type : ThrottledRequest.EVENT_RESPONSE_COMPLETE,
-			clip : clip,
-			url : url
-		};
-		dispatchEvent( eventObj );
+		dispatchEvent( ThrottledRequest.EVENT_RESPONSE_COMPLETE, clip, url );
 		
 		cleanup();
 	}
 	
 	private function onLoadError( clip : MovieClip, errorCode : String, httpStatus : Number ) : Void
 	{
-		var eventObj : Object =
-		{
-			target : this,
-			type : ThrottledRequest.EVENT_RESPONSE_ERROR,
-			errorCode : errorCode,
-			httpStatus : httpStatus,
-			clip: clip
-		};
-		dispatchEvent( eventObj );
+		dispatchEvent( ThrottledRequest.EVENT_RESPONSE_ERROR, clip, errorCode, httpStatus );
 		
 		cleanup();
 	}

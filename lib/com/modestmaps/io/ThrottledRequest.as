@@ -1,34 +1,22 @@
-import mx.events.EventDispatcher;
-import com.modestmaps.io.RequestThrottler;
+import org.casaframework.event.EventDispatcher;
+
 import com.modestmaps.io.IRequest;
+import com.modestmaps.io.RequestThrottler;
 
 /**
  * @author darren
  */
 class com.modestmaps.io.ThrottledRequest 
+extends EventDispatcher
 implements IRequest
 {
-	// tracks if we're set up to broadcast events
-	private static var __dispatcherInited : Boolean = false;
-	
 	// Events
 	public static var EVENT_REQUEST_ERROR : String = "onRequestError";
 	public static var EVENT_RESPONSE_COMPLETE : String = "onResponseComplete";
 	public static var EVENT_RESPONSE_ERROR : String = "onResponseError";
 	
-	// stubs for EventDispatcher
-	public var dispatchEvent : Function;
-	public var addEventListener : Function;
-	public var removeEventListener : Function;
-	
 	public function ThrottledRequest()
 	{
-		// only set up broadcasting once, in the prototype
-		if ( !__dispatcherInited )
-		{		
-			EventDispatcher.initialize( this.__proto__ );
-			__dispatcherInited = true;
-		}
 	}
 	
 	/*

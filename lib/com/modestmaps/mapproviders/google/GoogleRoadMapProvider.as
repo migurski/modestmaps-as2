@@ -1,15 +1,15 @@
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.google.AbstractGoogleMapProvider;
 import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.events.IDispatchable;
 
 /**
  * @author darren
  */
 class com.modestmaps.mapproviders.google.GoogleRoadMapProvider 
 extends AbstractGoogleMapProvider 
-implements IMapProvider, IDispatchable 
+implements IMapProvider, DispatchableInterface 
 {
 	public function toString() : String
 	{

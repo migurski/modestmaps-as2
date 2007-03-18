@@ -2,14 +2,15 @@
  * @author darren
  */
  
-import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.mapproviders.AbstractMapProvider;
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.events.IDispatchable;
+import com.modestmaps.mapproviders.AbstractMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 
 class com.modestmaps.mapproviders.VanillaMapProvider 
 extends AbstractMapProvider
-implements IMapProvider, IDispatchable
+implements IMapProvider, DispatchableInterface
 {
 	public function paintTile( clip : MovieClip, coord : Coordinate ) : Void 
 	{

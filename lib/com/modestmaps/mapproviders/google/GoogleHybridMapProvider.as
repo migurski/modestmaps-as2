@@ -1,18 +1,17 @@
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.geo.Location;
-import com.modestmaps.mapproviders.google.AbstractGoogleMapProvider;
-import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.events.IDispatchable;
 import com.modestmaps.io.MapProviderPaintThrottledRequest;
-import mx.utils.Delegate;
+import com.modestmaps.mapproviders.google.AbstractGoogleMapProvider;
 import com.modestmaps.mapproviders.google.GoogleAerialMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 
 /**
  * @author darren
  */
 class com.modestmaps.mapproviders.google.GoogleHybridMapProvider 
 extends AbstractGoogleMapProvider 
-implements IMapProvider, IDispatchable 
+implements IMapProvider, DispatchableInterface 
 {
 	private var __gamp : GoogleAerialMapProvider;
 	
@@ -33,15 +32,15 @@ implements IMapProvider, IDispatchable
 		clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
 		
 		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
 		request.send();
 
 		request = new MapProviderPaintThrottledRequest( clip.overlay, getOverlayTileUrl( coord ), coord );
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
 		request.send();
 		
 		//createLabel( clip, coord.toString() );
@@ -61,9 +60,9 @@ implements IMapProvider, IDispatchable
 
 	// Event Handlers
 	
-	private function onResponseComplete( eventObj : Object ) : Void
+	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
-		if ( eventObj.clip.bg._loaded && eventObj.clip.overlay._loaded )
-			raisePaintComplete( eventObj.clip._parent, eventObj.coord );
+		if ( clip.bg._loaded && clip.overlay._loaded )
+			raisePaintComplete( clip._parent, coordinate );
 	}
 }

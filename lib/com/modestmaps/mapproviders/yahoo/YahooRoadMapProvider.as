@@ -1,6 +1,6 @@
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.events.IDispatchable;
-import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.modestmaps.mapproviders.yahoo.AbstractYahooMapProvider;
 
@@ -9,7 +9,7 @@ import com.modestmaps.mapproviders.yahoo.AbstractYahooMapProvider;
  */
 class com.modestmaps.mapproviders.yahoo.YahooRoadMapProvider 
 extends AbstractYahooMapProvider 
-implements IMapProvider, IDispatchable 
+implements IMapProvider, DispatchableInterface 
 {	
 	public function toString() : String
 	{

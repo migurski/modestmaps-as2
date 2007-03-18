@@ -4,18 +4,19 @@
  */
 
 import mx.utils.Delegate;
-import mx.events.EventDispatcher;
-import com.stamen.twisted.Reactor;
-import com.stamen.twisted.DelayedCall;
 
-import com.modestmaps.geo.Location;
-import com.modestmaps.core.Point;
-import com.modestmaps.core.Marker;
-import com.modestmaps.core.TileGrid;
+import org.casaframework.movieclip.DispatchableMovieClip;
+
 import com.modestmaps.core.Coordinate;
+import com.modestmaps.core.Point;
+import com.modestmaps.core.TileGrid;
+import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.IMapProvider;
+import com.stamen.twisted.DelayedCall;
+import com.stamen.twisted.Reactor;
 
-class com.modestmaps.Map extends MovieClip
+class com.modestmaps.Map 
+extends DispatchableMovieClip
 {
     private var __width:Number = 320;
     private var __height:Number = 240;
@@ -43,12 +44,6 @@ class com.modestmaps.Map extends MovieClip
 
     // Who do we get our Map graphics from?
     private var __mapProvider:IMapProvider;
-
-    // stubs for EventDispatcher
-    public var dispatchEvent:Function;
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
-    public static var eventLink = EventDispatcher.initialize(Map.prototype);
 
     // Events thrown
     public static var EVENT_MARKER_ENTERS:String = 'Marker enters';
@@ -451,7 +446,7 @@ class com.modestmaps.Map extends MovieClip
     public function onMarkerEnters(id:String, location:Location):Void
     {
         //grid.log('+ '+marker.toString());
-        dispatchEvent({type: EVENT_MARKER_ENTERS, id: id, location: location});
+        dispatchEvent( EVENT_MARKER_ENTERS, id, location );
     }
     
    /**
@@ -461,7 +456,7 @@ class com.modestmaps.Map extends MovieClip
     public function onMarkerLeaves(id:String, location:Location):Void
     {
         //grid.log('- '+marker.toString());
-        dispatchEvent({type: EVENT_MARKER_LEAVES, id: id, location: location});
+        dispatchEvent( EVENT_MARKER_LEAVES, id, location );
     }
     
    /**
@@ -471,27 +466,27 @@ class com.modestmaps.Map extends MovieClip
     public function onStartZoom():Void
     {
         //grid.log('Leaving zoom level '+grid.zoomLevel+'...');
-        dispatchEvent({type: EVENT_START_ZOOMING, level: grid.zoomLevel});
+        dispatchEvent( EVENT_START_ZOOMING, grid.zoomLevel );
     }
     
    /**
     * Dispatches EVENT_STOP_ZOOMING when the map stops zooming.
-    * Event object includes level:Number.
+    * Callback arguments includes level:Number.
     */
     public function onStopZoom():Void
     {
         //grid.log('...Entering zoom level '+grid.zoomLevel);
-        dispatchEvent({type: EVENT_STOP_ZOOMING, level: grid.zoomLevel});
+        dispatchEvent( EVENT_STOP_ZOOMING, grid.zoomLevel );
     }
     
    /**
     * Dispatches EVENT_ZOOMED_BY when the map is zooomed.
-    * Event object includes delta:Number, difference in levels from zoom start.
+    * Callback arguments includes delta:Number, difference in levels from zoom start.
     */
     public function onZoomed(delta:Number):Void
     {
         //grid.log('Current well offset from start: '+delta.toString());
-        dispatchEvent({type: EVENT_ZOOMED_BY, delta: delta});
+        dispatchEvent( EVENT_ZOOMED_BY, delta );
     }
     
    /**
@@ -500,7 +495,7 @@ class com.modestmaps.Map extends MovieClip
     public function onStartPan():Void
     {
         //grid.log('Starting pan...');
-        dispatchEvent({type: EVENT_START_PANNING});
+        dispatchEvent( EVENT_START_PANNING );
     }
     
    /**
@@ -509,25 +504,25 @@ class com.modestmaps.Map extends MovieClip
     public function onStopPan():Void
     {
         //grid.log('...Stopping pan');
-        dispatchEvent({type: EVENT_STOP_PANNING});
+        dispatchEvent( EVENT_STOP_PANNING );
     }
     
    /**
     * Dispatches EVENT_PANNED_BY when the map is panned.
-    * Event object includes delta:Point, difference in pixels from pan start.
+    * Callback arguments includes delta:Point, difference in pixels from pan start.
     */
     public function onPanned(delta:Point):Void
     {
         //grid.log('Current well offset from start: '+delta.toString());
-        dispatchEvent({type: EVENT_PANNED_BY, delta: delta});
+        dispatchEvent( EVENT_PANNED_BY, delta );
     }
     
    /**
     * Dispatches EVENT_RESIZED_TO when the map is resized.
-    * Event object includes width:Number and height:Number.
+    * Callback arguments include width:Number and height:Number.
     */
     public function onResized():Void
     {
-        dispatchEvent({type: EVENT_RESIZED_TO, width: __width, height: __height});
+        dispatchEvent( EVENT_RESIZED_TO, __width, __height );
     }
 }

@@ -8,9 +8,12 @@ import mx.events.EventDispatcher;
 import com.stamen.twisted.*;
 import com.modestmaps.events.IDispatchable;
 import com.modestmaps.mapproviders.AbstractMapProvider;
+import org.casaframework.movieclip.DispatchableMovieClip;
+import org.casaframework.event.DispatchableInterface;
 
 class com.modestmaps.core.Tile 
-extends MovieClip
+extends DispatchableMovieClip
+implements DispatchableInterface
 {
 	public static var EVENT_PAINT_COMPLETE : String = "onPaintComplete";
 	
@@ -25,20 +28,10 @@ extends MovieClip
 
 	// Keeps track of all clips awaiting painting.
 	private var __displayClips : Array;
-
-	private var __paintCompleteDelegate : Function;
 	
 	private var __paintCall : TilePaintCall;
 	
 	private var __active:Boolean;
-
-	// tracks if we're set up to broadcast events
-	private static var __dispatcherInited : Boolean = false;
-
-	// stubs for EventDispatcher
-	public var dispatchEvent : Function;
-	public var addEventListener : Function;
-	public var removeEventListener : Function;
 
     public static var symbolName:String = '__Packages.com.modestmaps.core.Tile';
     public static var symbolOwner:Function = Tile;
@@ -46,16 +39,8 @@ extends MovieClip
 
     public function Tile()
     {
-    	// only set up broadcasting once, in the prototype
-		if ( !__dispatcherInited )
-		{		
-			EventDispatcher.initialize( this.__proto__ );
-			__dispatcherInited = true;
-		}
-    	
     	__active = true;
-    	__displayClips = new Array();
-    	__paintCompleteDelegate = Delegate.create( this, this.onPaintComplete );   	
+    	__displayClips = new Array();  	
     }
    
     public function get coord() : Coordinate
@@ -149,7 +134,7 @@ extends MovieClip
         if(!grid.paintingAllowed())
             return;
 
-    	IDispatchable(grid.mapProvider).addEventListener(AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate);
+    	DispatchableInterface(grid.mapProvider).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
 
     	// cancel existing call, if any...
     	if(__paintCall)
@@ -186,13 +171,11 @@ extends MovieClip
     
     // Event Handlers
     
-    private function onPaintComplete( eventObj : Object ) : Void
+    private function onPaintComplete( clip : MovieClip, coord : Coordinate ) : Void
     {
-    	var coord : Coordinate = Coordinate( eventObj.coord );
-    	
     	if ( this.coord.equalTo( coord ) )
     	{
-    		IDispatchable( grid.mapProvider ).removeEventListener( AbstractMapProvider.EVENT_PAINT_COMPLETE, __paintCompleteDelegate );
+    		DispatchableInterface(grid.mapProvider).removeEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
     		
     		// remove all other displayClips /below/ this clip   		
     		var dcCoord : Coordinate;
@@ -209,13 +192,7 @@ extends MovieClip
     			}
     		}
     		
-    		// notify anyone who's listening
-    		var newEventObj : Object =
-    		{
-    			target : this,
-    			type : EVENT_PAINT_COMPLETE	
-    		};
-    		dispatchEvent( newEventObj );
+    		dispatchEvent( EVENT_PAINT_COMPLETE );
     	}   	
     }   
 }

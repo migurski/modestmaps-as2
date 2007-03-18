@@ -1,8 +1,8 @@
+import org.casaframework.event.DispatchableInterface;
+
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider;
-import com.modestmaps.core.Coordinate;
-import com.modestmaps.util.BinaryUtil;
-import com.modestmaps.events.IDispatchable;
 
 /**
  * @author darren
@@ -10,7 +10,7 @@ import com.modestmaps.events.IDispatchable;
 
 class com.modestmaps.mapproviders.microsoft.MicrosoftAerialMapProvider 
 extends AbstractMicrosoftMapProvider
-implements IMapProvider, IDispatchable
+implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{

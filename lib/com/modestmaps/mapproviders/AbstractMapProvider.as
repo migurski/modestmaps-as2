@@ -1,19 +1,19 @@
-import mx.events.EventDispatcher;
+import org.casaframework.event.DispatchableInterface;
+import org.casaframework.event.EventDispatcher;
 
-import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.io.RequestThrottler;
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.events.IDispatchable;
 import com.modestmaps.geo.IProjection;
 import com.modestmaps.geo.LinearProjection;
-import com.modestmaps.geo.Transformation;
 import com.modestmaps.geo.Location;
+import com.modestmaps.geo.Transformation;
+import com.modestmaps.io.RequestThrottler;
 
 /**
  * @author darren
  */
 class com.modestmaps.mapproviders.AbstractMapProvider  
-implements IDispatchable
+extends EventDispatcher
+implements DispatchableInterface
 {
 	// Event Types
 	public static var EVENT_PAINT_COMPLETE : String = "onPaintComplete";
@@ -24,9 +24,6 @@ implements IDispatchable
 	// boundaries for the current provider
 	private var __topLeftOutLimit:Coordinate;
 	private var __bottomRightInLimit:Coordinate;
-
-	// decorate the AbstractMapProvider prototype with event dispatching methods
-	private static var _dispatcherInited = EventDispatcher.initialize(AbstractMapProvider.prototype);
 
 	/*
 	 * Constructor.
@@ -90,30 +87,7 @@ implements IDispatchable
 	
 	private function raisePaintComplete( clip : MovieClip, coord : Coordinate ) : Void
 	{
-		var eventObj : Object =
-		{
-			target : this,
-			type : EVENT_PAINT_COMPLETE,
-			clip : clip,
-			coord : coord
-		};
-		dispatchEvent( eventObj );
-	}
-
-	// IDispatchable
-	public function addEventListener( type : String, handler ) : Void
-	{
-		super.addEventListener( type, handler );
-	}
-	
-	public function removeEventListener( type : String, handler ) : Void
-	{
-		super.removeEventListener( type, handler );
-	}
-	
-	public function dispatchEvent( eventObj : Object ) : Void
-	{
-		super.dispatchEvent( eventObj );
+		dispatchEvent( EVENT_PAINT_COMPLETE, clip, coord );
 	}
     
    /*

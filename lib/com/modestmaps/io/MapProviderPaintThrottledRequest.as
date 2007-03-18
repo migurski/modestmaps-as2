@@ -17,16 +17,9 @@ extends LoadMovieThrottledRequest
 		this.coord = coord;
 	}
 
-	private function onLoadComplete( clip : MovieClip, httpStatus : Number ) : Void
+	private function onLoadComplete( clip : MovieClip, url : String ) : Void
 	{
-		var eventObj : Object =
-		{
-			target : this,
-			type : ThrottledRequest.EVENT_RESPONSE_COMPLETE,
-			clip : clip,
-			coord : coord
-		};
-		dispatchEvent( eventObj );
+		dispatchEvent( ThrottledRequest.EVENT_RESPONSE_COMPLETE, clip, coord );
 		
 		cleanup();
 	}

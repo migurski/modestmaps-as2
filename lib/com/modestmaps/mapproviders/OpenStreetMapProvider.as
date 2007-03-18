@@ -1,9 +1,10 @@
-import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.events.IDispatchable;
 import com.modestmaps.geo.MercatorProjection;
 import com.modestmaps.geo.Transformation;
+import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
 
 /**
  * @author migurski
@@ -11,7 +12,7 @@ import com.modestmaps.geo.Transformation;
 
 class com.modestmaps.mapproviders.OpenStreetMapProvider
 extends AbstractImageBasedMapProvider
-implements IMapProvider, IDispatchable
+implements IMapProvider, DispatchableInterface
 {
     public function OpenStreetMapProvider()
     {

@@ -4,10 +4,20 @@
  * @author darren
  */
  
-import com.modestmaps.mapproviders.*; 
-import com.modestmaps.mapproviders.microsoft.*;
-import com.modestmaps.mapproviders.google.*;
-import com.modestmaps.mapproviders.yahoo.*;
+import com.modestmaps.mapproviders.BlueMarbleMapProvider;
+import com.modestmaps.mapproviders.google.GoogleAerialMapProvider;
+import com.modestmaps.mapproviders.google.GoogleHybridMapProvider;
+import com.modestmaps.mapproviders.google.GoogleRoadMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
+import com.modestmaps.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.microsoft.MicrosoftAerialMapProvider;
+import com.modestmaps.mapproviders.microsoft.MicrosoftHybridMapProvider;
+import com.modestmaps.mapproviders.microsoft.MicrosoftRoadMapProvider;
+import com.modestmaps.mapproviders.OpenStreetMapProvider;
+import com.modestmaps.mapproviders.VanillaMapProvider;
+import com.modestmaps.mapproviders.yahoo.YahooAerialMapProvider;
+import com.modestmaps.mapproviders.yahoo.YahooHybridMapProvider;
+import com.modestmaps.mapproviders.yahoo.YahooRoadMapProvider;
 
 class com.modestmaps.mapproviders.MapProviderFactory 
 {

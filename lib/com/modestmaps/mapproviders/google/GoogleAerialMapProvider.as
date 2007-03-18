@@ -1,8 +1,8 @@
+import org.casaframework.event.DispatchableInterface;
+
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.google.AbstractGoogleMapProvider;
 import com.modestmaps.mapproviders.IMapProvider;
-import com.modestmaps.events.IDispatchable;
 import com.modestmaps.util.BinaryUtil;
 
 /**
@@ -10,7 +10,7 @@ import com.modestmaps.util.BinaryUtil;
  */
 class com.modestmaps.mapproviders.google.GoogleAerialMapProvider 
 extends AbstractGoogleMapProvider 
-implements IMapProvider, IDispatchable 
+implements IMapProvider, DispatchableInterface 
 {
 	public function toString() : String
 	{

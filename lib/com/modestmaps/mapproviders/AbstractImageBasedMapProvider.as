@@ -20,9 +20,9 @@ extends AbstractMapProvider
 		super.paint( clip, coord );
 		
 		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.image, getTileUrl( coord ), coord );
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, Delegate.create( this, this.onRequestError ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, Delegate.create( this, this.onResponseComplete ));
-		request.addEventListener( MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, Delegate.create( this, this.onResponseError ));
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError");
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError");
 		request.send();
 		
 		//createLabel( clip, coord.toString() );
@@ -39,19 +39,19 @@ extends AbstractMapProvider
 
 	// Event Handlers
 
-	private function onRequestError( eventObj : Object ) : Void
+	private function onRequestError( clip : MovieClip ) : Void
 	{
-	    paintFailure(eventObj.clip);
+	    paintFailure( clip );
 	}
 	
-	private function onResponseComplete( eventObj : Object ) : Void
+	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
-		raisePaintComplete( eventObj.clip, eventObj.coord );
+		raisePaintComplete( clip, coordinate );
 	}
 	
-	private function onResponseError( eventObj : Object ) : Void
+	private function onResponseError( clip : MovieClip, errorCode : String, httpStatus : Number ) : Void
 	{
-	    paintFailure(eventObj.clip);
+	    paintFailure(clip);
 	}		
 	
 	private function paintFailure(clip:MovieClip):Void
