@@ -1,5 +1,5 @@
 import com.stamen.twisted.DelayedCall;
-import mx.utils.Delegate;
+import com.bigspaceship.utils.Delegate;
 
 /**
  * Inspired by:

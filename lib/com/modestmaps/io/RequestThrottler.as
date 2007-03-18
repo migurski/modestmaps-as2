@@ -1,5 +1,5 @@
+import com.bigspaceship.utils.Delegate;
 import com.modestmaps.io.IRequest;
-import mx.utils.Delegate;
 
 /**
  * Used to limit the number of requests per frame.

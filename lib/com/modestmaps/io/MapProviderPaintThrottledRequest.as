@@ -1,5 +1,5 @@
-import com.modestmaps.io.LoadMovieThrottledRequest;
 import com.modestmaps.core.Coordinate;
+import com.modestmaps.io.LoadMovieThrottledRequest;
 import com.modestmaps.io.ThrottledRequest;
 
 /**

@@ -1,15 +1,14 @@
-import com.modestmaps.core.Point;
-import com.modestmaps.core.Coordinate;
-import com.modestmaps.core.TilePaintCall;
-import com.modestmaps.core.TileGrid;
-import com.modestmaps.mapproviders.IMapProvider;
-import mx.utils.Delegate;
-import mx.events.EventDispatcher;
-import com.stamen.twisted.*;
-import com.modestmaps.events.IDispatchable;
-import com.modestmaps.mapproviders.AbstractMapProvider;
-import org.casaframework.movieclip.DispatchableMovieClip;
 import org.casaframework.event.DispatchableInterface;
+import org.casaframework.movieclip.DispatchableMovieClip;
+
+import com.bigspaceship.utils.Delegate;
+import com.modestmaps.core.Coordinate;
+import com.modestmaps.core.Point;
+import com.modestmaps.core.TileGrid;
+import com.modestmaps.core.TilePaintCall;
+import com.modestmaps.mapproviders.AbstractMapProvider;
+import com.modestmaps.mapproviders.IMapProvider;
+import com.stamen.twisted.Reactor;
 
 class com.modestmaps.core.Tile 
 extends DispatchableMovieClip

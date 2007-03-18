@@ -2,13 +2,10 @@
  * vim:et sts=4 sw=4 cindent:
  */
 
-import mx.utils.Delegate;
-import com.stamen.twisted.*;
-
-import com.modestmaps.core.Tile;
-import com.modestmaps.core.Marker;
-import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.Coordinate;
+import com.modestmaps.core.Marker;
+import com.modestmaps.core.Tile;
+import com.modestmaps.core.TileGrid;
 
 class com.modestmaps.core.MarkerSet
 {

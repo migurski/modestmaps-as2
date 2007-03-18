@@ -1,8 +1,6 @@
-import com.modestmaps.mapproviders.AbstractMapProvider;
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.io.LoadMovieThrottledRequest;
-import mx.utils.Delegate;
 import com.modestmaps.io.MapProviderPaintThrottledRequest;
+import com.modestmaps.mapproviders.AbstractMapProvider;
 
 /**
  * @author darren

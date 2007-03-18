@@ -1,8 +1,7 @@
-import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
-import com.modestmaps.geo.Transformation;
-import com.modestmaps.geo.MercatorProjection;
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.util.BinaryUtil;
+import com.modestmaps.geo.MercatorProjection;
+import com.modestmaps.geo.Transformation;
+import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
 
 /**
  * @author darren

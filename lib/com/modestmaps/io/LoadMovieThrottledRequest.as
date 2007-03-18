@@ -1,6 +1,5 @@
-import com.modestmaps.io.ThrottledRequest;
-import com.modestmaps.io.RequestThrottler;
 import com.modestmaps.io.IRequest;
+import com.modestmaps.io.ThrottledRequest;
 
 /**
  * @author darren

@@ -3,7 +3,7 @@
  * $Id$
  */
 
-import mx.utils.Delegate;
+import com.bigspaceship.utils.Delegate;
 
 import org.casaframework.movieclip.DispatchableMovieClip;
 

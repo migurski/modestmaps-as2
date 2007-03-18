@@ -3,18 +3,18 @@
  * $Id$
  */
 
-import com.modestmaps.Map;
-import com.modestmaps.geo.Location;
-import com.modestmaps.core.Coordinate;
+import com.bigspaceship.utils.Delegate;
 import com.modestmaps.core.Bounds;
-import com.modestmaps.core.MarkerSet;
+import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Marker;
+import com.modestmaps.core.MarkerSet;
 import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
+import com.modestmaps.geo.Location;
+import com.modestmaps.Map;
 import com.modestmaps.mapproviders.IMapProvider;
-
-import mx.utils.Delegate;
-import com.stamen.twisted.*;
+import com.stamen.twisted.DelayedCall;
+import com.stamen.twisted.Reactor;
 
 class com.modestmaps.core.TileGrid extends MovieClip
 {

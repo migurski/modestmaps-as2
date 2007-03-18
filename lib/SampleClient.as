@@ -1,5 +1,4 @@
-import mx.utils.Delegate;
-
+import com.bigspaceship.utils.Delegate;
 import com.modestmaps.core.Point;
 import com.modestmaps.geo.Location;
 import com.modestmaps.Map;
