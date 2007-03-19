@@ -60,7 +60,7 @@ implements IRequest
 
 	// Event Handlers
 	
-	private function onLoadComplete( clip : MovieClip, httpStatus : Number ) : Void
+	private function onLoadInit( clip : MovieClip, httpStatus : Number ) : Void
 	{
 		dispatchEvent( ThrottledRequest.EVENT_RESPONSE_COMPLETE, clip, url );
 		

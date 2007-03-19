@@ -17,6 +17,10 @@ implements IMapProvider, DispatchableInterface
 		return "YahooHybridMapProvider[]";
 	}
 	
+	/**
+	 * Yahoo clips are 258x258 to deal with Flash pixel fudge, we mask and offset them by
+	 * one pixel so they show up correctly.
+	 */
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
 		clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
@@ -34,7 +38,10 @@ implements IMapProvider, DispatchableInterface
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
 		request.send();
 		
-		//createLabel( clip, coord.toString() );
+		clip.bg._x = clip.bg._y = -1;
+		clip.overlay._x = clip.overlay._y = -1;
+
+		createMask( clip );		
 	}	
 
 	private function getBGTileUrl(coord:Coordinate):String
@@ -58,11 +65,22 @@ implements IMapProvider, DispatchableInterface
 		return zoomString; 
 	}	
 
+	private function isClipLoaded( clip : MovieClip ) : Boolean
+	{
+		return ( clip.getBytesTotal() > 0 && clip.getBytesLoaded() == clip.getBytesTotal() );
+	}
+
 	// Event Handlers
 	
 	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
-		if ( clip.bg._loaded && clip.overlay._loaded )
+		// HAKT
+		var bgClip : MovieClip = clip._parent.bg;
+		var overlayClip : MovieClip = clip._parent.overlay;
+		
+		if ( isClipLoaded( bgClip ) && isClipLoaded( overlayClip ) )
+		{
 			raisePaintComplete( clip._parent, coordinate );
+		}
 	}
 }

@@ -87,7 +87,7 @@ implements DispatchableInterface
 	
 	private function raisePaintComplete( clip : MovieClip, coord : Coordinate ) : Void
 	{
-		dispatchEvent( EVENT_PAINT_COMPLETE, clip, coord );
+		dispatchEvent( AbstractMapProvider.EVENT_PAINT_COMPLETE, clip, coord );
 	}
     
    /*

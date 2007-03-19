@@ -18,6 +18,10 @@ import com.stamen.twisted.Reactor;
 
 class com.modestmaps.core.TileGrid extends MovieClip
 {
+    // Real maps use 256.
+    public static var TILE_WIDTH : Number = 256;
+    public static var TILE_HEIGHT : Number = 256;
+
     private var map:Map;
 
     private var width:Number;
@@ -35,10 +39,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
     // Markers overlapping the currently-included set of tiles, hash of booleans
     private var __overlappingMarkers:Object;
 
-    // Real maps use 256.
-    public var tileWidth:Number = 256;
-    public var tileHeight:Number = 256;
-    
     // Allow (true) or prevent (false) tiles to paint themselves.
     private var __paintingAllowed:Boolean;
     
@@ -130,8 +130,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var initObj:Object =
         { 
             grid: this, 
-            width: tileWidth, 
-            height: tileHeight,
+            width: TILE_WIDTH, 
+            height: TILE_HEIGHT,
             coord: coord
         };
 
@@ -163,8 +163,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var initObj:Object =
         { 
             grid: this, 
-            width: tileWidth, 
-            height: tileHeight,
+            width: TILE_WIDTH, 
+            height: TILE_HEIGHT,
             coord: initTileCoord
         };
         
@@ -353,7 +353,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             force.x = coord.column;
             
         } else {
-            point.x += tileWidth * (coord.column - tile.coord.column);
+            point.x += TILE_WIDTH * (coord.column - tile.coord.column);
         
         }
         
@@ -361,7 +361,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             force.y = coord.row;
             
         } else {
-            point.y += tileHeight * (coord.row - tile.coord.row);
+            point.y += TILE_HEIGHT * (coord.row - tile.coord.row);
 
         }
         
@@ -407,8 +407,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         tileCoord = tileCoord.zoomTo(Coordinate.MAX_ZOOM);
         
         // distance in tile widths from reference tile to point
-        var xTiles:Number = (point.x - tile._x) / tileWidth;
-        var yTiles:Number = (point.y - tile._y) / tileHeight;
+        var xTiles:Number = (point.x - tile._x) / TILE_WIDTH;
+        var yTiles:Number = (point.y - tile._y) / TILE_HEIGHT;
 
         // distance in rows & columns at maximum zoom
         var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.coord.zoom));
@@ -659,8 +659,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var wellWidth:Number  = (100 / well._xscale) * width;
         var wellHeight:Number = (100 / well._yscale) * height;
 
-        var targetCols:Number = Math.ceil(wellWidth  / tileWidth)  + 1 + 2 * tileBuffer;
-        var targetRows:Number = Math.ceil(wellHeight / tileHeight) + 1 + 2 * tileBuffer;
+        var targetCols:Number = Math.ceil(wellWidth  / TILE_WIDTH)  + 1 + 2 * tileBuffer;
+        var targetRows:Number = Math.ceil(wellHeight / TILE_HEIGHT) + 1 + 2 * tileBuffer;
 
         // grid can't drop below 1 x 1
         targetCols = Math.max(1, targetCols);
@@ -747,8 +747,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
             active[0]._y = Math.round(active[0]._y);
             
             for(var i:Number = 1; i < active.length; i += 1) {
-                active[i]._x = active[0]._x + (active[i].coord.column - active[0].coord.column) * tileWidth;
-                active[i]._y = active[0]._y + (active[i].coord.row    - active[0].coord.row)    * tileHeight;
+                active[i]._x = active[0]._x + (active[i].coord.column - active[0].coord.column) * TILE_WIDTH;
+                active[i]._y = active[0]._y + (active[i].coord.row    - active[0].coord.row)    * TILE_HEIGHT;
             
                 //log(active[i].toString()+' at '+active[i]._x+', '+active[i]._y+' vs. '+active[0].toString());
             }
@@ -841,8 +841,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
             if(yOffset)
                 newTile.coord = newTile.coord.down();
 
-            newTile._x = referenceTile._x + (xOffset * tileWidth / 2);
-            newTile._y = referenceTile._y + (yOffset * tileHeight / 2);
+            newTile._x = referenceTile._x + (xOffset * TILE_WIDTH / 2);
+            newTile._y = referenceTile._y + (yOffset * TILE_HEIGHT / 2);
 
             newTile._xscale = newTile._yscale = referenceTile._xscale / 2;
             newTile.redraw();
@@ -922,15 +922,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
         this.localToGlobal(point);
         well.globalToLocal(point); // all tiles are attached to well
         
-        var xMin:Number = point.x - (1 + tileBuffer) * tileWidth;
-        var yMin:Number = point.y - (1 + tileBuffer) * tileHeight;
+        var xMin:Number = point.x - (1 + tileBuffer) * TILE_WIDTH;
+        var yMin:Number = point.y - (1 + tileBuffer) * TILE_HEIGHT;
         
         point = new Point(width, height);
         this.localToGlobal(point);
         well.globalToLocal(point); // all tiles are attached to well
         
-        var xMax:Number = point.x + (0 + tileBuffer) * tileWidth;
-        var yMax:Number = point.y + (0 + tileBuffer) * tileHeight;
+        var xMax:Number = point.x + (0 + tileBuffer) * TILE_WIDTH;
+        var yMax:Number = point.y + (0 + tileBuffer) * TILE_HEIGHT;
         
         for(var i:Number = 0; i < active.length; i += 1) {
         
@@ -943,15 +943,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
             if(tile._y < yMin) {
                 // too far up
                 tile.panDown(rows);
-                tile._y += rows * tileHeight;
+                tile._y += rows * TILE_HEIGHT;
                 touched = true;
 
             } else if(tile._y > yMax) {
                 // too far down
-                if((tile._y - rows * tileHeight) > yMin) {
+                if((tile._y - rows * TILE_HEIGHT) > yMin) {
                     // moving up wouldn't put us too far
                     tile.panUp(rows);
-                    tile._y -= rows * tileHeight;
+                    tile._y -= rows * TILE_HEIGHT;
                     touched = true;
                 }
             }
@@ -959,15 +959,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
             if(tile._x < xMin) {
                 // too far left
                 tile.panRight(columns);
-                tile._x += columns * tileWidth;
+                tile._x += columns * TILE_WIDTH;
                 touched = true;
 
             } else if(tile._x > xMax) {
                 // too far right
-                if((tile._x - columns * tileWidth) > xMin) {
+                if((tile._x - columns * TILE_WIDTH) > xMin) {
                     // moving left wouldn't put us too far
                     tile.panLeft(columns);
-                    tile._x -= columns * tileWidth;
+                    tile._x -= columns * TILE_WIDTH;
                     touched = true;
                 }
             }
@@ -1017,7 +1017,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
             newTileParams = {grid:  lastTile.grid,  coord:  lastTile.coord.down(),
                              _x:    lastTile._x,    _y:     lastTile._y + lastTile.height,
-                             width: tileWidth,      height: tileHeight};
+                             width: TILE_WIDTH,      height: TILE_HEIGHT};
 
             createTile(newTileParams);
         }
@@ -1057,7 +1057,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
             newTileParams = {grid:  lastTile.grid,                  coord:  lastTile.coord.right(),
                              _x:    lastTile._x + lastTile.width,   _y:     lastTile._y,
-                             width: tileWidth,                      height: tileHeight};
+                             width: TILE_WIDTH,                     height: TILE_HEIGHT};
 
             createTile(newTileParams);
         }

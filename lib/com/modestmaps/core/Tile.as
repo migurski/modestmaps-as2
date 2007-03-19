@@ -132,9 +132,7 @@ implements DispatchableInterface
         // are we even allowed to paint ourselves?
         if(!grid.paintingAllowed())
             return;
-
-    	DispatchableInterface(grid.mapProvider).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
-
+		
     	// cancel existing call, if any...
     	if(__paintCall)
     	    __paintCall.cancel();
@@ -154,6 +152,7 @@ implements DispatchableInterface
     	//grid.log("Painting tile: " + tileCoord.toString());
     	
     	// set up the proper clip to paint here
+   		DispatchableInterface(grid.mapProvider).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
     	
     	var clipId : Number = this.getNextHighestDepth();
     	var clip : MovieClip = this.createEmptyMovieClip( "display" + clipId, clipId );
@@ -181,6 +180,7 @@ implements DispatchableInterface
     		for ( var i : Number = 0; i < __displayClips.length; i++ )
     		{
     			dcCoord = Coordinate( __displayClips[i].coord );
+    			    			
     			if ( dcCoord.equalTo( this.coord ) )
 					break;
     			else
@@ -191,7 +191,7 @@ implements DispatchableInterface
     			}
     		}
     		
-    		dispatchEvent( EVENT_PAINT_COMPLETE );
+	   		dispatchEvent( EVENT_PAINT_COMPLETE );
     	}   	
     }   
 }

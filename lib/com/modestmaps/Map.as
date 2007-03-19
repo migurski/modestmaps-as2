@@ -125,8 +125,8 @@ extends DispatchableMovieClip
         var initTileCoord:Coordinate = new Coordinate(Math.floor(centerCoord.row), Math.floor(centerCoord.column), Math.floor(centerCoord.zoom));
 
         // initial tile position, assuming centered tile well in grid
-        var initX:Number = (initTileCoord.column - centerCoord.column) * grid.tileWidth;
-        var initY:Number = (initTileCoord.row - centerCoord.row) * grid.tileHeight;
+        var initX:Number = (initTileCoord.column - centerCoord.column) * TileGrid.TILE_WIDTH;
+        var initY:Number = (initTileCoord.row - centerCoord.row) * TileGrid.TILE_HEIGHT;
         var initPoint:Point = new Point(Math.round(initX), Math.round(initY));
         
         return {coord: initTileCoord, point: initPoint};
@@ -156,7 +156,7 @@ extends DispatchableMovieClip
         }
 
         // multiplication factor between horizontal span and map width
-        var hFactor:Number = (BR.column - TL.column) / (__width / grid.tileWidth);
+        var hFactor:Number = (BR.column - TL.column) / (__width / TileGrid.TILE_WIDTH);
         
         // multiplication factor expressed as base-2 logarithm, for zoom difference
         var hZoomDiff:Number = Math.log(hFactor) / Math.log(2);
@@ -165,7 +165,7 @@ extends DispatchableMovieClip
         var hPossibleZoom:Number = TL.zoom - Math.ceil(hZoomDiff);
         
         // multiplication factor between vertical span and map height
-        var vFactor:Number = (BR.row - TL.row) / (__height / grid.tileHeight);
+        var vFactor:Number = (BR.row - TL.row) / (__height / TileGrid.TILE_HEIGHT);
         
         // multiplication factor expressed as base-2 logarithm, for zoom difference
         var vZoomDiff:Number = Math.log(vFactor) / Math.log(2);
