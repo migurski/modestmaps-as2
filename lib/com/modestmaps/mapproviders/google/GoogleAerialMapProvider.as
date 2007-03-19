@@ -47,6 +47,6 @@ implements IMapProvider, DispatchableInterface
 	
 	public function get versionNum() : String
 	{
-		return AbstractGoogleMapProvider.AERIAL_VERSION_NUM;
+		return __versionNumXml.firstChild.attributes.aerialVersionNum;
 	}	
 }

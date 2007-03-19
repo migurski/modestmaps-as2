@@ -28,6 +28,6 @@ implements IMapProvider, DispatchableInterface
 	
 	public function get versionNum() : String
 	{
-		return AbstractGoogleMapProvider.ROAD_VERSION_NUM;
+		return __versionNumXml.firstChild.attributes.roadVersionNum;
 	}		
 }

@@ -77,6 +77,6 @@ implements IMapProvider, DispatchableInterface
 	
 	public function get versionNum() : String
 	{
-		return AbstractGoogleMapProvider.HYBRID_VERSION_NUM;
+		return __versionNumXml.firstChild.attributes.hybridVersionNum;
 	}	
 }

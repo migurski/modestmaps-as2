@@ -12,11 +12,9 @@ extends AbstractImageBasedMapProvider
 {
 	private var __paintQueue : Array;
 
-	public static var AERIAL_VERSION_NUM : String;
-	public static var HYBRID_VERSION_NUM : String;
-	public static var ROAD_VERSION_NUM : String;
+	private static var __versionNumXml : XML;
 
-	private static var __VERSION_NUM_REQUESTED : Boolean = false;
+	private static var VERSION_NUM_REQUESTED : Boolean = false;
 	
 	function AbstractGoogleMapProvider() 
 	{
@@ -56,11 +54,11 @@ extends AbstractImageBasedMapProvider
 	
 	private function checkVersionRequested()
 	{
-		if ( !AbstractGoogleMapProvider.__VERSION_NUM_REQUESTED )
+		if ( !AbstractGoogleMapProvider.VERSION_NUM_REQUESTED )
 		{
-			trace ("  checkVersionRequested(): " + AbstractGoogleMapProvider.__VERSION_NUM_REQUESTED );
+			trace ("  checkVersionRequested(): " + AbstractGoogleMapProvider.VERSION_NUM_REQUESTED );
 			// we need to create a blocking request to load our version number
-			AbstractGoogleMapProvider.__VERSION_NUM_REQUESTED = true;
+			AbstractGoogleMapProvider.VERSION_NUM_REQUESTED = true;
 		
 			__paintQueue = new Array();
 
@@ -96,11 +94,7 @@ extends AbstractImageBasedMapProvider
 	
 	private function onVersionNumResponseComplete( xml : XML ) : Void
 	{
-		var atts : Object = xml.firstChild.attributes;
-
-		AERIAL_VERSION_NUM = atts.aerialVersionNum;
-		HYBRID_VERSION_NUM = atts.hybridVersionNum;
-		ROAD_VERSION_NUM = atts.roadVersionNum;
+		__versionNumXml = xml;
 		processQueue();
 	}
 	
