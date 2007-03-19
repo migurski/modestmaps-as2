@@ -15,8 +15,11 @@ implements IRequest
 	public static var EVENT_RESPONSE_COMPLETE : String = "onResponseComplete";
 	public static var EVENT_RESPONSE_ERROR : String = "onResponseError";
 	
-	public function ThrottledRequest()
+	private var __blocking : Boolean;
+	
+	public function ThrottledRequest( blocking : Boolean )
 	{
+		__blocking = blocking != null ? blocking : false;
 	}
 	
 	/*
@@ -34,5 +37,10 @@ implements IRequest
 	public function execute() : Void
 	{
 		throw new Error( "Abstract method not implemented by subclass." );	
+	}
+	
+	public function isBlocking() : Boolean
+	{
+		return __blocking;	
 	}
 }

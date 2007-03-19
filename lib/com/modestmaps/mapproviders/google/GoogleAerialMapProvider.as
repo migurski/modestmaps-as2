@@ -19,7 +19,7 @@ implements IMapProvider, DispatchableInterface
 
 	public function getTileUrl( coord : Coordinate ) : String
 	{
-		return "http://kh" + Math.floor(Math.random() * 4) + ".google.com/kh?n=404&v=17&t=" + getZoomString(sourceCoordinate(coord));
+		return "http://kh" + Math.floor(Math.random() * 4) + ".google.com/kh?n=404&v=" + versionNum + "&t=" + getZoomString(sourceCoordinate(coord));
 	}
 	
 	private function getZoomString(coord:Coordinate):String
@@ -44,4 +44,9 @@ implements IMapProvider, DispatchableInterface
                          
 		return zoomString; 
 	}
+	
+	public function get versionNum() : String
+	{
+		return AbstractGoogleMapProvider.AERIAL_VERSION_NUM;
+	}	
 }

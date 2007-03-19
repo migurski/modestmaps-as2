@@ -1,5 +1,6 @@
 import com.bigspaceship.utils.Delegate;
 import com.modestmaps.io.IRequest;
+import com.modestmaps.io.ThrottledRequest;
 
 /**
  * Used to limit the number of requests per frame.
@@ -30,7 +31,7 @@ class com.modestmaps.io.RequestThrottler
 	{
 		__queue = new Array();
 		
-		__throttleTimer = setInterval( Delegate.create( this, this.onThrottleTimer ), __throttleSpeedMS );	
+		startQueue();
 	}
 	
 	public function toString() : String
@@ -62,9 +63,40 @@ class com.modestmaps.io.RequestThrottler
 		var count = __requestsPerCycle;
 		while ( __queue.length > 0 && count-- )
 		{
-			var request : IRequest = IRequest( __queue.shift() );			
+			var request : IRequest = IRequest( __queue.shift() );
 			request.execute(); 
+
+			if ( request.isBlocking() )
+			{
+				// we don't care what the response was, just that it's done blocking. let the primary listener
+				// handle errors
+				request.addEventObserver( this, ThrottledRequest.EVENT_REQUEST_ERROR, "onBlockingRequestComplete");
+				request.addEventObserver( this, ThrottledRequest.EVENT_RESPONSE_COMPLETE, "onBlockingRequestComplete");
+				request.addEventObserver( this, ThrottledRequest.EVENT_RESPONSE_ERROR, "onBlockingRequestComplete");
+				
+				// stop the queue and wait for resolution.
+				stopQueue();		
+				break;
+			}
 		}
+	}
+	
+	/**
+	 * Stops queue execution.
+	 */
+	private function stopQueue() : Void
+	{
+		clearInterval( __throttleTimer );
+		delete __throttleTimer;
+	}
+	
+	/**
+	 * Starts queue execution.
+	 */
+	private function startQueue() : Void
+	{
+		if ( __throttleTimer == undefined )
+			__throttleTimer = setInterval( Delegate.create( this, this.onThrottleTimer ), __throttleSpeedMS );	
 	}
 	
 	// Event Handlers
@@ -73,4 +105,10 @@ class com.modestmaps.io.RequestThrottler
 	{
 		processQueue();
 	}
+	
+	private function onBlockingRequestComplete() : Void
+	{
+		startQueue();
+	}
+	
 }

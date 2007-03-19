@@ -28,20 +28,29 @@ implements IMapProvider, DispatchableInterface
 
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
-		clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
+		checkVersionRequested();
 		
-		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
-		request.send();
-
-		request = new MapProviderPaintThrottledRequest( clip.overlay, getOverlayTileUrl( coord ), coord );
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
-		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
-		request.send();
+		if ( versionNum != undefined )
+		{		
+			clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
+			clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
+			
+			var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
+			request.send();
+	
+			request = new MapProviderPaintThrottledRequest( clip.overlay, getOverlayTileUrl( coord ), coord );
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
+			request.send();
+		}
+		else
+		{
+			enqueuePaintRequest( clip, coord );
+		}
 		
 		//createLabel( clip, coord.toString() );
 	}	
@@ -55,7 +64,7 @@ implements IMapProvider, DispatchableInterface
 	{		
         var sourceCoord:Coordinate = sourceCoordinate(coord);
         var zoomString:String = "&x=" + sourceCoord.column + "&y=" + sourceCoord.row + "&zoom=" + (17 - sourceCoord.zoom);
-		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=w2t.43" + zoomString;
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=" + versionNum + zoomString;
 	}
 
 	// Event Handlers
@@ -65,4 +74,9 @@ implements IMapProvider, DispatchableInterface
 		if ( clip.bg._loaded && clip.overlay._loaded )
 			raisePaintComplete( clip._parent, coordinate );
 	}
+	
+	public function get versionNum() : String
+	{
+		return AbstractGoogleMapProvider.HYBRID_VERSION_NUM;
+	}	
 }

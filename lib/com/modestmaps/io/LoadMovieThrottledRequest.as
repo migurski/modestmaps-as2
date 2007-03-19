@@ -15,7 +15,7 @@ implements IRequest
 	
 	public function LoadMovieThrottledRequest( clip : MovieClip, url : String ) 
 	{
-		super();
+		super( false );
 		this.clip = clip;
 		this.url = url;
 		
