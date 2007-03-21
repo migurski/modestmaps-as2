@@ -2,8 +2,8 @@
  * vim:et sts=4 sw=4 cindent:
  * @ignore
  *
- * @author Michal Migurski <mike@stamen.com>
- * @author Darren David <darren@lookorfeel.com>
+ * @author migurski
+ * @author darren
  *
  * com.modestmaps.Map is the base class and interface for Modest Maps.
  *
