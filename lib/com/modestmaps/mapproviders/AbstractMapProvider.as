@@ -1,3 +1,18 @@
+/**
+ * vim:et sts=4 sw=4 cindent:
+ * @ignore
+ *
+ * @author darren
+ * @author migurski
+ *
+ * AbstractMapProvider is the base class for all MapProviders.
+ * 
+ * @description AbstractMapProvider is the base class for all 
+ * 				MapProviders. MapProviders are primarily responsible
+ * 				for "painting" map Tiles with the correct 
+ * 				graphic imagery.
+ */
+
 import org.casaframework.event.DispatchableInterface;
 import org.casaframework.event.EventDispatcher;
 
@@ -8,9 +23,6 @@ import com.modestmaps.geo.Location;
 import com.modestmaps.geo.Transformation;
 import com.modestmaps.io.RequestThrottler;
 
-/**
- * @author darren
- */
 class com.modestmaps.mapproviders.AbstractMapProvider  
 extends EventDispatcher
 implements DispatchableInterface
@@ -26,7 +38,7 @@ implements DispatchableInterface
 	private var __bottomRightInLimit:Coordinate;
 
 	/*
-	 * Constructor.
+	 * Abstract constructor, should not be instantiated directly.
 	 */
 	private function AbstractMapProvider()
 	{
@@ -39,6 +51,12 @@ implements DispatchableInterface
         __bottomRightInLimit = (new Coordinate(1, 1, 0)).zoomTo(Coordinate.MAX_ZOOM);
 	}
 
+	/**
+	 * Paints a map graphic onto the supplied MovieClip.
+	 * 
+	 * @param clip The MovieClip to contain the graphics.
+	 * @param coord The coordinate of the Tile that contains the clip.
+	 */
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
 	    clip.createEmptyMovieClip( "image", clip.getNextHighestDepth() );
@@ -52,6 +70,11 @@ implements DispatchableInterface
         return __projection.toString();
 	}
 
+	/**
+	 * Generates a copy of the specified coordinate.
+	 * 
+	 * @param coord The Coordinate to copy.
+	 */
     public function sourceCoordinate(coord:Coordinate):Coordinate
     {
         return coord.copy();
@@ -71,6 +94,12 @@ implements DispatchableInterface
         return limits;
     }
 
+	/**
+	 * Creates a text label for debugging purposes.
+	 * 
+	 * @param clip The MovieClip to contain the label.
+	 * @param label The text the label.
+	 */
 	public function createLabel( clip : MovieClip, label : String ) : Void
 	{
 		clip["labelTF"].removeTextField();
@@ -82,14 +111,7 @@ implements DispatchableInterface
 	    tf.textColor = 0xFF0000;
 		tf.text = label;	
 	}
-	
-	// Private Methods
-	
-	private function raisePaintComplete( clip : MovieClip, coord : Coordinate ) : Void
-	{
-		dispatchEvent( AbstractMapProvider.EVENT_PAINT_COMPLETE, clip, coord );
-	}
-    
+
    /*
     * Return projected and transformed coordinate for a location.
     */
@@ -105,4 +127,11 @@ implements DispatchableInterface
     {
         return __projection.coordinateLocation(coordinate);
     }
+	
+	// Private Methods
+	
+	private function raisePaintComplete( clip : MovieClip, coord : Coordinate ) : Void
+	{
+		dispatchEvent( AbstractMapProvider.EVENT_PAINT_COMPLETE, clip, coord );
+	}
 }

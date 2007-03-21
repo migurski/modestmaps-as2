@@ -1,18 +1,40 @@
+/**
+ * vim:et sts=4 sw=4 cindent:
+ * @ignore
+ *
+ * @author darren
+ * @author migurski
+ *
+ * AbstractImageBasedMapProvider is the base class for all MapProviders
+ * that use externally loaded images to paint Tiles.
+ * 
+ * @see com.modestmaps.mapproviders.AbstractMapProvider
+ */
+ 
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.io.MapProviderPaintThrottledRequest;
 import com.modestmaps.mapproviders.AbstractMapProvider;
 
-/**
- * @author darren
- */
 class com.modestmaps.mapproviders.AbstractImageBasedMapProvider 
 extends AbstractMapProvider 
 {
-	
-	function AbstractImageBasedMapProvider() {
+	/**
+	 * Abstract constructor, should not be instantiated directly.
+	 */
+	function AbstractImageBasedMapProvider() 
+	{
 		super();
 	}
 
+	/**
+	 * Generates a new MapProviderPaintThrottledRequest to load in an 
+	 * external image.
+	 * 
+	 * @see com.modestmaps.mapproviders.AbstractMapProvider
+ 	 * @param clip The MovieClip to contain the graphics.
+	 * @param coord The coordinate of the Tile that contains the clip.
+
+	 */
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
 		super.paint( clip, coord );
@@ -37,16 +59,25 @@ extends AbstractMapProvider
 
 	// Event Handlers
 
+	/**
+	 * Event handler for MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR
+	 */
 	private function onRequestError( clip : MovieClip ) : Void
 	{
 	    paintFailure( clip );
 	}
 	
+	/**
+	 * Event handler for MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE
+	 */
 	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
 		raisePaintComplete( clip, coordinate );
 	}
 	
+	/**
+	 * Event handler for MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR
+	 */
 	private function onResponseError( clip : MovieClip, errorCode : String, httpStatus : Number ) : Void
 	{
 	    paintFailure(clip);

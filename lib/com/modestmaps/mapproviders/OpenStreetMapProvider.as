@@ -1,3 +1,9 @@
+/**
+ * MapProvider for Open Street Map data.
+ * 
+ * @author migurski
+ */
+ 
 import org.casaframework.event.DispatchableInterface;
 
 import com.modestmaps.core.Coordinate;
@@ -5,10 +11,6 @@ import com.modestmaps.geo.MercatorProjection;
 import com.modestmaps.geo.Transformation;
 import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
 import com.modestmaps.mapproviders.IMapProvider;
-
-/**
- * @author migurski
- */
 
 class com.modestmaps.mapproviders.OpenStreetMapProvider
 extends AbstractImageBasedMapProvider

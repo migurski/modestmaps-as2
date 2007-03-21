@@ -1,4 +1,4 @@
-/*
+/**
  * vim:et sts=4 sw=4 cindent:
  * @ignore
  *
@@ -7,8 +7,10 @@
  *
  * com.modestmaps.Map is the base class and interface for Modest Maps.
  *
- * Correctly attaching an instance of this MovieClip subclass should result
- * in a pannable map. Controls and event handlers must be added separately.
+ * @description Map is the base class and interface for Modest Maps.
+ * 				Correctly attaching an instance of this MovieClip subclass 
+ * 				should result in a pannable map. Controls and event 
+ * 				handlers must be added separately.
  *
  * @usage <code>
  *          import com.modestmaps.Map;

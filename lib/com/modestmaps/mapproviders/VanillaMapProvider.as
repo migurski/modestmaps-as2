@@ -1,4 +1,6 @@
 /**
+ * Provides the simplest possible graphic for a Tile, useful for debugging purposes.
+ * 
  * @author darren
  */
  
@@ -14,7 +16,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function paintTile( clip : MovieClip, coord : Coordinate ) : Void 
 	{
-		super.paint( clip, coord );
+	   super.paint( clip, coord );
 
 		with ( clip )
 		{
@@ -31,6 +33,6 @@ implements IMapProvider, DispatchableInterface
 
 	    createLabel( clip, coord.toString() );
 
-		// TODO: Fire even when paint is done.
+		raisePaintComplete();
 	}
 }
