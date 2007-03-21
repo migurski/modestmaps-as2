@@ -20,7 +20,7 @@ class com.modestmaps.core.MarkerSet
     // tile id's hashed by marker id
     private var markerTiles:Object;
     
-    // for use of TileGrid.log()
+    // for finding which is visible
     private var grid:TileGrid;
 
     function MarkerSet(grid:TileGrid)
@@ -81,7 +81,7 @@ class com.modestmaps.core.MarkerSet
             
         markerTiles[markerId][tileKey] = true;
         
-        //grid.log('Marker '+markerId+' in '+tileKey);
+        //trace('Marker '+markerId+' in '+tileKey);
     }
 
     /**
@@ -123,7 +123,7 @@ class com.modestmaps.core.MarkerSet
                 }
         }
         
-        //grid.log('Touched markers: '+ids.toString());
+        //trace('Touched markers: '+ids.toString());
         return touched;
     }
 }

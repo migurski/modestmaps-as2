@@ -65,7 +65,6 @@ class SampleClient
         buttons.push(makeButton(__navButtons, 'up', 'pan up', Delegate.create(__map, __map.panUp)));
         buttons.push(makeButton(__navButtons, 'down', 'pan down', Delegate.create(__map, __map.panDown)));
         buttons.push(makeButton(__navButtons, 'left', 'pan right', Delegate.create(__map, __map.panRight)));
-        buttons.push(makeButton(__navButtons, 'clear', 'clear log', Delegate.create(__map.grid, __map.grid.clearLog)));
 
 		//__navButtons._x = __navButtons._y = 50;
 		
@@ -191,11 +190,11 @@ class SampleClient
     
     private static function onMarkerEnters( id : String, location : Location ):Void
     {
-        __map.grid.log('+ '+id+' =)');
+        trace('+ '+id+' =)');
     }
     
     private static function onMarkerLeaves( id : String, location : Location ):Void
     {
-        __map.grid.log('- '+id+' =(');
+        trace('- '+id+' =(');
     }
 }

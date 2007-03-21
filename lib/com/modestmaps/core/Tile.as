@@ -149,7 +149,7 @@ implements DispatchableInterface
     
     public function paint(mapProvider:IMapProvider, tileCoord:Coordinate):Void
     {
-    	//grid.log("Painting tile: " + tileCoord.toString());
+    	//trace("Painting tile: " + tileCoord.toString());
     	
     	// set up the proper clip to paint here
    		DispatchableInterface(grid.mapProvider).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );

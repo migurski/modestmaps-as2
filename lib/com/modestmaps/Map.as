@@ -251,10 +251,10 @@ extends DispatchableMovieClip
         corners.push(__mapProvider.coordinateLocation(BR));
         
         /*
-        grid.log('top left: '+corners[0].toString());
-        grid.log('top right: '+corners[1].toString());
-        grid.log('bottom left: '+corners[2].toString());
-        grid.log('bottom right: '+corners[3].toString());
+        trace('top left: '+corners[0].toString());
+        trace('top right: '+corners[1].toString());
+        trace('bottom left: '+corners[2].toString());
+        trace('bottom right: '+corners[3].toString());
         */
 
         return corners;
@@ -505,7 +505,7 @@ extends DispatchableMovieClip
     */
     public function putMarker(id:String, location:Location):Void
     {
-        //grid.log('Marker '+id+': '+location.toString());
+        //trace('Marker '+id+': '+location.toString());
         grid.putMarker(id, __mapProvider.locationCoordinate(location), location);
     }
 
@@ -530,7 +530,7 @@ extends DispatchableMovieClip
     */
     public function onMarkerEnters(id:String, location:Location):Void
     {
-        //grid.log('+ '+marker.toString());
+        //trace('+ '+marker.toString());
         dispatchEvent( EVENT_MARKER_ENTERS, id, location );
     }
     
@@ -545,7 +545,7 @@ extends DispatchableMovieClip
     */
     public function onMarkerLeaves(id:String, location:Location):Void
     {
-        //grid.log('- '+marker.toString());
+        //trace('- '+marker.toString());
         dispatchEvent( EVENT_MARKER_LEAVES, id, location );
     }
     
@@ -557,7 +557,7 @@ extends DispatchableMovieClip
     */
     public function onStartZoom():Void
     {
-        //grid.log('Leaving zoom level '+grid.zoomLevel+'...');
+        //trace('Leaving zoom level '+grid.zoomLevel+'...');
         dispatchEvent( EVENT_START_ZOOMING, grid.zoomLevel );
     }
     
@@ -569,7 +569,7 @@ extends DispatchableMovieClip
     */
     public function onStopZoom():Void
     {
-        //grid.log('...Entering zoom level '+grid.zoomLevel);
+        //trace('...Entering zoom level '+grid.zoomLevel);
         dispatchEvent( EVENT_STOP_ZOOMING, grid.zoomLevel );
     }
     
@@ -583,7 +583,7 @@ extends DispatchableMovieClip
     */
     public function onZoomed(delta:Number):Void
     {
-        //grid.log('Current well offset from start: '+delta.toString());
+        //trace('Current well offset from start: '+delta.toString());
         dispatchEvent( EVENT_ZOOMED_BY, delta );
     }
     
@@ -594,7 +594,7 @@ extends DispatchableMovieClip
     */
     public function onStartPan():Void
     {
-        //grid.log('Starting pan...');
+        //trace('Starting pan...');
         dispatchEvent( EVENT_START_PANNING );
     }
     
@@ -605,7 +605,7 @@ extends DispatchableMovieClip
     */
     public function onStopPan():Void
     {
-        //grid.log('...Stopping pan');
+        //trace('...Stopping pan');
         dispatchEvent( EVENT_STOP_PANNING );
     }
     
@@ -619,7 +619,7 @@ extends DispatchableMovieClip
     */
     public function onPanned(delta:Point):Void
     {
-        //grid.log('Current well offset from start: '+delta.toString());
+        //trace('Current well offset from start: '+delta.toString());
         dispatchEvent( EVENT_PANNED_BY, delta );
     }
     

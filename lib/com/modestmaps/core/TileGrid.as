@@ -60,11 +60,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     
     // Mask clip to hide outside edges of tiles.
     private var mask:MovieClip;
-    
-    // For testing purposes.
-    public var labelContainer:MovieClip;
-    public var label:TextField;
-    
+
     // Active when the well is being dragged on the stage.
     private var wellDragTask:DelayedCall;
     
@@ -82,12 +78,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
     public function TileGrid()
     {
-        this.createEmptyMovieClip( "labelContainer", getNextHighestDepth() );
-        labelContainer.createTextField('label', 1, 10, 10, width-20, height-20);
-        label = labelContainer["label"];
-        label.selectable = false;
-        label.textColor = 0xFF6600;
-                
         buildWell();
         buildMask();
         allowPainting(true);
@@ -183,8 +173,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         allocateTiles();
         
-        labelContainer.swapDepths( getNextHighestDepth() );    
-
         // let 'em know we're coming
         markers.indexAtZoom(zoomLevel);
         
@@ -194,7 +182,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public function putMarker(id:String, coord:Coordinate, location:Location):Marker
     {
         var marker:Marker = new Marker(id, coord, location);
-        //log('Marker '+id+': '+coord.toString());
+        //trace('Marker '+id+': '+coord.toString());
         markers.put(marker);
 
         updateMarkers();
@@ -222,19 +210,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         }
 
         centerWell(false);
-        
-        /*
-        // So the log is visible...
-        var c:Color = new Color(well);
-        var t:Object = c.getTransform();
-        t.ra = 20;
-        t.rb = 204;
-        t.ga = 20;
-        t.gb = 204;
-        t.ba = 20;
-        t.bb = 204;
-        c.setTransform(t);
-        */
     }
     
    /**
@@ -277,7 +252,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         tile.redraw();
         tiles.push(tile);
         
-        //log('Created tile: '+tile.toString());
+        //trace('Created tile: '+tile.toString());
         return tile;
     }
 
@@ -286,7 +261,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function destroyTile(tile:Tile):Void
     {
-        //log('Destroying tile: '+tile.toString());
+        //trace('Destroying tile: '+tile.toString());
         tiles.splice(tileIndex(tile), 1);
         tile.cancelDraw();
         tile.removeMovieClip();
@@ -302,18 +277,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             Reactor.callLater(0, Delegate.create(this, this.destroyTiles), tiles);
         }
     }
-    
-    public function log(msg:String):Void
-    {
-        label.text += msg + '\n';
-        label.scroll = label.maxscroll;
-    }
-    
-    public function clearLog():Void
-    {
-        label.text = '';
-    }
-    
+
    /*
     * Reposition tiles and schedule a recursive call for the next frame.
     */
@@ -460,7 +424,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         max.x = well._x - max.x;
         max.y = well._y - max.y;
         
-        //log('min/max for drag: '+min+', '+max+' ('+topLeftOutLimit+', '+bottomRightInLimit+')');
+        //trace('min/max for drag: '+min+', '+max+' ('+topLeftOutLimit+', '+bottomRightInLimit+')');
         
         // weird negative edge conditions, limit all movement on an axis
         if(min.x > max.x)
@@ -507,10 +471,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
                                 ? -100000
                                 : bounds.max.y);
                                 
-        //log('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
+        //trace('Drag bounds would be: '+xMin+', '+yMin+', '+xMax+', '+yMax);
         
         __startingWellPosition = new Point(well._x, well._y);
-        //log('Starting well position: '+__startingWellPosition.toString());
+        //trace('Starting well position: '+__startingWellPosition.toString());
         
         map.onStartPan();
         well.startDrag(false, xMin, yMin, xMax, yMax);
@@ -550,7 +514,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         if(redraw) {
             normalizeWell();
             allocateTiles();
-            //log('New well scale: '+well._xscale.toString());
+            //trace('New well scale: '+well._xscale.toString());
         }
     }
     
@@ -750,7 +714,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 active[i]._x = active[0]._x + (active[i].coord.column - active[0].coord.column) * TILE_WIDTH;
                 active[i]._y = active[0]._y + (active[i].coord.row    - active[0].coord.row)    * TILE_HEIGHT;
             
-                //log(active[i].toString()+' at '+active[i]._x+', '+active[i]._y+' vs. '+active[0].toString());
+                //trace(active[i].toString()+' at '+active[i]._x+', '+active[i]._y+' vs. '+active[0].toString());
             }
 
         } else if(Math.floor(well._xscale) <= 60 || Math.ceil(well._xscale) >= 165) {
@@ -761,7 +725,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             zoomAdjust = Math.round(Math.log(well._xscale / 100) / Math.log(2));
             scaleAdjust = Math.pow(2, zoomAdjust);
         
-            //log('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
+            //trace('This is where we scale the whole well by '+zoomAdjust+' zoom levels: '+(100 / scaleAdjust)+'%');
 
             for(var i:Number = 0; i < zoomAdjust; i += 1) {
                 splitTiles();
@@ -784,7 +748,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 tiles[i]._yscale *= scaleAdjust;
             }
         
-            //log('Scaled to '+zoomLevel+', '+well._xscale+'%');
+            //trace('Scaled to '+zoomLevel+', '+well._xscale+'%');
             markers.indexAtZoom(zoomLevel);
         }
     }
@@ -1178,9 +1142,5 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well.lineTo(width/2, height/-2);
         well.lineTo(width/-2, height/-2);
         well.endFill();
-        
-        label.textColor = 0xFF6600;
-        label._width = width - 20;
-        label._height = height - 20;
     }
 }
