@@ -32,7 +32,7 @@ extends AbstractImageBasedMapProvider
 	{
 		super.paint( clip, coord );
 
-	    clip.image._x = clip.image._y = -1;
+	    clip.image._x = clip.image._y = -.5;
 		createMask( clip );		
 	}
 

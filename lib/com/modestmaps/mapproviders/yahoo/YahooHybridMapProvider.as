@@ -38,8 +38,8 @@ implements IMapProvider, DispatchableInterface
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
 		request.send();
 		
-		clip.bg._x = clip.bg._y = -1;
-		clip.overlay._x = clip.overlay._y = -1;
+		clip.bg._x = clip.bg._y = -.5;
+		clip.overlay._x = clip.overlay._y = -.5;
 
 		createMask( clip );		
 	}	
