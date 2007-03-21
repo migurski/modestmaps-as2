@@ -30,7 +30,7 @@ implements IMapProvider, DispatchableInterface
 	{
 		checkVersionRequested();
 		
-		if ( versionNum != undefined )
+		if ( __hybridVersion != undefined )
 		{		
 			clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
 			clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
@@ -64,7 +64,7 @@ implements IMapProvider, DispatchableInterface
 	{		
         var sourceCoord:Coordinate = sourceCoordinate(coord);
         var zoomString:String = "&x=" + sourceCoord.column + "&y=" + sourceCoord.row + "&zoom=" + (17 - sourceCoord.zoom);
-		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=" + versionNum + zoomString;
+		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=" + __hybridVersion + zoomString;
 	}
 
 	// Event Handlers
@@ -74,9 +74,4 @@ implements IMapProvider, DispatchableInterface
 		if ( clip.bg._loaded && clip.overlay._loaded )
 			raisePaintComplete( clip._parent, coordinate );
 	}
-	
-	public function get versionNum() : String
-	{
-		return __versionNumXml.firstChild.attributes.hybridVersionNum;
-	}	
 }

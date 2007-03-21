@@ -12,9 +12,14 @@ extends AbstractImageBasedMapProvider
 {
 	private var __paintQueue : Array;
 
-	private static var __versionNumXml : XML;
+    // Google often updates its tiles and expires old sets.
+    // This a way to determine the newest version numbers.
+	private static var __versionSource:String = "google_version.xml";
+	private static var __roadVersion:String;
+	private static var __hybridVersion:String;
+	private static var __aerialVersion:String;
 
-	private static var VERSION_NUM_REQUESTED : Boolean = false;
+	private static var __versionRequested:Boolean = false;
 	
 	function AbstractGoogleMapProvider() 
 	{
@@ -44,7 +49,7 @@ extends AbstractImageBasedMapProvider
 	{
 		checkVersionRequested();
 		
-		if ( versionNum != undefined )		
+		if ( __roadVersion != undefined && __hybridVersion != undefined && __aerialVersion != undefined )
 			super.paint( clip, coord );
 		else
 			enqueuePaintRequest( clip, coord );					
@@ -54,17 +59,17 @@ extends AbstractImageBasedMapProvider
 	
 	private function checkVersionRequested()
 	{
-		if ( !AbstractGoogleMapProvider.VERSION_NUM_REQUESTED )
+		if ( !AbstractGoogleMapProvider.__versionRequested )
 		{
-			trace ("  checkVersionRequested(): " + AbstractGoogleMapProvider.VERSION_NUM_REQUESTED );
+			trace ("  checkVersionRequested(): " + AbstractGoogleMapProvider.__versionRequested );
 			// we need to create a blocking request to load our version number
-			AbstractGoogleMapProvider.VERSION_NUM_REQUESTED = true;
+			AbstractGoogleMapProvider.__versionRequested = true;
 		
 			__paintQueue = new Array();
 
-			var request : XmlThrottledRequest = new XmlThrottledRequest( "google_version.xml", true );
-			request.addEventObserver( this, XmlThrottledRequest.EVENT_RESPONSE_COMPLETE, "onVersionNumResponseComplete" );
-			request.addEventObserver( this, XmlThrottledRequest.EVENT_RESPONSE_COMPLETE, "onVersionNumResponseError" );
+			var request : XmlThrottledRequest = new XmlThrottledRequest( __versionSource, true );
+			request.addEventObserver( this, XmlThrottledRequest.EVENT_RESPONSE_COMPLETE, "onVersionResponseComplete" );
+			request.addEventObserver( this, XmlThrottledRequest.EVENT_RESPONSE_COMPLETE, "onVersionResponseError" );
 			request.send();
 		}
 	}
@@ -83,22 +88,19 @@ extends AbstractImageBasedMapProvider
 			paint( paintRequest.clip, paintRequest.coord ); 	
 		}
 	}
-	
-	public function get versionNum() : String
-	{
-		throw new Error( "Abstract method, not implemented" );
-		return null;
-	}
-	
+
 	// Event Handlers
 	
-	private function onVersionNumResponseComplete( xml : XML ) : Void
+	private function onVersionResponseComplete( xml : XML ) : Void
 	{
-		__versionNumXml = xml;
+        __roadVersion = xml.firstChild.attributes.road;
+        __hybridVersion = xml.firstChild.attributes.hybrid;
+        __aerialVersion = xml.firstChild.attributes.aerial;
+
 		processQueue();
 	}
 	
-	private function onVersionNumResponseError() : Void
+	private function onVersionResponseError() : Void
 	{
 	    // now what?
 	}		
