@@ -1,6 +1,25 @@
 /*
  * vim:et sts=4 sw=4 cindent:
- * $Id$
+ * @ignore
+ *
+ * @author Michal Migurski <mike@stamen.com>
+ * @author Darren David <darren@lookorfeel.com>
+ *
+ * com.modestmaps.Map is the base class and interface for Modest Maps.
+ *
+ * Correctly attaching an instance of this MovieClip subclass should result
+ * in a pannable map. Controls and event handlers must be added separately.
+ *
+ * @usage <code>
+ *          import com.modestmaps.Map;
+ *          import com.modestmaps.geo.Location;
+ *          import com.modestmaps.mapproviders.BlueMarbleMapProvider;
+ *          import com.stamen.twisted.Reactor;
+ *          ...
+ *          Reactor.run(clip, null, 50);
+ *          var map:Map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth()));
+ *          map.init(640, 480, true, new BlueMarbleMapProvider());
+ *        </code>
  */
 
 import com.bigspaceship.utils.Delegate;
@@ -29,10 +48,10 @@ extends DispatchableMovieClip
     private var __animTask:DelayedCall;
 
     // frames-per-2x-zoom
-    private static var __zoomFrames:Number = 6;
+    public var zoomFrames:Number = 6;
     
     // frames-per-full-pan
-    private static var __panFrames:Number = 12;
+    public var panFrames:Number = 12;
     
     private var __startingPosition:Point;
     private var __currentPosition:Point;
@@ -62,6 +81,14 @@ extends DispatchableMovieClip
     
    /*
     * Initialize the map: set properties, add a tile grid, draw it.
+    * Default extent covers the entire globe, (+/-85, +/-180).
+    *
+    * @param    Width of map, in pixels.
+    * @param    Height of map, in pixels.
+    * @param    Whether the map can be dragged or not.
+    * @param    Desired map provider, e.g. Blue Marble.
+    *
+    * @see com.modestmaps.core.TileGrid
     */
     public function init(width:Number, height:Number, draggable:Boolean, provider:IMapProvider):Void
     {
@@ -93,6 +120,13 @@ extends DispatchableMovieClip
     * Based on an array of locations, determine appropriate map
     * bounds using calculateMapExtent(), and inform the grid of
     * tile coordinate and point by calling grid.resetTiles().
+    * Resulting map extent will ensure that all passed locations
+    * are visible.
+    *
+    * @param    Array of locations.
+    *
+    * @see com.modestmaps.Map#calculateMapExtent
+    * @see com.modestmaps.core.TileGrid#resetTiles
     */
     public function setExtent(locations:/*Location*/Array):Void
     {
@@ -106,6 +140,12 @@ extends DispatchableMovieClip
     * Based on a location and zoom level, determine appropriate initial
     * tile coordinate and point using calculateMapCenter(), and inform
     * the grid of tile coordinate and point by calling grid.resetTiles().
+    *
+    * @param    Location of center.
+    * @param    Desired zoom level.
+    *
+    * @see com.modestmaps.Map#calculateMapExtent
+    * @see com.modestmaps.core.TileGrid#resetTiles
     */
     public function setCenterZoom(location:Location, zoom:Number):Void
     {
@@ -190,6 +230,8 @@ extends DispatchableMovieClip
     
    /*
     * Return the current coverage area of the map, as four locations.
+    *
+    * @return   Array of four locations: [top-left, top-right, bottom-left, bottom-right].
     */
     public function getExtent():/*Location*/Array
     {
@@ -219,7 +261,9 @@ extends DispatchableMovieClip
     }
 
    /*
-    * Return the current center location and zoom of the map, in a two-element array.
+    * Return the current center location and zoom of the map.
+    *
+    * @return   Array of center and zoom: [center location, zoom number].
     */
     public function getCenterZoom():Array
     {
@@ -227,7 +271,12 @@ extends DispatchableMovieClip
     }
 
    /**
-    * Set new map size.
+    * Set new map size, call onResized().
+    *
+    * @param    New map width.
+    * @param    New map height.
+    *
+    * @see com.modestmaps.Map#onResized
     */
     public function setSize(width:Number, height:Number):Void
     {
@@ -238,7 +287,9 @@ extends DispatchableMovieClip
     }
 
    /**
-    * Get map size, width:Number, height:Number.
+    * Get map size.
+    *
+    * @return   Array of [width, height].
     */
     public function getSize():/*Number*/Array
     {
@@ -247,7 +298,11 @@ extends DispatchableMovieClip
     }
 
    /**
-    * Get a reference to the current mapProvider.
+    * Get a reference to the current map provider.
+    *
+    * @return   Map provider.
+    *
+    * @see com.modestmaps.mapproviders.IMapProvider
     */
     public function getMapProvider():IMapProvider
     {
@@ -255,7 +310,11 @@ extends DispatchableMovieClip
     }
 
    /**
-    * Set a new mapProvider, repainting tiles and changing bounding box if necessary.
+    * Set a new map provider, repainting tiles and changing bounding box if necessary.
+    *
+    * @param   Map provider.
+    *
+    * @see com.modestmaps.mapproviders.IMapProvider
     */
     public function setMapProvider(newProvider:IMapProvider):Void
     {
@@ -275,6 +334,11 @@ extends DispatchableMovieClip
     
    /**
     * Get a point (x, y) for a location (lat, lon) in the context of a given clip.
+    *
+    * @param    Location to match.
+    * @param    Movie clip context in which returned point should make sense.
+    *
+    * @return   Matching point.
     */
     public function locationPoint(location:Location, context:MovieClip):Point
     {
@@ -284,6 +348,11 @@ extends DispatchableMovieClip
     
    /**
     * Get a location (lat, lon) for a point (x, y) in the context of a given clip.
+    *
+    * @param    Point to match.
+    * @param    Movie clip context in which passed point should make sense.
+    *
+    * @return   Matching location.
     */
     public function pointLocation(point:Point, context:MovieClip):Location
     {
@@ -293,43 +362,47 @@ extends DispatchableMovieClip
     
    /**
     * Pan up by 2/3 of the map height.
+    * @see com.modestmaps.Map#panMap
     */
     public function panUp():Void
     {
         var distance:Number = -2*__height / 3;
-        panMap(new Point(0, Math.round(distance/__panFrames)));
+        panMap(new Point(0, Math.round(distance/panFrames)));
     }      
 
    /**
     * Pan down by 2/3 of the map height.
+    * @see com.modestmaps.Map#panMap
     */
     public function panDown():Void
     {
         var distance:Number = 2*__height / 3;
-        panMap(new Point(0, Math.round(distance/__panFrames)));
+        panMap(new Point(0, Math.round(distance/panFrames)));
     }
     
    /**
     * Pan to the left by 2/3 of the map width.
+    * @see com.modestmaps.Map#panMap
     */
     public function panLeft():Void
     {
         var distance:Number = -2*__width / 3;
-        panMap(new Point(Math.round(distance/__panFrames, 0)));
+        panMap(new Point(Math.round(distance/panFrames, 0)));
     }      
 
    /**
     * Pan to the right by 2/3 of the map width.
+    * @see com.modestmaps.Map#panMap
     */
     public function panRight():Void
     {
         var distance:Number = 2*__width / 3;
-        panMap(new Point(Math.round(distance/__panFrames, 0)));
+        panMap(new Point(Math.round(distance/panFrames, 0)));
     }
     
     private function panMap(perFrame:Point):Void
     {
-        for(var i = 1; i <= __panFrames; i += 1)
+        for(var i = 1; i <= panFrames; i += 1)
             __animSteps.push({type: 'pan', amount: perFrame});
             
         if(!__animTask) {
@@ -342,12 +415,13 @@ extends DispatchableMovieClip
     }
     
    /**
-    * Zoom in by 200% over the course of __zoomFrames frames.
+    * Zoom in by 200% over the course of several frames.
+    * @see com.modestmaps.Map#zoomFrames
     */
     public function zoomIn():Void
     {
-        for(var i = 1; i <= __zoomFrames; i += 1)
-            __animSteps.push({type: 'zoom', amount: 1/__zoomFrames, redraw: Boolean(i == __zoomFrames)});
+        for(var i = 1; i <= zoomFrames; i += 1)
+            __animSteps.push({type: 'zoom', amount: 1/zoomFrames, redraw: Boolean(i == zoomFrames)});
             
         if(!__animTask) {
             __startingZoom = grid.zoomLevel;
@@ -359,12 +433,13 @@ extends DispatchableMovieClip
     }
     
    /**
-    * Zoom in by 200% over the course of __zoomFrames frames.
+    * Zoom out by 50% over the course of several frames.
+    * @see com.modestmaps.Map#zoomFrames
     */
     public function zoomOut():Void
     {
-        for(var i = 1; i <= __zoomFrames; i += 1)
-            __animSteps.push({type: 'zoom', amount: -1/__zoomFrames, redraw: Boolean(i == __zoomFrames)});
+        for(var i = 1; i <= zoomFrames; i += 1)
+            __animSteps.push({type: 'zoom', amount: -1/zoomFrames, redraw: Boolean(i == zoomFrames)});
             
         if(!__animTask) {
             __startingZoom = grid.zoomLevel;
@@ -424,6 +499,9 @@ extends DispatchableMovieClip
 
    /**
     * Add a marker with the given id and location (lat, lon).
+    *
+    * @param    ID of marker, opaque string.
+    * @param    Location of marker.
     */
     public function putMarker(id:String, location:Location):Void
     {
@@ -433,6 +511,8 @@ extends DispatchableMovieClip
 
    /**
     * Remove a marker with the given id.
+    *
+    * @param    ID of marker, opaque string.
     */
     public function removeMarker(id:String):Void
     {
@@ -442,6 +522,11 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_MARKER_ENTERS when a given marker enters the tile coverage area.
     * Event object includes id:String and location:Location.
+    *
+    * @param    ID of marker.
+    * @param    Location of marker.
+    *
+    * @see com.modestmaps.Map#EVENT_MARKER_ENTERS
     */
     public function onMarkerEnters(id:String, location:Location):Void
     {
@@ -452,6 +537,11 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_MARKER_LEAVES when a given marker leaves the tile coverage area.
     * Event object includes id:String and location:Location.
+    *
+    * @param    ID of marker.
+    * @param    Location of marker.
+    *
+    * @see com.modestmaps.Map#EVENT_MARKER_LEAVES
     */
     public function onMarkerLeaves(id:String, location:Location):Void
     {
@@ -462,6 +552,8 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_START_ZOOMING when the map starts zooming.
     * Event object includes level:Number.
+    *
+    * @see com.modestmaps.Map#EVENT_START_ZOOMING
     */
     public function onStartZoom():Void
     {
@@ -472,6 +564,8 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_STOP_ZOOMING when the map stops zooming.
     * Callback arguments includes level:Number.
+    *
+    * @see com.modestmaps.Map#EVENT_STOP_ZOOMING
     */
     public function onStopZoom():Void
     {
@@ -482,6 +576,10 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_ZOOMED_BY when the map is zooomed.
     * Callback arguments includes delta:Number, difference in levels from zoom start.
+    *
+    * @param    Change in level since beginning of zoom.
+    *
+    * @see com.modestmaps.Map#EVENT_ZOOMED_BY
     */
     public function onZoomed(delta:Number):Void
     {
@@ -491,6 +589,8 @@ extends DispatchableMovieClip
     
    /**
     * Dispatches EVENT_START_PANNING when the map starts to be panned.
+    *
+    * @see com.modestmaps.Map#EVENT_START_PANNING
     */
     public function onStartPan():Void
     {
@@ -500,6 +600,8 @@ extends DispatchableMovieClip
     
    /**
     * Dispatches EVENT_STOP_PANNING when the map stops being panned.
+    *
+    * @see com.modestmaps.Map#EVENT_STOP_PANNING
     */
     public function onStopPan():Void
     {
@@ -510,6 +612,10 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_PANNED_BY when the map is panned.
     * Callback arguments includes delta:Point, difference in pixels from pan start.
+    *
+    * @param    Change in position since beginning of pan.
+    *
+    * @see com.modestmaps.Map#EVENT_PANNED_BY
     */
     public function onPanned(delta:Point):Void
     {
@@ -520,6 +626,8 @@ extends DispatchableMovieClip
    /**
     * Dispatches EVENT_RESIZED_TO when the map is resized.
     * Callback arguments include width:Number and height:Number.
+    *
+    * @see com.modestmaps.Map#EVENT_RESIZED_TO
     */
     public function onResized():Void
     {
