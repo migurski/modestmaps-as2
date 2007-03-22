@@ -9,23 +9,23 @@ import com.modestmaps.core.TileGrid;
 
 class com.modestmaps.core.MarkerSet
 {
-    private var lastZoom:Number;
+    private var __lastZoom:Number;
     
     // markers hashed by id
-    private var markers:Object;
+    private var __markers:Object;
     
     // marker lists hashed by containing tile id
-    private var tileMarkers:Object;
+    private var __tileMarkers:Object;
     
     // tile id's hashed by marker id
-    private var markerTiles:Object;
+    private var __markerTiles:Object;
     
     // for finding which is visible
-    private var grid:TileGrid;
+    private var __grid:TileGrid;
 
     function MarkerSet(grid:TileGrid)
     {
-        this.grid = grid;
+        __grid = grid;
         initializeIndex();
     }
     
@@ -34,7 +34,7 @@ class com.modestmaps.core.MarkerSet
      */
     public function put(marker:Marker):Void
     {
-        markers[marker.id] = marker;
+        __markers[marker.id] = marker;
         indexMarker(marker.id);
     }
     
@@ -44,23 +44,23 @@ class com.modestmaps.core.MarkerSet
     public function remove(marker:Marker):Void
     {
         unIndexMarker(marker.id);
-        delete markers[marker.id];
+        delete __markers[marker.id];
     }
 
     public function initializeIndex():Void
     {
-        lastZoom = 0;
+        __lastZoom = 0;
 
-        markers = {};
-        tileMarkers = {};
-        /*markerTiles = {};*/
+        __markers = {};
+        __tileMarkers = {};
+        __markerTiles = {};
     }
 
     public function indexAtZoom(level:Number):Void
     {
-        lastZoom = level;
+        __lastZoom = level;
     
-        for(var markerId:String in markers)
+        for(var markerId:String in __markers)
             indexMarker(markerId);
     }
 
@@ -69,17 +69,17 @@ class com.modestmaps.core.MarkerSet
     */
     private function indexMarker(markerId:String):Void
     {
-        var tileKey:String = markers[markerId].coord.zoomTo(lastZoom).container().toString();
+        var tileKey:String = __markers[markerId].coord.zoomTo(__lastZoom).container().toString();
         
-        if(tileMarkers[tileKey] == undefined)
-            tileMarkers[tileKey] = {};
+        if(__tileMarkers[tileKey] == undefined)
+            __tileMarkers[tileKey] = {};
             
-        tileMarkers[tileKey][markerId] = true;
+        __tileMarkers[tileKey][markerId] = true;
         
-        if(markerTiles[markerId] == undefined)
-            markerTiles[markerId] = {};
+        if(__markerTiles[markerId] == undefined)
+            __markerTiles[markerId] = {};
             
-        markerTiles[markerId][tileKey] = true;
+        __markerTiles[markerId][tileKey] = true;
         
         //trace('Marker '+markerId+' in '+tileKey);
     }
@@ -89,11 +89,10 @@ class com.modestmaps.core.MarkerSet
      */
     private function unIndexMarker(markerId:String):Void
     {
-        for (var tileKey:String in markerTiles[markerId])
-        {
-            delete tileMarkers[tileKey][markerId];
-        }
-        delete markerTiles[markerId];
+        for(var tileKey:String in __markerTiles[markerId])
+            delete __tileMarkers[tileKey][markerId];
+
+        delete __markerTiles[markerId];
     }
 
    /**
@@ -101,7 +100,7 @@ class com.modestmaps.core.MarkerSet
     */
     public function getMarker(id:String):Marker
     {
-        return markers[id];
+        return __markers[id];
     }
 
    /**
@@ -114,12 +113,12 @@ class com.modestmaps.core.MarkerSet
         var sourceCoord:Coordinate;
         
         for(var i:Number = 0; i < tiles.length; i += 1) {
-            sourceCoord = grid.getMapProvider().sourceCoordinate(tiles[i].coord);
+            sourceCoord = __grid.getMapProvider().sourceCoordinate(tiles[i].coord);
         
-            if(tileMarkers[sourceCoord.toString()] != undefined)
-                for(var markerId:String in tileMarkers[sourceCoord.toString()]) {
+            if(__tileMarkers[sourceCoord.toString()] != undefined)
+                for(var markerId:String in __tileMarkers[sourceCoord.toString()]) {
                     ids.push(markerId);
-                    touched.push(markers[markerId]);
+                    touched.push(__markers[markerId]);
                 }
         }
         
