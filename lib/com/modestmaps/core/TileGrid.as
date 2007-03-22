@@ -232,6 +232,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var previousGeometry:String = __mapProvider.geometry();
 
         __mapProvider = mapProvider; 
+        topLeftOutLimit = __mapProvider.outerLimits()[0];
+        bottomRightInLimit = __mapProvider.outerLimits()[1];
 
         if(__mapProvider.geometry() != previousGeometry) {
             markers.initializeIndex();
@@ -511,6 +513,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         well._xscale *= Math.pow(2, amount);
         well._yscale *= Math.pow(2, amount);
         
+        boundWell();
+        
         if(redraw) {
             normalizeWell();
             allocateTiles();
@@ -654,6 +658,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         if(positionTiles())
             updateMarkers();
+    }
+    
+   /**
+    * Adjust position of the well, so it does not stray outside the provider boundaries.
+    */
+    private function boundWell():Void
+    {
+        var bounds:Bounds = getWellBounds(true);
+        
+        well._x = Math.min(bounds.max.x, Math.max(bounds.min.x, well._x));
+        well._y = Math.min(bounds.max.y, Math.max(bounds.min.y, well._y));
     }
     
    /**
