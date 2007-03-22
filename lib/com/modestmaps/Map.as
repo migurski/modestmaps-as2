@@ -83,6 +83,7 @@ extends DispatchableMovieClip
     
    /*
     * Initialize the map: set properties, add a tile grid, draw it.
+    * This method must be called before the map can be used!
     * Default extent covers the entire globe, (+/-85, +/-180).
     *
     * @param    Width of map, in pixels.
@@ -94,23 +95,17 @@ extends DispatchableMovieClip
     */
     public function init(width:Number, height:Number, draggable:Boolean, provider:IMapProvider):Void
     {
+        if(!Reactor.running())
+            throw new Error('com.modestmaps.Map.init(): com.stamen.Twisted.Reactor ought to be running at this point.');
+
         __animSteps = [];
 
         setSize(width, height);
         setMapProvider(provider);
         __draggable = draggable;
     
-    	var initObj:Object = {
-    	    map: this,
-    		mapProvider: __mapProvider,
-    		_x: 0, 
-    		_y: 0, 
-    		width: __width, 
-    		height: __height, 
-    		draggable: __draggable
-    	};
-    		
-        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth(), initObj));
+        grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth()));
+        grid.init(width, height, draggable, provider, this);
 
         var extent:/*Location*/Array = [new Location(85, -180),
                                         new Location(-85, 180)];
@@ -323,7 +318,8 @@ extends DispatchableMovieClip
         var previousGeometry:String = __mapProvider.geometry();
     	var extent:/*Location*/Array = getExtent();
     	
-        __mapProvider = grid.mapProvider = newProvider;
+        __mapProvider = newProvider;
+        grid.setMapProvider(__mapProvider);
         
         if(__mapProvider.geometry() == previousGeometry) {
         	grid.repaintTiles();

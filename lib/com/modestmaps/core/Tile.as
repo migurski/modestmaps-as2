@@ -126,7 +126,7 @@ implements DispatchableInterface
     public function redraw():Void
     {
     	// any need to repeat ourselves?
-    	if(__paintCall && __paintCall.match(grid.mapProvider, coord.copy()) && __paintCall.pending())
+    	if(__paintCall && __paintCall.match(grid.getMapProvider(), coord.copy()) && __paintCall.pending())
             return;
     	
         // are we even allowed to paint ourselves?
@@ -143,8 +143,8 @@ implements DispatchableInterface
    			__displayClips[count].clip._visible = false;
    			
     	// fire up a new call for the next frame...
-    	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.mapProvider, coord.copy()),
-    	                                grid.mapProvider, coord.copy());
+    	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.getMapProvider(), coord.copy()),
+    	                                grid.getMapProvider(), coord.copy());
     }
     
     public function paint(mapProvider:IMapProvider, tileCoord:Coordinate):Void
@@ -152,7 +152,7 @@ implements DispatchableInterface
     	//trace("Painting tile: " + tileCoord.toString());
     	
     	// set up the proper clip to paint here
-   		DispatchableInterface(grid.mapProvider).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
+   		DispatchableInterface(grid.getMapProvider()).addEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
     	
     	var clipId : Number = this.getNextHighestDepth();
     	var clip : MovieClip = this.createEmptyMovieClip( "display" + clipId, clipId );
@@ -173,7 +173,7 @@ implements DispatchableInterface
     {
     	if ( this.coord.equalTo( coord ) )
     	{
-    		DispatchableInterface(grid.mapProvider).removeEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
+    		DispatchableInterface(grid.getMapProvider()).removeEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
     		
     		// remove all other displayClips /below/ this clip   		
     		var dcCoord : Coordinate;

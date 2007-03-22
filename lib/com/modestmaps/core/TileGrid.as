@@ -76,8 +76,17 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public static var symbolOwner:Function = TileGrid;
     public static var symbolLink:Boolean = Object.registerClass(symbolName, symbolOwner);
 
-    public function TileGrid()
+    public function init(width:Number, height:Number, draggable:Boolean, provider:IMapProvider, map:Map):Void
     {
+        if(!Reactor.running())
+            throw new Error('com.modestmaps.core.TileGrid.init(): com.stamen.Twisted.Reactor really ought to be running at this point. Seriously.');
+
+        this.width = width;
+        this.height = height;
+        this.draggable = draggable;
+        this.map = map;
+        __mapProvider = provider;
+    
         buildWell();
         buildMask();
         allowPainting(true);
@@ -146,8 +155,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         // impose some limits
         zoomLevel = initTileCoord.zoom;
-        topLeftOutLimit = mapProvider.outerLimits()[0];
-        bottomRightInLimit = mapProvider.outerLimits()[1];
+        topLeftOutLimit = __mapProvider.outerLimits()[0];
+        bottomRightInLimit = __mapProvider.outerLimits()[1];
         
         // initial tile
         var initObj:Object =
@@ -222,12 +231,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
     }
     
     
-    public function get mapProvider():IMapProvider
+    public function getMapProvider():IMapProvider
     {
         return __mapProvider; 
     }
 
-    public function set mapProvider(mapProvider:IMapProvider):Void
+    public function setMapProvider(mapProvider:IMapProvider):Void
     {
         var previousGeometry:String = __mapProvider.geometry();
 
@@ -1105,7 +1114,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var active:/*Tile*/Array = activeTiles();
         
         for(var i:Number = 0; i < active.length; i += 1)
-            active[i].paint(mapProvider, active[i].coord);
+            active[i].paint(__mapProvider, active[i].coord);
     }
     
    /**
