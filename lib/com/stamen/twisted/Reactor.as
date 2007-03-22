@@ -45,6 +45,14 @@ class com.stamen.twisted.Reactor
     }
     
    /**
+    * Determine whether the reactor is currently running.
+    */
+    public static function running():Boolean
+    {
+        return Boolean(runningEnterFrame);
+    }
+    
+   /**
     * Stop running Reactor.
     */
     public static function stop():Void
