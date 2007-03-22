@@ -751,16 +751,16 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 mergeTiles();
                 zoomLevel -= 1;
             }
-                
-            well._xscale /= scaleAdjust;
-            well._yscale /= scaleAdjust;
-            
-            for(var i:Number = 0; i < tiles.length; i += 1) {
-                tiles[i]._x *= scaleAdjust;
-                tiles[i]._y *= scaleAdjust;
 
-                tiles[i]._xscale *= scaleAdjust;
-                tiles[i]._yscale *= scaleAdjust;
+            well._xscale = Math.round(well._xscale / scaleAdjust);
+            well._yscale = Math.round(well._yscale / scaleAdjust);
+
+            for(var i:Number = 0; i < tiles.length; i += 1) {
+                tiles[i]._x = Math.round(tiles[i]._x * scaleAdjust);
+                tiles[i]._y = Math.round(tiles[i]._y * scaleAdjust);
+
+                tiles[i]._xscale = Math.round(tiles[i]._xscale * scaleAdjust);
+                tiles[i]._yscale = Math.round(tiles[i]._yscale * scaleAdjust);
             }
         
             //trace('Scaled to '+zoomLevel+', '+well._xscale+'%');
