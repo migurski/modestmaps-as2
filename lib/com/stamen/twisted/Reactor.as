@@ -1,10 +1,27 @@
+/**
+ * @author migurski
+ *
+ * com.stamen.twisted.Reactor is inspired by the Reactor class of Twisted Python.
+ *
+ * It is a static class that can schedule events via a single onEnterFrame loop.
+ * The Reactor is well-suited to setting up delayed function calls complete with
+ * arguments, and scheduling their execution some number of milliseconds into the
+ * future. It is also useful for helping to maintain framerate, by only executing
+ * as many calls as can fit in a pre-determined time limit.
+ *
+ * @see http://twistedmatrix.com/projects/core/documentation/howto/reactor-basics.html
+ *
+ * @usage <code>
+ *          import com.stamen.twisted.Reactor;
+ *          ...
+ *          Reactor.run(_root, null, 50);
+ *          Reactor.callLater(1000, trace, "A message in the mysterious future");
+ *        </code>
+ */
+
 import com.stamen.twisted.DelayedCall;
 import com.bigspaceship.utils.Delegate;
 
-/**
- * Inspired by:
- *  http://twistedmatrix.com/projects/core/documentation/howto/reactor-basics.html
- */
 class com.stamen.twisted.Reactor
 {
     private static var oldEnterFrame:Function;

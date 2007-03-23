@@ -6,7 +6,7 @@ import com.modestmaps.mapproviders.MapProviderFactory;
 import com.modestmaps.mapproviders.MapProviders;
 import com.stamen.twisted.Reactor;
 
-class SampleClient
+class SampleClient1
 {
 	private static var __map:Map;
 	private static var __navButtons:MovieClip;
@@ -19,11 +19,11 @@ class SampleClient
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth()));
         __map.init(Stage.width-256, Stage.height-256, true, MapProviderFactory.getInstance().getMapProvider(MapProviders.GOOGLE_ROAD));
-        __map.addEventObserver(SampleClient, Map.EVENT_ZOOMED_BY, "onZoomed");
-        __map.addEventObserver(SampleClient, Map.EVENT_STOP_ZOOMING, "onStopZoom");
-        __map.addEventObserver(SampleClient, Map.EVENT_PANNED_BY, "onPanned");
-        __map.addEventObserver(SampleClient, Map.EVENT_STOP_PANNING, "onStopPan");
-        __map.addEventObserver(SampleClient, Map.EVENT_RESIZED_TO, "onResized");
+        __map.addEventObserver(SampleClient1, Map.EVENT_ZOOMED_BY, "onZoomed");
+        __map.addEventObserver(SampleClient1, Map.EVENT_STOP_ZOOMING, "onStopZoom");
+        __map.addEventObserver(SampleClient1, Map.EVENT_PANNED_BY, "onPanned");
+        __map.addEventObserver(SampleClient1, Map.EVENT_STOP_PANNING, "onStopPan");
+        __map.addEventObserver(SampleClient1, Map.EVENT_RESIZED_TO, "onResized");
         
         __status = clip.createTextField('status', clip.getNextHighestDepth(), 0, 0, 600, 100);
         __status.selectable = false;
@@ -38,8 +38,8 @@ class SampleClient
 
         //Reactor.callLater(2000, Delegate.create(__map, __map.setNewCenter), new Location(37.811411, -122.360916), 14);
         
-        __map.addEventObserver(SampleClient, Map.EVENT_MARKER_ENTERS, "onMarkerEnters");
-        __map.addEventObserver(SampleClient, Map.EVENT_MARKER_LEAVES, "onMarkerLeaves");
+        __map.addEventObserver(SampleClient1, Map.EVENT_MARKER_ENTERS, "onMarkerEnters");
+        __map.addEventObserver(SampleClient1, Map.EVENT_MARKER_LEAVES, "onMarkerLeaves");
         
         __map.putMarker('Rochdale', new Location(37.865571, -122.259679));
         __map.putMarker('Parker Ave.', new Location(37.780492, -122.453731));
@@ -51,7 +51,7 @@ class SampleClient
         
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
-        Stage.addListener(SampleClient);
+        Stage.addListener(SampleClient1);
         
         Reactor.callNextFrame(onResize);
         
@@ -81,20 +81,20 @@ class SampleClient
 
         buttons = new Array();
 		
-		buttons.push(makeButton(__mapButtons, 'MICROSOFT_ROAD', 'ms road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'MICROSOFT_AERIAL', 'ms aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'MICROSOFT_HYBRID', 'ms hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+		buttons.push(makeButton(__mapButtons, 'MICROSOFT_ROAD', 'ms road', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'MICROSOFT_AERIAL', 'ms aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'MICROSOFT_HYBRID', 'ms hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
 
-		buttons.push(makeButton(__mapButtons, 'GOOGLE_ROAD', 'google road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'GOOGLE_AERIAL', 'google aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'GOOGLE_HYBRID', 'google hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+		buttons.push(makeButton(__mapButtons, 'GOOGLE_ROAD', 'google road', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'GOOGLE_AERIAL', 'google aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'GOOGLE_HYBRID', 'google hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
 
-		buttons.push(makeButton(__mapButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+		buttons.push(makeButton(__mapButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
 
-        buttons.push(makeButton(__mapButtons, 'BLUE_MARBLE', 'blue marble', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'OPEN_STREET_MAP', 'open street map', Delegate.create(SampleClient, SampleClient.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'BLUE_MARBLE', 'blue marble', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
+        buttons.push(makeButton(__mapButtons, 'OPEN_STREET_MAP', 'open street map', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
 
 		var nextY : Number = 0;
 		
@@ -134,7 +134,7 @@ class SampleClient
         
         button.onRelease = function()
         {
-        	action.apply(SampleClient, [button]);
+        	action.apply(SampleClient1, [button]);
         };
         
         return button;
