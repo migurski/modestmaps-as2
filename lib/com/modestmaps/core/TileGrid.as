@@ -1146,29 +1146,25 @@ class com.modestmaps.core.TileGrid extends MovieClip
         lineTo(0, 0);
         endFill();
         
-        with(__mask) {
-            clear();
-            moveTo(0, 0);
-            lineStyle(2, 0x990099, 100);
-            beginFill(0x000000, 0);
-            lineTo(0, __height);
-            lineTo(__width, __height);
-            lineTo(__width, 0);
-            lineTo(0, 0);
-            endFill();
-        }
+        __mask.clear();
+        __mask.moveTo(0, 0);
+        __mask.lineStyle(2, 0x990099, 100);
+        __mask.beginFill(0x000000, 0);
+        __mask.lineTo(0, __height);
+        __mask.lineTo(__width, __height);
+        __mask.lineTo(__width, 0);
+        __mask.lineTo(0, 0);
+        __mask.endFill();
         
         // note that __well (0, 0) is grid center.
-        with(__well) {
-            clear();
-            moveTo(__width/-2, __height/-2);
-            lineStyle();
-            beginFill(0x666666, 100);
-            lineTo(__width/-2, __height/2);
-            lineTo(__width/2, __height/2);
-            lineTo(__width/2, __height/-2);
-            lineTo(__width/-2, __height/-2);
-            endFill();
-        }
+        __well.clear();
+        __well.moveTo(__width/-2, __height/-2);
+        __well.lineStyle();
+        __well.beginFill(0x666666, 100);
+        __well.lineTo(__width/-2, __height/2);
+        __well.lineTo(__width/2, __height/2);
+        __well.lineTo(__width/2, __height/-2);
+        __well.lineTo(__width/-2, __height/-2);
+        __well.endFill();
     }
 }
