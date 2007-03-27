@@ -96,7 +96,10 @@ extends DispatchableMovieClip
     public function init(width:Number, height:Number, draggable:Boolean, provider:IMapProvider):Void
     {
         if(!Reactor.running())
-            throw new Error('com.modestmaps.Map.init(): com.stamen.Twisted.Reactor ought to be running at this point.');
+        {
+            // throw new Error('com.modestmaps.Map.init(): com.stamen.Twisted.Reactor ought to be running at this point.');
+            Reactor.run(this, 50);
+        }
 
         __animSteps = [];
 

@@ -1137,6 +1137,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     private function redraw()
     {
         clear();
+        /*
         moveTo(0, 0);
         lineStyle(2, 0x990099, 100);
         beginFill(0x666666, 100);
@@ -1145,6 +1146,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         lineTo(__width, 0);
         lineTo(0, 0);
         endFill();
+        */
         
         __mask.clear();
         __mask.moveTo(0, 0);

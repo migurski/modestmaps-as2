@@ -15,7 +15,7 @@ class SampleClient1
 	
     public static function main(clip:MovieClip):Void
     {
-        Reactor.run(clip, null, 50);
+        Reactor.run(clip, 50);
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth()));
         __map.init(Stage.width-256, Stage.height-256, true, MapProviderFactory.getInstance().getMapProvider(MapProviders.GOOGLE_ROAD));
