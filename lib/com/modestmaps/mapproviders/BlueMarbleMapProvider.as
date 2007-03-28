@@ -30,7 +30,7 @@ implements IMapProvider, DispatchableInterface
 
     public function toString() : String
     {
-        return "BlueMarble[]";
+        return "BLUE_MARBLE";
     }
 
     private function getTileUrl(coord:Coordinate):String

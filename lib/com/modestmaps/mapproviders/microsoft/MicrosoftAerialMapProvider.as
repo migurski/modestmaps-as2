@@ -14,7 +14,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "MicrosoftAerialMapProvider[]";
+		return "MICROSOFT_AERIAL";
 	}
 	
 	private function getTileUrl( coord : Coordinate ) : String

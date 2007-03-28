@@ -14,7 +14,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "MicrosoftHybridMapProvider[]";
+		return "MICROSOFT_HYBRID";
 	}
 	
 	private function getTileUrl( coord : Coordinate ) : String

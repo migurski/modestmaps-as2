@@ -15,7 +15,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "MicrosoftRoadMapProvider[]";
+		return "MICROSOFT_ROAD";
 	}
 	
 	private function getTileUrl( coord : Coordinate ) : String

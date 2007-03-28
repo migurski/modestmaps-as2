@@ -14,7 +14,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "YahooHybridMapProvider[]";
+		return "YAHOO_HYBRID";
 	}
 	
 	/**

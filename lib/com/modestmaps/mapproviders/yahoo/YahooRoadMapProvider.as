@@ -13,7 +13,7 @@ implements IMapProvider, DispatchableInterface
 {	
 	public function toString() : String
 	{
-		return "YahooRoadMapProvider[]";
+		return "YAHOO_ROAD";
 	}
 
 	private function getTileUrl(coord:Coordinate):String

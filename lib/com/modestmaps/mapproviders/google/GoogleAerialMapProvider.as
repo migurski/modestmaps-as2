@@ -14,7 +14,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "GoogleAerialMapProvider[]";
+		return "GOOGLE_AERIAL";
 	}
 
 	public function getTileUrl( coord : Coordinate ) : String

@@ -13,7 +13,7 @@ implements IMapProvider, DispatchableInterface
 {
 	public function toString() : String
 	{
-		return "YahooAerialMapProvider[]";
+		return "YAHOO_AERIAL";
 	}
 
 	private function getTileUrl(coord:Coordinate):String

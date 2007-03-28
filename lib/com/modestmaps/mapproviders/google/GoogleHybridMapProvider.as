@@ -23,7 +23,7 @@ implements IMapProvider, DispatchableInterface
 	
 	public function toString() : String
 	{
-		return "GoogleHybridMapProvider[]";
+		return "GOOGLE_HYBRID";
 	}
 
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 

@@ -32,7 +32,7 @@ implements IMapProvider, DispatchableInterface
 
     public function toString() : String
     {
-        return "OpenStreet[]";
+        return "OPEN_STREET_MAP";
     }
 
     private function getTileUrl(coord:Coordinate):String
