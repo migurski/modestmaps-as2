@@ -366,14 +366,13 @@ class com.modestmaps.core.TileGrid extends MovieClip
         return point;
     }
     
-    public function pointCoordinate(point:Point):Coordinate
+    public function pointCoordinate(point:Point, context:MovieClip):Coordinate
     {
         var tile:Tile;
         var tileCoord:Coordinate;
         var pointCoord:Coordinate;
         
-        // point is assumed to be in tile grid local coordinates
-        localToGlobal(point);
+        context.localToGlobal(point);
         __well.globalToLocal(point);
 
         // an arbitrary reference tile, zoomed to the maximum
@@ -400,19 +399,19 @@ class com.modestmaps.core.TileGrid extends MovieClip
     public function topLeftCoordinate():Coordinate
     {
         var point:Point = new Point(0, 0);
-        return pointCoordinate(point);
+        return pointCoordinate(point, this);
     }
     
     public function centerCoordinate():Coordinate
     {
         var point:Point = new Point(__width/2, __height/2);
-        return pointCoordinate(point);
+        return pointCoordinate(point, this);
     }
     
     public function bottomRightCoordinate():Coordinate
     {
         var point:Point = new Point(__width, __height);
-        return pointCoordinate(point);
+        return pointCoordinate(point, this);
     }
     
    /*
