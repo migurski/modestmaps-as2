@@ -13,27 +13,27 @@ var modestMaps = {
                     break;
         
                 case 'MICROSOFT_ROAD':
-                    this.microsoft.getCopyrightHolders('road', minLat, minLon, maxLat, maxLon, zoom);
+                    this.microsoft.copyright('road', minLat, minLon, maxLat, maxLon, zoom);
                     break;
         
                 case 'MICROSOFT_AERIAL':
-                    this.microsoft.getCopyrightHolders('aerial', minLat, minLon, maxLat, maxLon, zoom);
+                    this.microsoft.copyright('aerial', minLat, minLon, maxLat, maxLon, zoom);
                     break;
         
                 case 'MICROSOFT_HYBRID':
-                    this.microsoft.getCopyrightHolders(undefined, minLat, minLon, maxLat, maxLon, zoom);
+                    this.microsoft.copyright(undefined, minLat, minLon, maxLat, maxLon, zoom);
                     break;
     
                 case 'GOOGLE_ROAD':
-                    this.google.getCopyrightHolders('', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    this.google.copyright('', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
                     break;
         
                 case 'GOOGLE_AERIAL':
-                    this.google.getCopyrightHolders('&t=k', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    this.google.copyright('&t=k', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
                     break;
         
                 case 'GOOGLE_HYBRID':
-                    this.google.getCopyrightHolders('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    this.google.copyright('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
                     break;
         
                 case 'OPEN_STREET_MAP':
@@ -66,7 +66,7 @@ var modestMaps = {
                 }
             },
     
-        getCopyrightHolders:
+        copyright:
             function(t, cenLat, cenLon, spanLat, spanLon, zoom)
             {
                 this.holders = ['&copy; Google'];
@@ -128,7 +128,7 @@ var modestMaps = {
              ['aerial', 'geoeye', 14, 17, -28.3, 152.62, -26.94, 153.64],
              ['aerial', 'pasco', 14, 17, 23.5, 122.5, 46.65, 151.66]],
     
-        getCopyrightHolders:
+        copyright:
             function(kind, minLat, minLon, maxLat, maxLon, zoom)
             {
                 var tracts = this.tracts;
@@ -146,7 +146,7 @@ var modestMaps = {
                     holders.push(this.holders[p]);
                 }
     
-                this.copyrightCallback(holders.join(', '));
+                modestMaps.copyrightCallback(holders.join(', '));
             }
     }
 };
