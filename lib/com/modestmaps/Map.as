@@ -336,6 +336,8 @@ extends DispatchableMovieClip
         	setExtent(extent);
         	
         }
+
+        Reactor.callLater(1000, Delegate.create(this, this.callCopyright));
     }
     
    /**
