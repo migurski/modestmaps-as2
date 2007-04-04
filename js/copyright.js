@@ -1,7 +1,7 @@
 var modestMaps = {
-    copyrightCallback: function(holders)
+    copyrightCallback: function(holdersHTML)
     {
-        alert(holders.join(', '));
+        alert('Copyright holders for this map: '+holdersHTML);
     },
     
     google: {
@@ -20,7 +20,7 @@ var modestMaps = {
                 
                 if(this.holders && holder && newHolder) {
                     this.holders.push(holder);
-                    modestMaps.copyrightCallback(this.holders);
+                    modestMaps.copyrightCallback(this.holders.join(', '));
                 }
             },
     
@@ -29,7 +29,7 @@ var modestMaps = {
             {
                 this.holders = ['&copy; Google'];
                 var s = document.createElement('script');
-                s.src='http://maps.google.com/maps?spn='+spanLat+','+spanLon+'&z='+zoom+t+'&vp='+cenLat+','+cenLon+'&ev=p';
+                s.src='http://maps.google.com/maps?spn='+spanLat+','+spanLon+'&z='+zoom+'&vp='+cenLat+','+cenLon+'&ev=p'+t;
                 document.getElementsByTagName('head')[0].appendChild(s);
             }
     },
@@ -104,7 +104,7 @@ var modestMaps = {
                     holders.push(this.holders[p]);
                 }
     
-                this.copyrightCallback(holders);
+                this.copyrightCallback(holders.join(', '));
             }
     },
     
