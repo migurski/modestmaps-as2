@@ -113,7 +113,7 @@ class com.modestmaps.core.MarkerSet
         var sourceCoord:Coordinate;
         
         for(var i:Number = 0; i < tiles.length; i += 1) {
-            sourceCoord = __grid.getMapProvider().sourceCoordinate(tiles[i].coord);
+            sourceCoord = __grid.getMapProvider().sourceCoordinate(tiles[i].getCoord());
         
             if(__tileMarkers[sourceCoord.toString()] != undefined)
                 for(var markerId:String in __tileMarkers[sourceCoord.toString()]) {

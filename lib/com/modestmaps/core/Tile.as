@@ -42,11 +42,20 @@ implements DispatchableInterface
     	__displayClips = new Array();  	
     }
    
-    public function get coord() : Coordinate
+    public function init(w:Number, h:Number, c:Coordinate, g:TileGrid):Void
+    {
+        grid = g;
+        width = w;
+        height = h;
+        setCoord(c);
+    }
+   
+    public function getCoord():Coordinate
     {
     	return __coord;	
     }
-    public function set coord( coord : Coordinate ) : Void
+
+    public function setCoord(coord:Coordinate):Void
     {
     	__coord = coord;
     	redraw();	
@@ -70,47 +79,47 @@ implements DispatchableInterface
     
     public function zoomOut():Void
     {
-        coord = new Coordinate(Math.floor(coord.row / 2), Math.floor(coord.column / 2), coord.zoom + 1);
+        setCoord(new Coordinate(Math.floor(__coord.row / 2), Math.floor(__coord.column / 2), __coord.zoom + 1));
     }
 
     public function zoomInTopLeft():Void
     {
-        coord = new Coordinate(coord.row * 2, coord.column * 2, coord.zoom - 1);
+        setCoord(new Coordinate(__coord.row * 2, __coord.column * 2, __coord.zoom - 1));
     }
 
     public function zoomInTopRight():Void
     {
-        coord = new Coordinate(coord.row * 2, coord.column * 2 + 1, coord.zoom - 1);
+        setCoord(new Coordinate(__coord.row * 2, __coord.column * 2 + 1, __coord.zoom - 1));
     }
 
     public function zoomInBottomLeft():Void
     {
-        coord = new Coordinate(coord.row * 2 + 1, coord.column * 2, coord.zoom - 1);
+        setCoord(new Coordinate(__coord.row * 2 + 1, __coord.column * 2, __coord.zoom - 1));
     }
 
     public function zoomInBottomRight():Void
     {
-        coord = new Coordinate(coord.row * 2 + 1, coord.column * 2 + 1, coord.zoom - 1);
+        setCoord(new Coordinate(__coord.row * 2 + 1, __coord.column * 2 + 1, __coord.zoom - 1));
     }
 
     public function panUp(distance:Number):Void
     {
-        coord = coord.up(distance);
+        setCoord(__coord.up(distance));
     }
 
     public function panRight(distance:Number):Void
     {
-        coord = coord.right(distance);
+        setCoord(__coord.right(distance));
     }
 
     public function panDown(distance:Number):Void
     {
-        coord = coord.down(distance);
+        setCoord(__coord.down(distance));
     }
 
     public function panLeft(distance:Number):Void
     {
-        coord = coord.left(distance);
+        setCoord(__coord.left(distance));
     }
 
     public function toString():String
@@ -120,13 +129,13 @@ implements DispatchableInterface
 
     public function id():String
     {
-        return 'Tile' + coord.toString();
+        return 'Tile' + __coord.toString();
     }
 
     public function redraw():Void
     {
     	// any need to repeat ourselves?
-    	if(__paintCall && __paintCall.match(grid.getMapProvider(), coord.copy()) && __paintCall.pending())
+    	if(__paintCall && __paintCall.match(grid.getMapProvider(), __coord.copy()) && __paintCall.pending())
             return;
     	
         // are we even allowed to paint ourselves?
@@ -143,8 +152,8 @@ implements DispatchableInterface
    			__displayClips[count].clip._visible = false;
    			
     	// fire up a new call for the next frame...
-    	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.getMapProvider(), coord.copy()),
-    	                                grid.getMapProvider(), coord.copy());
+    	__paintCall = new TilePaintCall(Reactor.callNextFrame(Delegate.create(this, this.paint), grid.getMapProvider(), __coord.copy()),
+    	                                grid.getMapProvider(), __coord.copy());
     }
     
     public function paint(mapProvider:IMapProvider, tileCoord:Coordinate):Void
@@ -171,7 +180,7 @@ implements DispatchableInterface
     
     private function onPaintComplete( clip : MovieClip, coord : Coordinate ) : Void
     {
-    	if ( this.coord.equalTo( coord ) )
+    	if ( __coord.equalTo( coord ) )
     	{
     		DispatchableInterface(grid.getMapProvider()).removeEventObserver( this, AbstractMapProvider.EVENT_PAINT_COMPLETE, "onPaintComplete" );
     		
@@ -181,7 +190,7 @@ implements DispatchableInterface
     		{
     			dcCoord = Coordinate( __displayClips[i].coord );
     			    			
-    			if ( dcCoord.equalTo( this.coord ) )
+    			if ( dcCoord.equalTo( __coord ) )
 					break;
     			else
     			{

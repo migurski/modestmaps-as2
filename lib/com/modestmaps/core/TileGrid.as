@@ -126,15 +126,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         Reactor.callLater(condemnationDelay(), Delegate.create(this, this.destroyTiles), condemnedTiles);
 
         // initial tile
-        var initObj:Object =
-        { 
-            grid: this, 
-            width: TILE_WIDTH, 
-            height: TILE_HEIGHT,
-            coord: coord
-        };
-
-        initTile = createTile(initObj);
+        initTile = createTile(TILE_WIDTH, TILE_HEIGHT, coord);
                                                                   
         centerWell(true);
         initTile._x = point.x;
@@ -159,16 +151,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         bottomRightInLimit = __mapProvider.outerLimits()[1];
         
         // initial tile
-        var initObj:Object =
-        { 
-            grid: this, 
-            width: TILE_WIDTH, 
-            height: TILE_HEIGHT,
-            coord: __initTileCoord
-        };
-        
         __tiles = [];
-        initTile = createTile(initObj);
+        initTile = createTile(TILE_WIDTH, TILE_HEIGHT, __initTileCoord);
                                                                   
         centerWell(false);
         initTile._x = __initTilePoint.x;
@@ -255,12 +239,12 @@ class com.modestmaps.core.TileGrid extends MovieClip
    /**
     * Create a new tile, add it to __tiles array, and return it.
     */
-    private function createTile(tileParams:Object):Tile
+    private function createTile(width:Number, height:Number, coord:Coordinate):Tile
     {
         var tile:Tile;
 
-        tile = Tile(__well.attachMovie(Tile.symbolName, 'tile'+__well.getNextHighestDepth(), __well.getNextHighestDepth(), tileParams));
-        tile.redraw();
+        tile = Tile(__well.attachMovie(Tile.symbolName, 'tile'+__well.getNextHighestDepth(), __well.getNextHighestDepth()));
+        tile.init(width, height, coord, this);
         __tiles.push(tile);
         
         //trace('Created tile: '+tile.toString());
@@ -319,7 +303,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var point:Point = new Point(tile._x, tile._y);
         
         // make sure coord is using the same zoom level
-        coord = coord.zoomTo(tile.coord.zoom);
+        coord = coord.zoomTo(tile.getCoord().zoom);
         
         // store the infinite
         var force:Point = new Point(0, 0);
@@ -328,7 +312,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             force.x = coord.column;
             
         } else {
-            point.x += TILE_WIDTH * (coord.column - tile.coord.column);
+            point.x += TILE_WIDTH * (coord.column - tile.getCoord().column);
         
         }
         
@@ -336,7 +320,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
             force.y = coord.row;
             
         } else {
-            point.y += TILE_HEIGHT * (coord.row - tile.coord.row);
+            point.y += TILE_HEIGHT * (coord.row - tile.getCoord().row);
 
         }
         
@@ -377,7 +361,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
 
         // an arbitrary reference tile, zoomed to the maximum
         tile = activeTiles()[0];
-        tileCoord = tile.coord.copy();
+        tileCoord = tile.getCoord().copy();
         tileCoord = tileCoord.zoomTo(Coordinate.MAX_ZOOM);
         
         // distance in tile widths from reference tile to point
@@ -385,15 +369,15 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var yTiles:Number = (point.y - tile._y) / TILE_HEIGHT;
 
         // distance in rows & columns at maximum zoom
-        var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.coord.zoom));
-        var yDistance:Number = yTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.coord.zoom));
+        var xDistance:Number = xTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.getCoord().zoom));
+        var yDistance:Number = yTiles * Math.pow(2, (Coordinate.MAX_ZOOM - tile.getCoord().zoom));
         
         // new point coordinate reflecting that distance
         pointCoord = new Coordinate(Math.round(tileCoord.row + yDistance),
                                     Math.round(tileCoord.column + xDistance),
                                     tileCoord.zoom);
         
-        return pointCoord.zoomTo(tile.coord.zoom);
+        return pointCoord.zoomTo(tile.getCoord().zoom);
     }
     
     public function topLeftCoordinate():Coordinate
@@ -734,8 +718,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
             active[0]._y = Math.round(active[0]._y);
             
             for(var i:Number = 1; i < active.length; i += 1) {
-                active[i]._x = active[0]._x + (active[i].coord.column - active[0].coord.column) * TILE_WIDTH;
-                active[i]._y = active[0]._y + (active[i].coord.row    - active[0].coord.row)    * TILE_HEIGHT;
+                active[i]._x = active[0]._x + (active[i].getCoord().column - active[0].getCoord().column) * TILE_WIDTH;
+                active[i]._y = active[0]._y + (active[i].getCoord().row    - active[0].getCoord().row)    * TILE_HEIGHT;
             
                 //trace(active[i].toString()+' at '+active[i]._x+', '+active[i]._y+' vs. '+active[0].toString());
             }
@@ -819,14 +803,14 @@ class com.modestmaps.core.TileGrid extends MovieClip
             xOffset = q & 1;
             yOffset = (q >> 1) & 1;
             
-            newTile = createTile(referenceTile);
-            newTile.coord = newTile.coord.zoomBy(1);
+            newTile = createTile(referenceTile.width, referenceTile.height, referenceTile.getCoord());
+            newTile.setCoord(newTile.getCoord().zoomBy(1));
             
             if(xOffset)
-                newTile.coord = newTile.coord.right();
+                newTile.setCoord(newTile.getCoord().right());
             
             if(yOffset)
-                newTile.coord = newTile.coord.down();
+                newTile.setCoord(newTile.getCoord().down());
 
             newTile._x = referenceTile._x + (xOffset * TILE_WIDTH / 2);
             newTile._y = referenceTile._y + (yOffset * TILE_HEIGHT / 2);
@@ -860,7 +844,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
                 __tiles[i].expire();
                 condemnedTiles.push(__tiles[i]);
 
-                if(__tiles[i].coord.zoomBy(-1).isEdge()) {
+                if(__tiles[i].getCoord().zoomBy(-1).isEdge()) {
                     // save for later (you only need one)
                     referenceTile = __tiles[i];
                 }
@@ -874,8 +858,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
             return;
 
         // we are only interested in tiles that are edges for this zoom
-        newTile = createTile(referenceTile);
-        newTile.coord = newTile.coord.zoomBy(-1);
+        newTile = createTile(referenceTile.width, referenceTile.height, referenceTile.getCoord());
+        newTile.setCoord(newTile.getCoord().zoomBy(-1));
         
         newTile._x = referenceTile._x;
         newTile._y = referenceTile._y;
@@ -992,8 +976,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function pushTileRow():Void
     {
-        var lastTile:Tile;
-        var newTileParams:Object;
+        var lastTile:Tile, newTile:Tile;
         var active:/*Tile*/Array = activeTiles();
         
         active.sort(compareTileRowColumn);
@@ -1002,11 +985,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
             lastTile = active[i];
         
-            newTileParams = {grid:  lastTile.grid,  coord:  lastTile.coord.down(),
-                             _x:    lastTile._x,    _y:     lastTile._y + lastTile.height,
-                             width: TILE_WIDTH,     height: TILE_HEIGHT};
-
-            createTile(newTileParams);
+            newTile = createTile(TILE_WIDTH, TILE_HEIGHT, lastTile.getCoord().down());
+            newTile._x = lastTile._x;
+            newTile._y = lastTile._y + lastTile.height;
         }
         
         __rows += 1;
@@ -1032,8 +1013,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private function pushTileColumn():Void
     {
-        var lastTile:Tile;
-        var newTileParams:Object;
+        var lastTile:Tile, newTile:Tile;
         var active:/*Tile*/Array = activeTiles();
         
         active.sort(compareTileColumnRow);
@@ -1042,11 +1022,9 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
             lastTile = active[i];
         
-            newTileParams = {grid:  lastTile.grid,                  coord:  lastTile.coord.right(),
-                             _x:    lastTile._x + lastTile.width,   _y:     lastTile._y,
-                             width: TILE_WIDTH,                     height: TILE_HEIGHT};
-
-            createTile(newTileParams);
+            newTile = createTile(TILE_WIDTH, TILE_HEIGHT, lastTile.getCoord().right());
+            newTile._x = lastTile._x + lastTile.width;
+            newTile._y = lastTile._y;
         }
         
         __columns += 1;
@@ -1085,11 +1063,11 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private static function compareTileRowColumn(a:Tile, b:Tile):Number
     {
-        if(a.coord.row == b.coord.row) {
-            return a.coord.column - b.coord.column;
+        if(a.getCoord().row == b.getCoord().row) {
+            return a.getCoord().column - b.getCoord().column;
             
         } else {
-            return a.coord.row - b.coord.row;
+            return a.getCoord().row - b.getCoord().row;
             
         }
     }
@@ -1099,11 +1077,11 @@ class com.modestmaps.core.TileGrid extends MovieClip
     */
     private static function compareTileColumnRow(a:Tile, b:Tile):Number
     {
-        if(a.coord.column == b.coord.column) {
-            return a.coord.row - b.coord.row;
+        if(a.getCoord().column == b.getCoord().column) {
+            return a.getCoord().row - b.getCoord().row;
             
         } else {
-            return a.coord.column - b.coord.column;
+            return a.getCoord().column - b.getCoord().column;
             
         }
     }
@@ -1113,7 +1091,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         var active:/*Tile*/Array = activeTiles();
         
         for(var i:Number = 0; i < active.length; i += 1)
-            active[i].paint(__mapProvider, active[i].coord);
+            active[i].paint(__mapProvider, active[i].getCoord());
     }
     
    /**
