@@ -4,12 +4,54 @@ var modestMaps = {
         alert('Copyright holders for this map: '+holdersHTML);
     },
     
+    copyright:
+        function(provider, cenLat, cenLon, minLat, minLon, maxLat, maxLon, zoom)
+        {
+            switch(provider) {
+                case 'BLUE_MARBLE':
+                    this.copyrightCallback('&copy; NASA');
+                    break;
+        
+                case 'MICROSOFT_ROAD':
+                    this.microsoft.getCopyrightHolders('road', minLat, minLon, maxLat, maxLon, zoom);
+                    break;
+        
+                case 'MICROSOFT_AERIAL':
+                    this.microsoft.getCopyrightHolders('aerial', minLat, minLon, maxLat, maxLon, zoom);
+                    break;
+        
+                case 'MICROSOFT_HYBRID':
+                    this.microsoft.getCopyrightHolders(undefined, minLat, minLon, maxLat, maxLon, zoom);
+                    break;
+    
+                case 'GOOGLE_ROAD':
+                    this.google.getCopyrightHolders('', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    break;
+        
+                case 'GOOGLE_AERIAL':
+                    this.google.getCopyrightHolders('&t=k', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    break;
+        
+                case 'GOOGLE_HYBRID':
+                    this.google.getCopyrightHolders('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
+                    break;
+        
+                case 'OPEN_STREET_MAP':
+                    // to do
+                    break;
+            } 
+        },
+    
     google: {
         holders: undefined,
     
         addCopyright:
             function(g,a,r,b,a,g,e, holder)
             {
+                if(!this.holders || !holder) {
+                    return;
+                }
+                
                 var newHolder = true;
                 
                 for(var i = 0; i < this.holders.length; i += 1) {
@@ -18,7 +60,7 @@ var modestMaps = {
                     }
                 }
                 
-                if(this.holders && holder && newHolder) {
+                if(newHolder) {
                     this.holders.push(holder);
                     modestMaps.copyrightCallback(this.holders.join(', '));
                 }
@@ -106,39 +148,7 @@ var modestMaps = {
     
                 this.copyrightCallback(holders.join(', '));
             }
-    },
-    
-    copyright:
-        function(provider, cenLat, cenLon, minLat, minLon, maxLat, maxLon, zoom)
-        {
-            switch(provider) {
-                case 'MICROSOFT_ROAD':
-                    this.microsoft.getCopyrightHolders('road', minLat, minLon, maxLat, maxLon, zoom);
-        
-                case 'MICROSOFT_AERIAL':
-                    this.microsoft.getCopyrightHolders('aerial', minLat, minLon, maxLat, maxLon, zoom);
-        
-                case 'MICROSOFT_HYBRID':
-                    this.microsoft.getCopyrightHolders(undefined, minLat, minLon, maxLat, maxLon, zoom);
-    
-                case 'GOOGLE_ROAD':
-                    this.google.getCopyrightHolders('', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-        
-                case 'GOOGLE_AERIAL':
-                    this.google.getCopyrightHolders('&t=k', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-        
-                case 'GOOGLE_HYBRID':
-                    this.google.getCopyrightHolders('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-        
-                case 'BLUE_MARBLE':
-                    // to do
-                    break;
-        
-                case 'OPEN_STREET_MAP':
-                    // to do
-                    break;
-            } 
-        }
+    }
 };
 
 GAddCopyright = function(g,a,r,b,a,g,e, holder) { modestMaps.google.addCopyright(g,a,r,b,a,g,e, holder); };
