@@ -130,10 +130,14 @@ extends DispatchableMovieClip
     */
     public function setExtent(locations:/*Location*/Array):Void
     {
+        if(!locations.length)
+            return;
+    
         var extent:Object = calculateMapExtent(locations);
     
         // tell grid what the rock is cooking
         grid.resetTiles(Coordinate(extent['coord']), Point(extent['point']));
+        Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
     }
     
    /*
@@ -153,6 +157,7 @@ extends DispatchableMovieClip
         
         // tell grid what the rock is cooking
         grid.resetTiles(Coordinate(center['coord']), Point(center['point']));
+        Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
     }
     
    /*
@@ -521,6 +526,32 @@ extends DispatchableMovieClip
     }
     
    /**
+    * Call javascript:modestMaps.copyright() with details about current view.
+    * See js/copyright.js.
+    */
+    private function callCopyright():Void
+    {
+        var cenP:Point = new Point(__width/2, __height/2);
+        var minP:Point = new Point(__width/5, __height/5);
+        var maxP:Point = new Point(__width*4/5, __height*4/5);
+        
+        var cenC:Coordinate = grid.pointCoordinate(cenP, this);
+        var minC:Coordinate = grid.pointCoordinate(minP, this);
+        var maxC:Coordinate = grid.pointCoordinate(maxP, this);
+        
+        var cenL:Location = __mapProvider.coordinateLocation(__mapProvider.sourceCoordinate(cenC));
+        var minL:Location = __mapProvider.coordinateLocation(__mapProvider.sourceCoordinate(minC));
+        var maxL:Location = __mapProvider.coordinateLocation(__mapProvider.sourceCoordinate(maxC));
+    
+        var minLat:Number = Math.min(minL.lat, maxL.lat);
+        var minLon:Number = Math.min(minL.lon, maxL.lon);
+        var maxLat:Number = Math.max(minL.lat, maxL.lat);
+        var maxLon:Number = Math.max(minL.lon, maxL.lon);
+        
+        getURL('javascript:modestMaps.copyright("'+__mapProvider.toString()+'", '+cenL.lat+', '+cenL.lon+', '+minLat+', '+minLon+', '+maxLat+', '+maxLon+', '+grid.zoomLevel+')');
+    }
+    
+   /**
     * Dispatches EVENT_MARKER_ENTERS when a given marker enters the tile coverage area.
     * Event object includes id:String and location:Location.
     *
@@ -572,6 +603,7 @@ extends DispatchableMovieClip
     {
         //trace('...Entering zoom level '+grid.zoomLevel);
         dispatchEvent( EVENT_STOP_ZOOMING, grid.zoomLevel );
+        callCopyright();
     }
     
    /**
@@ -608,6 +640,7 @@ extends DispatchableMovieClip
     {
         //trace('...Stopping pan');
         dispatchEvent( EVENT_STOP_PANNING );
+        callCopyright();
     }
     
    /**
