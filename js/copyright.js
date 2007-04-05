@@ -9,7 +9,11 @@ var modestMaps = {
         {
             switch(provider) {
                 case 'BLUE_MARBLE':
-                    this.copyrightCallback('&copy; NASA');
+                    this.copyrightCallback('Image courtesy of NASA');
+                    break;
+        
+                case 'OPEN_STREET_MAP':
+                    this.copyrightCallback('Image courtesy of OpenStreetMap');
                     break;
         
                 case 'MICROSOFT_ROAD':
@@ -35,10 +39,6 @@ var modestMaps = {
                 case 'GOOGLE_HYBRID':
                     this.google.copyright('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
                     break;
-        
-                case 'OPEN_STREET_MAP':
-                    // to do
-                    break;
             } 
         },
     
@@ -46,7 +46,7 @@ var modestMaps = {
         holders: undefined,
     
         addCopyright:
-            function(g,a,r,b,a,g,e, holder)
+            function(holder)
             {
                 if(!this.holders || !holder) {
                     return;
@@ -151,4 +151,4 @@ var modestMaps = {
     }
 };
 
-GAddCopyright = function(g,a,r,b,a,g,e, holder) { modestMaps.google.addCopyright(g,a,r,b,a,g,e, holder); };
+GAddCopyright = function(g,a,r,b,a,g,e, holder) { modestMaps.google.addCopyright(holder); };
