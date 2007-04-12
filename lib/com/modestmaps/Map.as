@@ -550,7 +550,7 @@ extends DispatchableMovieClip
         var maxLat:Number = Math.max(minL.lat, maxL.lat);
         var maxLon:Number = Math.max(minL.lon, maxL.lon);
         
-        getURL('javascript:modestMaps.copyright("'+__mapProvider.toString()+'", '+cenL.lat+', '+cenL.lon+', '+minLat+', '+minLon+', '+maxLat+', '+maxLon+', '+grid.zoomLevel+')');
+        getURL('javascript:try{modestMaps.copyright("'+__mapProvider.toString()+'", '+cenL.lat+', '+cenL.lon+', '+minLat+', '+minLon+', '+maxLat+', '+maxLon+', '+grid.zoomLevel+');}catch(e){void(0);};void(0);');
     }
     
    /**
