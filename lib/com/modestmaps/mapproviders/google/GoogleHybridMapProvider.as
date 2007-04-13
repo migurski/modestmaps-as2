@@ -37,13 +37,7 @@ implements IMapProvider, DispatchableInterface
 			
 			var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
 			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
-			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
-			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
-			request.send();
-	
-			request = new MapProviderPaintThrottledRequest( clip.overlay, getOverlayTileUrl( coord ), coord );
-			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
-			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onBackgroundComplete");
 			request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
 			request.send();
 		}
@@ -68,6 +62,15 @@ implements IMapProvider, DispatchableInterface
 	}
 
 	// Event Handlers
+	
+	private function onBackgroundComplete( clip : MovieClip, coord : Coordinate ) : Void
+	{
+        var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip._parent.overlay, getOverlayTileUrl( coord ), coord );
+        request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
+        request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
+        request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError" );
+        request.send();
+	}
 	
 	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
