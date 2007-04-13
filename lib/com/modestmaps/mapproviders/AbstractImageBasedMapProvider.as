@@ -11,6 +11,8 @@
  * @see com.modestmaps.mapproviders.AbstractMapProvider
  */
  
+import com.stamen.twisted.Reactor;
+import com.bigspaceship.utils.Delegate;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.io.MapProviderPaintThrottledRequest;
 import com.modestmaps.mapproviders.AbstractMapProvider;
@@ -18,6 +20,8 @@ import com.modestmaps.mapproviders.AbstractMapProvider;
 class com.modestmaps.mapproviders.AbstractImageBasedMapProvider 
 extends AbstractMapProvider 
 {
+    public static var fadeSteps:Number = 3;
+
 	/**
 	 * Abstract constructor, should not be instantiated directly.
 	 */
@@ -38,6 +42,8 @@ extends AbstractMapProvider
 	public function paint( clip : MovieClip, coord : Coordinate ) : Void 
 	{
 		super.paint( clip, coord );
+		
+		clip.image._alpha = 0;
 		
 		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.image, getTileUrl( coord ), coord );
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError");
@@ -67,11 +73,25 @@ extends AbstractMapProvider
 	    paintFailure( clip );
 	}
 	
+	private function fadeClipIn( clip : MovieClip) : Void
+	{
+	    if( clip._alpha + (100/fadeSteps) >= 100 )
+	    {
+	        clip._alpha = 100;
+        }
+        else
+        {
+            clip._alpha += (100/fadeSteps);
+            Reactor.callNextFrame(Delegate.create(this, this.fadeClipIn), clip);
+        }
+	}
+	
 	/**
 	 * Event handler for MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE
 	 */
 	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
+	    fadeClipIn( clip );
 		raisePaintComplete( clip, coordinate );
 	}
 	
@@ -80,6 +100,7 @@ extends AbstractMapProvider
 	 */
 	private function onResponseError( clip : MovieClip, errorCode : String, httpStatus : Number ) : Void
 	{
+	    fadeClipIn( clip );
 	    paintFailure(clip);
 	}		
 	

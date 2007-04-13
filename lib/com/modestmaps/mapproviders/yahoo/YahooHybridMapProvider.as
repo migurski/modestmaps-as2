@@ -25,7 +25,9 @@ implements IMapProvider, DispatchableInterface
 	{
 		clip.createEmptyMovieClip( "bg", clip.getNextHighestDepth() );
 		clip.createEmptyMovieClip( "overlay", clip.getNextHighestDepth() );
-		
+        
+        clip.bg._alpha = 0;
+        
 		var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip.bg, getBGTileUrl( coord ), coord );
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onBackgroundComplete");
@@ -68,6 +70,9 @@ implements IMapProvider, DispatchableInterface
 	
 	private function onBackgroundComplete( clip : MovieClip, coord : Coordinate ) : Void
 	{
+	    fadeClipIn( clip );
+	    clip._parent.overlay._alpha = 0;
+
         var request : MapProviderPaintThrottledRequest = new MapProviderPaintThrottledRequest( clip._parent.overlay, getOverlayTileUrl( coord ), coord );
         request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_REQUEST_ERROR, "onRequestError" );
         request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
@@ -77,6 +82,8 @@ implements IMapProvider, DispatchableInterface
 	
 	private function onResponseComplete( clip : MovieClip, coordinate : Coordinate ) : Void
 	{
+	    fadeClipIn( clip );
+
 		// HAKT
 		var bgClip : MovieClip = clip._parent.bg;
 		var overlayClip : MovieClip = clip._parent.overlay;
