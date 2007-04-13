@@ -109,11 +109,6 @@ extends DispatchableMovieClip
     
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth()));
         grid.init(width, height, draggable, provider, this);
-
-        var extent:/*Location*/Array = [new Location(85, -180),
-                                        new Location(-85, 180)];
-        
-        setExtent(extent);
     }
 
    /*

@@ -95,7 +95,8 @@ class com.modestmaps.core.TileGrid extends MovieClip
         __overlappingMarkers = {};
         markers = new MarkerSet(this);
         
-        Reactor.callNextFrame(Delegate.create(this, this.initializeTiles));
+        setInitialTile(new Coordinate(0, 0, 1), new Point(-TILE_WIDTH, -TILE_HEIGHT));
+        initializeTiles();
     }
     
    /**
@@ -126,6 +127,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         Reactor.callLater(condemnationDelay(), Delegate.create(this, this.destroyTiles), condemnedTiles);
 
         // initial tile
+        zoomLevel = coord.zoom;
         initTile = createTile(TILE_WIDTH, TILE_HEIGHT, coord);
                                                                   
         centerWell(true);
@@ -587,9 +589,10 @@ class com.modestmaps.core.TileGrid extends MovieClip
     {
         var matches:/*Tile*/Array = [];
         
-        for(var i:Number = 0; i < __tiles.length; i += 1)
-            if(__tiles[i].isActive())
-                matches.push(__tiles[i]);
+        if(__tiles)
+            for(var i:Number = 0; i < __tiles.length; i += 1)
+                if(__tiles[i].isActive())
+                    matches.push(__tiles[i]);
 
         return matches;
     }
