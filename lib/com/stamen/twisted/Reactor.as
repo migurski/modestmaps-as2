@@ -103,7 +103,7 @@ class com.stamen.twisted.Reactor
     
     private static function mainLoop():Void
     {
-        trace('...Reactor main loop...');
+        //trace('...Reactor main loop...');
         
         var loopStop:Number = getTime() + limit;
         
@@ -150,7 +150,7 @@ class com.stamen.twisted.Reactor
         var args:Array = arguments.slice(2);    // more than two arguments can be passed to this function
         var call:DelayedCall = new DelayedCall(due, func, args);
 
-        trace('Adding delayed call with '+call.args.length+' arguments at '+call.due+'...');
+        //trace('Adding delayed call with '+call.args.length+' arguments at '+call.due+'...');
         addCall(call);
         return call;
     }
@@ -164,7 +164,7 @@ class com.stamen.twisted.Reactor
         var args:Array = arguments.slice(1);    // more than one argument can be passed to this function
         var call:DelayedCall = new DelayedCall(due, func, args);
 
-        trace('Adding delayed call for next frame with '+call.args.length+' arguments at '+call.due+'...');
+        //trace('Adding delayed call for next frame with '+call.args.length+' arguments at '+call.due+'...');
         nextFrameCalls.push(call);
         return call;
     }
