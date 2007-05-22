@@ -5,12 +5,11 @@
  * @author darren
  * @author migurski
  *
- * AbstractMapProvider is the base class for all MapProviders.
+ * AbstractMapProvider is the base class for all map providers.
  * 
- * @description AbstractMapProvider is the base class for all 
- * 				MapProviders. MapProviders are primarily responsible
- * 				for "painting" map Tiles with the correct 
- * 				graphic imagery.
+ * @description AbstractMapProvider is the base class for all map providers.
+ * 				Map providers are primarily responsible for "painting" map
+ *              tiles with the correct graphic imagery.
  */
 
 import org.casaframework.event.DispatchableInterface;
@@ -93,24 +92,6 @@ implements DispatchableInterface
 
         return limits;
     }
-
-	/**
-	 * Creates a text label for debugging purposes.
-	 * 
-	 * @param clip The MovieClip to contain the label.
-	 * @param label The text the label.
-	 */
-	public function createLabel( clip : MovieClip, label : String ) : Void
-	{
-		clip["labelTF"].removeTextField();
-		
-		clip.createTextField('labelTF', 1, 0, 0, 1, 1);
-	    var tf : TextField = clip["labelTF"];
-	    tf.autoSize = true;
-	    tf.selectable = false;
-	    tf.textColor = 0xFF0000;
-		tf.text = label;	
-	}
 
    /*
     * Return projected and transformed coordinate for a location.

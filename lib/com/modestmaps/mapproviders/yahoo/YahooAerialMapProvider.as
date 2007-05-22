@@ -18,17 +18,12 @@ implements IMapProvider, DispatchableInterface
 
 	private function getTileUrl(coord:Coordinate):String
 	{		
-        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" + getZoomString(sourceCoordinate(coord));	
+        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/tile?v=1.7&t=a" + getZoomString(sourceCoordinate(coord));
 	}
 	
 	private function getZoomString( coord : Coordinate ) : String
 	{		
         var row : Number = ( Math.pow( 2, coord.zoom ) /2 ) - coord.row - 1;
-
-		var zoomString : String = "&x=" + coord.column + 
-			"&y=" + row + 
-			"&z=" + ( 18 - coord.zoom ) +
-			"&v=1.5&t=a";
-		return zoomString; 
+        return "&x=" + coord.column + "&y=" + row + "&z=" + (18 - coord.zoom);
 	}	
 }

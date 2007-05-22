@@ -1,10 +1,11 @@
+import SampleMarker;
 import com.bigspaceship.utils.Delegate;
-import com.modestmaps.core.Point;
+import com.modestmaps.core.MapExtent;
 import com.modestmaps.geo.Location;
 import com.modestmaps.Map;
-import com.modestmaps.mapproviders.MapProviderFactory;
-import com.modestmaps.mapproviders.MapProviders;
+import com.modestmaps.mapproviders.microsoft.MicrosoftRoadMapProvider;
 import com.stamen.twisted.Reactor;
+import flash.geom.Point;
 
 class SampleClient1
 {
@@ -18,7 +19,7 @@ class SampleClient1
         Reactor.run(clip, 50);
 
         __map = Map(clip.attachMovie(Map.symbolName, 'map', clip.getNextHighestDepth()));
-        __map.init(Stage.width-256, Stage.height-256, true, MapProviderFactory.getInstance().getMapProvider(MapProviders.GOOGLE_ROAD));
+        __map.init(Stage.width-256, Stage.height-256, true, new MicrosoftRoadMapProvider());
         __map.addEventObserver(SampleClient1, Map.EVENT_ZOOMED_BY, "onZoomed");
         __map.addEventObserver(SampleClient1, Map.EVENT_STOP_ZOOMING, "onStopZoom");
         __map.addEventObserver(SampleClient1, Map.EVENT_PANNED_BY, "onPanned");
@@ -31,24 +32,22 @@ class SampleClient1
         __status.text = '...';
         __status._height = __status.textHeight + 2;
 
-        var extent:/*Location*/Array = [new Location(37.829853, -122.514725),
-                                        new Location(37.700121, -122.212601)];
-        
-        __map.setExtent(extent);
+        __map.setExtent(new MapExtent(37.829853, 37.700121, -122.212601, -122.514725));
 
         //Reactor.callLater(2000, Delegate.create(__map, __map.setNewCenter), new Location(37.811411, -122.360916), 14);
         
         __map.addEventObserver(SampleClient1, Map.EVENT_MARKER_ENTERS, "onMarkerEnters");
         __map.addEventObserver(SampleClient1, Map.EVENT_MARKER_LEAVES, "onMarkerLeaves");
         
-        __map.putMarker('Rochdale', new Location(37.865571, -122.259679));
-        __map.putMarker('Parker Ave.', new Location(37.780492, -122.453731));
-        __map.putMarker('Pepper Dr.', new Location(37.623443, -122.426577));
-        __map.putMarker('3rd St.', new Location(37.779297, -122.392877));
-        __map.putMarker('Divisadero St.', new Location(37.771919, -122.437413));
-        __map.putMarker('Market St.', new Location(37.812734, -122.280064));
-        __map.putMarker('17th St.', new Location(37.804274, -122.262940));
-        
+        // Add a bunch of markers by attaching clips to the __map.markers movieclip:
+        __map.putMarker('Rochdale',       new Location(37.865571, -122.259679), SampleMarker.symbolName);
+        __map.putMarker('Parker Ave.',    new Location(37.780492, -122.453731), SampleMarker.symbolName);
+        __map.putMarker('Pepper Dr.',     new Location(37.623443, -122.426577), SampleMarker.symbolName);
+        __map.putMarker('3rd St.',        new Location(37.779297, -122.392877), SampleMarker.symbolName);
+        __map.putMarker('Divisadero St.', new Location(37.771919, -122.437413), SampleMarker.symbolName);
+        __map.putMarker('Market St.',     new Location(37.812734, -122.280064), SampleMarker.symbolName);
+        __map.putMarker('17th St.',       new Location(37.804274, -122.262940), SampleMarker.symbolName);
+
         Stage.scaleMode = 'noScale';
         Stage.align = 'TL';
         Stage.addListener(SampleClient1);
@@ -110,7 +109,55 @@ class SampleClient1
     
     private static function switchMapProvider(button:MovieClip):Void
     {
-    	__map.setMapProvider(MapProviderFactory.getInstance().getMapProvider(MapProviders[button._name]));
+        switch(button._name) {
+			case 'VANILLA':
+				__map.setMapProvider(new com.modestmaps.mapproviders.VanillaMapProvider());
+				break;
+
+			case 'BLUE_MARBLE':
+				__map.setMapProvider(new com.modestmaps.mapproviders.BlueMarbleMapProvider());
+				break;
+
+			case 'OPEN_STREET_MAP':
+				__map.setMapProvider(new com.modestmaps.mapproviders.OpenStreetMapProvider());
+				break;
+
+			case 'MICROSOFT_ROAD':
+				__map.setMapProvider(new com.modestmaps.mapproviders.microsoft.MicrosoftRoadMapProvider());
+				break;
+
+			case 'MICROSOFT_AERIAL':
+				__map.setMapProvider(new com.modestmaps.mapproviders.microsoft.MicrosoftAerialMapProvider());
+				break;
+
+			case 'MICROSOFT_HYBRID':
+				__map.setMapProvider(new com.modestmaps.mapproviders.microsoft.MicrosoftHybridMapProvider());
+				break;
+				
+			case 'GOOGLE_ROAD':
+				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleRoadMapProvider());
+				break;
+
+			case 'GOOGLE_AERIAL':
+				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleAerialMapProvider());
+				break;
+
+			case 'GOOGLE_HYBRID':
+				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleHybridMapProvider());
+				break;
+
+			case 'YAHOO_ROAD':
+				__map.setMapProvider(new com.modestmaps.mapproviders.yahoo.YahooRoadMapProvider());
+				break;
+
+			case 'YAHOO_AERIAL':
+				__map.setMapProvider(new com.modestmaps.mapproviders.yahoo.YahooAerialMapProvider());
+				break;
+
+			case 'YAHOO_HYBRID':
+				__map.setMapProvider(new com.modestmaps.mapproviders.yahoo.YahooHybridMapProvider());
+				break;
+        }
     }
     
     public static function makeButton(clip:MovieClip, name:String, label:String, action:Function):MovieClip
@@ -165,22 +212,22 @@ class SampleClient1
     
     private static function onPanned( delta : Point ):Void
     {
-        __status.text = 'Panned by '+ delta.toString() +', top left: '+__map.getExtent()[0].toString()+', bottom right: '+__map.getExtent()[3].toString();
+        __status.text = 'Panned by '+ delta.toString() +', top left: '+__map.getExtent().northWest.toString()+', bottom right: '+__map.getExtent().southEast.toString();
     }
     
     private static function onStopPan():Void
     {
-        __status.text = 'Stopped panning, top left: '+__map.getExtent()[0].toString()+', center: '+__map.getCenterZoom()[0].toString()+', bottom right: '+__map.getExtent()[3].toString()+', zoom: '+__map.getCenterZoom()[1];
+        __status.text = 'Stopped panning, top left: '+__map.getExtent().northWest.toString()+', center: '+__map.getCenterZoom()[0].toString()+', bottom right: '+__map.getExtent().southEast.toString()+', zoom: '+__map.getCenterZoom()[1];
     }
     
     private static function onZoomed( delta : Number ):Void
     {
-        __status.text = 'Zoomed by '+delta.toString()+', top left: '+__map.getExtent()[0].toString()+', bottom right: '+__map.getExtent()[3].toString();
+        __status.text = 'Zoomed by '+delta.toString()+', top left: '+__map.getExtent().northWest.toString()+', bottom right: '+__map.getExtent().southEast.toString();
     }
     
     private static function onStopZoom( zoomLevel : Number ):Void
     {
-        __status.text = 'Stopped zooming, top left: '+__map.getExtent()[0].toString()+', center: '+__map.getCenterZoom()[0].toString()+', bottom right: '+__map.getExtent()[3].toString()+', zoom: '+__map.getCenterZoom()[1];
+        __status.text = 'Stopped zooming, top left: '+__map.getExtent().northWest.toString()+', center: '+__map.getCenterZoom()[0].toString()+', bottom right: '+__map.getExtent().southEast.toString()+', zoom: '+__map.getCenterZoom()[1];
     }
     
     private static function onResized( width : Number, height : Number ):Void

@@ -3,12 +3,13 @@
  * $Id$
  */
 
+import flash.geom.Point;
+
 import com.bigspaceship.utils.Delegate;
 import com.modestmaps.core.Bounds;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.core.Marker;
 import com.modestmaps.core.MarkerSet;
-import com.modestmaps.core.Point;
 import com.modestmaps.core.Tile;
 import com.modestmaps.geo.Location;
 import com.modestmaps.Map;
@@ -474,7 +475,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         __map.onStartPan();
         __well.startDrag(false, xMin, yMin, xMax, yMax);
-        onWellDrag(__startingWellPosition.copy());
+        onWellDrag(new Point(__startingWellPosition.x, __startingWellPosition.y));
     }
     
    /*

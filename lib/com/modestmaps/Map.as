@@ -25,12 +25,14 @@
  */
 
 import com.bigspaceship.utils.Delegate;
-
 import org.casaframework.movieclip.DispatchableMovieClip;
+import flash.geom.Point;
 
+import com.modestmaps.core.MapExtent;
+import com.modestmaps.core.MapPosition;
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
+import com.modestmaps.core.MarkerClip;
 import com.modestmaps.geo.Location;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.stamen.twisted.DelayedCall;
@@ -63,6 +65,10 @@ extends DispatchableMovieClip
     // das grid
     public var grid:TileGrid;
 
+    // markers are attached here
+    private var __markers:MarkerClip;
+    private var __mask:MovieClip;
+
     // Who do we get our Map graphics from?
     private var __mapProvider:IMapProvider;
 
@@ -70,12 +76,13 @@ extends DispatchableMovieClip
     public static var EVENT_MARKER_ENTERS:String = 'Marker enters';
     public static var EVENT_MARKER_LEAVES:String = 'Marker leaves';
     public static var EVENT_START_ZOOMING:String = 'Start zooming';
-    public static var EVENT_STOP_ZOOMING:String = 'Stop Zooming';
+    public static var EVENT_STOP_ZOOMING:String = 'Stop zooming';
     public static var EVENT_ZOOMED_BY:String = 'Zoomed by...';
     public static var EVENT_START_PANNING:String = 'Start panning';
     public static var EVENT_STOP_PANNING:String = 'Stop panning';
     public static var EVENT_PANNED_BY:String = 'Panned by...';
     public static var EVENT_RESIZED_TO:String = 'Resized to...';
+    public static var EVENT_EXTENT_CHANGED:String = 'Extent changed';
 
     public static var symbolName:String = '__Packages.com.modestmaps.Map';
     public static var symbolOwner:Function = Map;
@@ -109,57 +116,66 @@ extends DispatchableMovieClip
     
         grid = TileGrid(attachMovie(TileGrid.symbolName, 'grid', getNextHighestDepth()));
         grid.init(width, height, draggable, provider, this);
+
+        __markers = MarkerClip(attachMovie(MarkerClip.symbolName, '__markers', getNextHighestDepth(), {_x: __width/2, _y: __height/2}));
+        __mask = createEmptyMovieClip('__mask', getNextHighestDepth());
+        __markers.setMask(__mask);
+        __markers.setMap(this);
+        
+        redraw();
     }
 
    /*
-    * Based on an array of locations, determine appropriate map
-    * bounds using calculateMapExtent(), and inform the grid of
+    * Based on a MapExtent, determine appropriate map
+    * bounds using extentPosition(), and inform the grid of
     * tile coordinate and point by calling grid.resetTiles().
     * Resulting map extent will ensure that all passed locations
     * are visible.
     *
-    * @param    Array of locations.
+    * @param    MapExtent.
     *
-    * @see com.modestmaps.Map#calculateMapExtent
+    * @see com.modestmaps.Map#extentPosition
     * @see com.modestmaps.core.TileGrid#resetTiles
     */
-    public function setExtent(locations:/*Location*/Array):Void
+    public function setExtent(extent:MapExtent):Void
     {
-        if(!locations.length)
-            return;
-    
-        var extent:Object = calculateMapExtent(locations);
+        // what to do if a bad extent is passed?
+        var position:MapPosition = extentPosition(extent);
     
         // tell grid what the rock is cooking
-        grid.resetTiles(Coordinate(extent['coord']), Point(extent['point']));
+        grid.resetTiles(position.coord, position.point);
+        onExtentChanged(getExtent());
+        Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
         Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
     }
     
    /*
     * Based on a location and zoom level, determine appropriate initial
-    * tile coordinate and point using calculateMapCenter(), and inform
+    * tile coordinate and point using coordinatePosition(), and inform
     * the grid of tile coordinate and point by calling grid.resetTiles().
     *
     * @param    Location of center.
     * @param    Desired zoom level.
     *
-    * @see com.modestmaps.Map#calculateMapExtent
+    * @see com.modestmaps.Map#extentPosition
     * @see com.modestmaps.core.TileGrid#resetTiles
     */
     public function setCenterZoom(location:Location, zoom:Number):Void
     {
-        var center:Object = calculateMapCenter(__mapProvider.locationCoordinate(location).zoomTo(zoom));
+        var center:MapPosition = coordinatePosition(__mapProvider.locationCoordinate(location).zoomTo(zoom));
         
         // tell grid what the rock is cooking
-        grid.resetTiles(Coordinate(center['coord']), Point(center['point']));
+        grid.resetTiles(center.coord, center.point);
+        onExtentChanged(getExtent());
+        Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
         Reactor.callNextFrame(Delegate.create(this, this.callCopyright));
     }
     
    /*
     * Based on a coordinate, determine appropriate starting tile and position,
-    * and return a two-element object with a coord and a point.
+    * and return a MapPosition.
     */
-    private function calculateMapCenter(centerCoord:Coordinate):Object
+    private function coordinatePosition(centerCoord:Coordinate):MapPosition
     {
         // initial tile coordinate
         var initTileCoord:Coordinate = new Coordinate(Math.floor(centerCoord.row), Math.floor(centerCoord.column), Math.floor(centerCoord.zoom));
@@ -169,15 +185,14 @@ extends DispatchableMovieClip
         var initY:Number = (initTileCoord.row - centerCoord.row) * TileGrid.TILE_HEIGHT;
         var initPoint:Point = new Point(Math.round(initX), Math.round(initY));
         
-        return {coord: initTileCoord, point: initPoint};
+        return new MapPosition(initTileCoord, initPoint);
     }
     
    /*
     * Based on an array of locations, determine appropriate map bounds
-    * in terms of tile grid, and return a two-element object with a coord
-    * and a point from calculateMapCenter().
+    * in terms of tile grid, and return a MapPosition from coordinatePosition().
     */
-    private function calculateMapExtent(locations:/*Location*/Array):Object
+    private function locationsPosition(locations:/*Location*/Array):MapPosition
     {
         // my kingdom for a decent map() function in AS2
         var coordinates:/*Coordinate*/Array = [];
@@ -225,39 +240,43 @@ extends DispatchableMovieClip
         var centerZoom:Number = (TL.zoom + BR.zoom) / 2;
         var centerCoord:Coordinate = (new Coordinate(centerRow, centerColumn, centerZoom)).zoomTo(initZoom);
         
-        return calculateMapCenter(centerCoord);
+        return coordinatePosition(centerCoord);
+    }
+
+   /*
+    * Based on a MapExtent, determine appropriate map bounds
+    * in terms of tile grid, and return a MapPosition from calculateMapCenter().
+    */
+    private function extentPosition(extent:MapExtent):MapPosition
+    {
+        var locations:/*Location*/Array = [extent.northWest, extent.southEast];
+        return locationsPosition(locations);
     }
     
    /*
-    * Return the current coverage area of the map, as four locations.
+    * Return the current coverage area of the map, as MapExtent.
     *
-    * @return   Array of four locations: [top-left, top-right, bottom-left, bottom-right].
+    * @return   MapExtent.
     */
-    public function getExtent():/*Location*/Array
+    public function getExtent():MapExtent
     {
-        var corners:/*Location*/Array = [];
-        
         if(!__mapProvider)
-            return corners;
+            return new MapExtent();
 
-        var TL:Coordinate = grid.topLeftCoordinate();
-        var BR:Coordinate = grid.bottomRightCoordinate();
-        var TR:Coordinate = new Coordinate(TL.row, BR.column, TL.zoom);
-        var BL:Coordinate = new Coordinate(BR.row, TL.column, BR.zoom);
-
-        corners.push(__mapProvider.coordinateLocation(TL));
-        corners.push(__mapProvider.coordinateLocation(TR));
-        corners.push(__mapProvider.coordinateLocation(BL));
-        corners.push(__mapProvider.coordinateLocation(BR));
+        var coordTL:Coordinate = grid.topLeftCoordinate();
+        var coordBR:Coordinate = grid.bottomRightCoordinate();
+        var coordTR:Coordinate = new Coordinate(coordTL.row, coordBR.column, coordTL.zoom);
+        var coordBL:Coordinate = new Coordinate(coordBR.row, coordTL.column, coordBR.zoom);
         
-        /*
-        trace('top left: '+corners[0].toString());
-        trace('top right: '+corners[1].toString());
-        trace('bottom left: '+corners[2].toString());
-        trace('bottom right: '+corners[3].toString());
-        */
-
-        return corners;
+        var TL:Location = __mapProvider.coordinateLocation(coordTL);
+        var BR:Location = __mapProvider.coordinateLocation(coordBR);
+        var TR:Location = __mapProvider.coordinateLocation(coordTR);
+        var BL:Location = __mapProvider.coordinateLocation(coordBL);
+        
+        return new MapExtent(Math.max(Math.max(TL.lat, TR.lat), Math.max(BL.lat, BR.lat)),
+                             Math.min(Math.min(TL.lat, TR.lat), Math.min(BL.lat, BR.lat)),
+                             Math.max(Math.max(TL.lon, TR.lon), Math.max(BL.lon, BR.lon)),
+                             Math.min(Math.min(TL.lon, TR.lon), Math.min(BL.lon, BR.lon)));
     }
 
    /*
@@ -282,6 +301,8 @@ extends DispatchableMovieClip
     {
         __width = width;
         __height = height;
+        redraw();
+
         grid.resizeTo(new Point(__width, __height));
         onResized();
     }
@@ -319,7 +340,7 @@ extends DispatchableMovieClip
     public function setMapProvider(newProvider:IMapProvider):Void
     {
         var previousGeometry:String = __mapProvider.geometry();
-    	var extent:/*Location*/Array = getExtent();
+    	var extent:MapExtent = getExtent();
     	
         __mapProvider = newProvider;
         grid.setMapProvider(__mapProvider);
@@ -505,11 +526,29 @@ extends DispatchableMovieClip
     *
     * @param    ID of marker, opaque string.
     * @param    Location of marker.
+    * @param    Optional symbol name if a clip is to be attached.
+    * @return   Optional attached movie clip, if a valid symbol was provided.
     */
-    public function putMarker(id:String, location:Location):Void
+    public function putMarker(id:String, location:Location, symbol:String):MovieClip
     {
         //trace('Marker '+id+': '+location.toString());
         grid.putMarker(id, __mapProvider.locationCoordinate(location), location);
+        
+        if(symbol)
+            return __markers.attachMarker(id, location, symbol);
+            
+        return undefined;
+    }
+
+   /**
+    * Get a marker clip with the given id if one was created.
+    *
+    * @param    ID of marker, opaque string.
+    * @return   Optional attached movie clip, if a valid symbol was provided.
+    */
+    public function getMarker(id:String):MovieClip
+    {
+        return __markers.getMarker(id);
     }
 
    /**
@@ -520,6 +559,7 @@ extends DispatchableMovieClip
     public function removeMarker(id:String):Void
     {
         grid.removeMarker(id);
+        __markers.removeMarker(id);
     }
     
    /**
@@ -663,5 +703,31 @@ extends DispatchableMovieClip
     public function onResized():Void
     {
         dispatchEvent( EVENT_RESIZED_TO, __width, __height );
+    }
+    
+   /**
+    * Dispatches EVENT_EXTENT_CHANGED when the map extent changes.
+    * Callback arguments include extent:MapExtent.
+    *
+    * @see com.modestmaps.Map#EVENT_EXTENT_CHANGED
+    */
+    public function onExtentChanged(extent:MapExtent):Void
+    {
+        dispatchEvent( EVENT_RESIZED_TO, extent );
+    }
+    
+    private function redraw()
+    {
+        clear();
+
+        __mask.clear();
+        __mask.moveTo(0, 0);
+        __mask.lineStyle();
+        __mask.beginFill(0xFF00FF, 0);
+        __mask.lineTo(0, __height);
+        __mask.lineTo(__width, __height);
+        __mask.lineTo(__width, 0);
+        __mask.lineTo(0, 0);
+        __mask.endFill();
     }
 }

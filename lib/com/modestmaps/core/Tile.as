@@ -3,12 +3,12 @@ import org.casaframework.movieclip.DispatchableMovieClip;
 
 import com.bigspaceship.utils.Delegate;
 import com.modestmaps.core.Coordinate;
-import com.modestmaps.core.Point;
 import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.TilePaintCall;
 import com.modestmaps.mapproviders.AbstractMapProvider;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.stamen.twisted.Reactor;
+import flash.geom.Point;
 
 class com.modestmaps.core.Tile 
 extends DispatchableMovieClip

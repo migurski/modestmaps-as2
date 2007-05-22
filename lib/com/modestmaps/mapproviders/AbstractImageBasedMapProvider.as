@@ -5,8 +5,8 @@
  * @author darren
  * @author migurski
  *
- * AbstractImageBasedMapProvider is the base class for all MapProviders
- * that use externally loaded images to paint Tiles.
+ * AbstractImageBasedMapProvider is the base class for all map
+ * providers that use externally loaded images to paint Tiles.
  * 
  * @see com.modestmaps.mapproviders.AbstractMapProvider
  */
@@ -50,8 +50,6 @@ extends AbstractMapProvider
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_COMPLETE, "onResponseComplete");
 		request.addEventObserver( this, MapProviderPaintThrottledRequest.EVENT_RESPONSE_ERROR, "onResponseError");
 		request.send();
-		
-		//createLabel( clip, coord.toString() );
 	}
 
 	/*

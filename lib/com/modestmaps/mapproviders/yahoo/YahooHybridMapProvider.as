@@ -42,23 +42,19 @@ implements IMapProvider, DispatchableInterface
 
 	private function getBGTileUrl(coord:Coordinate):String
 	{		
-		return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200605101500" + getZoomString(sourceCoordinate(coord)) + "&v=1.5&t=a";
+        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/tile?v=1.7&t=a" + getZoomString(sourceCoordinate(coord));
 	}
 
 	private function getOverlayTileUrl(coord:Coordinate):String
 	{		
-        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/img?md=200608221700&v=2.0&t=h" + getZoomString(sourceCoordinate(coord));
+        return "http://us.maps3.yimg.com/aerial.maps.yimg.com/png?v=2.2&t=h" + getZoomString(sourceCoordinate(coord));
 	}
 	
 	
 	private function getZoomString( coord : Coordinate ) : String
 	{		
         var row : Number = ( Math.pow( 2, coord.zoom ) /2 ) - coord.row - 1;
-
-		var zoomString : String = "&x=" + coord.column + 
-			"&y=" + row + 
-			"&z=" + ( 18 - coord.zoom );
-		return zoomString; 
+        return "&x=" + coord.column + "&y=" + row + "&z=" + (18 - coord.zoom);
 	}	
 
 	private function isClipLoaded( clip : MovieClip ) : Boolean

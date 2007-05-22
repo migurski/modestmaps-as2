@@ -1,4 +1,4 @@
-//import com.modestmaps.core.Point;
+//import flash.geom.Point;
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.geo.Location;
 

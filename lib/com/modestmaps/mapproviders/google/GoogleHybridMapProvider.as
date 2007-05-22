@@ -47,8 +47,6 @@ implements IMapProvider, DispatchableInterface
 		{
 			enqueuePaintRequest( clip, coord );
 		}
-		
-		//createLabel( clip, coord.toString() );
 	}	
 
 	private function getBGTileUrl( coord : Coordinate ) : String

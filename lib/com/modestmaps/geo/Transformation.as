@@ -1,4 +1,4 @@
-import com.modestmaps.core.Point;
+import flash.geom.Point;
  
 class com.modestmaps.geo.Transformation
 {
