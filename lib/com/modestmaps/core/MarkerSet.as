@@ -1,5 +1,6 @@
 /*
  * vim:et sts=4 sw=4 cindent:
+ * $Id$
  */
 
 import com.modestmaps.core.Coordinate;

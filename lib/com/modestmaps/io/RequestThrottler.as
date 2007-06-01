@@ -6,6 +6,7 @@ import com.modestmaps.io.ThrottledRequest;
  * Used to limit the number of requests per frame.
  * 
  * @author darren
+ * $Id$
  */
  
 class com.modestmaps.io.RequestThrottler 

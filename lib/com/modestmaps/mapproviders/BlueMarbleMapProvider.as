@@ -8,6 +8,7 @@ import com.modestmaps.mapproviders.IMapProvider;
 
 /**
  * @author migurski
+ * $Id$
  */
 
 class com.modestmaps.mapproviders.BlueMarbleMapProvider

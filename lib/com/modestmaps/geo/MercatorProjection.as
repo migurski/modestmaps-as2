@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 import Math;
 import flash.geom.Point;
 import com.modestmaps.core.Coordinate;

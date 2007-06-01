@@ -4,6 +4,7 @@ import com.modestmaps.io.ThrottledRequest;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.io.MapProviderPaintThrottledRequest 
 extends LoadMovieThrottledRequest 

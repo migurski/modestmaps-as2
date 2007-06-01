@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 import com.modestmaps.core.Coordinate;
 import com.modestmaps.mapproviders.IMapProvider;
 import com.stamen.twisted.DelayedCall;

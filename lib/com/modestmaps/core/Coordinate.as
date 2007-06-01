@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 class com.modestmaps.core.Coordinate
 {
     public var row:Number, column:Number, zoom:Number;

@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 import org.casaframework.event.DispatchableInterface;
 import org.casaframework.movieclip.DispatchableMovieClip;
 

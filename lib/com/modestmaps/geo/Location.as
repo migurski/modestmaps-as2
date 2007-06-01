@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 class com.modestmaps.geo.Location
 {
     // Latitude, longitude, _IN DEGREES_.

@@ -4,6 +4,7 @@ import com.bigspaceship.utils.Delegate;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.io.XmlThrottledRequest 
 extends ThrottledRequest 

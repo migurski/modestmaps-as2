@@ -1,5 +1,6 @@
 /**
  * @author darren
+ * $Id$
  */
 import com.modestmaps.core.Coordinate; 
 import com.modestmaps.geo.Location;

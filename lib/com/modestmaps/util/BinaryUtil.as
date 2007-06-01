@@ -1,5 +1,6 @@
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.util.BinaryUtil 
 {

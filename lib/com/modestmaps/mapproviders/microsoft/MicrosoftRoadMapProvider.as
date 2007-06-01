@@ -7,6 +7,7 @@ import com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider;
 
 /**
  * @author darren
+ * $Id$
  */
 
 class com.modestmaps.mapproviders.microsoft.MicrosoftRoadMapProvider 

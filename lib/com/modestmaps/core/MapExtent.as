@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 import com.modestmaps.geo.Location;
 
 class com.modestmaps.core.MapExtent

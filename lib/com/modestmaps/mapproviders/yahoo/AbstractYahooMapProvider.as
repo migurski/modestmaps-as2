@@ -6,6 +6,7 @@ import com.modestmaps.mapproviders.AbstractImageBasedMapProvider;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.mapproviders.yahoo.AbstractYahooMapProvider 
 extends AbstractImageBasedMapProvider 

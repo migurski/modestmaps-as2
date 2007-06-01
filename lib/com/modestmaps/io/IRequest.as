@@ -1,6 +1,7 @@
 import org.casaframework.event.DispatchableInterface;
 /**
  * @author darren
+ * $Id$
  */
 interface com.modestmaps.io.IRequest 
 extends DispatchableInterface

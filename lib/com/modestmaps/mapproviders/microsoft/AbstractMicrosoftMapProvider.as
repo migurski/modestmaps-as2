@@ -6,6 +6,7 @@ import com.modestmaps.util.BinaryUtil;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.mapproviders.microsoft.AbstractMicrosoftMapProvider 
 extends AbstractImageBasedMapProvider 

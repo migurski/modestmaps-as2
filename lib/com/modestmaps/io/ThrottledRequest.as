@@ -5,6 +5,7 @@ import com.modestmaps.io.RequestThrottler;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.io.ThrottledRequest 
 extends EventDispatcher

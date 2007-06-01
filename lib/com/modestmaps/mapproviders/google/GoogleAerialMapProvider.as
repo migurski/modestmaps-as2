@@ -7,6 +7,7 @@ import com.modestmaps.util.BinaryUtil;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.mapproviders.google.GoogleAerialMapProvider 
 extends AbstractGoogleMapProvider 

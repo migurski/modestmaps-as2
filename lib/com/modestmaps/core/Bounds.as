@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 import flash.geom.Point;
 
 class com.modestmaps.core.Bounds

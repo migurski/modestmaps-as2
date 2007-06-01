@@ -6,6 +6,7 @@ import com.modestmaps.io.XmlThrottledRequest;
 
 /**
  * @author darren
+ * $Id$
  */
 class com.modestmaps.mapproviders.google.AbstractGoogleMapProvider 
 extends AbstractImageBasedMapProvider 
