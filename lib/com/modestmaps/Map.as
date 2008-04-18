@@ -46,6 +46,8 @@ extends DispatchableMovieClip
     private var __height:Number = 240;
     private var __draggable:Boolean = true;
     
+    public var backgroundColor:Number = 0x666666;
+
     // pending animation steps, array of {type:'pan'/'zoom', amount:Point/Number, redraw:Boolean}
     private var __animSteps:/*Object*/Array;
 

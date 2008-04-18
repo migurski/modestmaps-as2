@@ -1131,7 +1131,6 @@ class com.modestmaps.core.TileGrid extends MovieClip
         
         __mask.clear();
         __mask.moveTo(0, 0);
-        __mask.lineStyle(2, 0x990099, 100);
         __mask.beginFill(0x000000, 0);
         __mask.lineTo(0, __height);
         __mask.lineTo(__width, __height);
@@ -1142,8 +1141,7 @@ class com.modestmaps.core.TileGrid extends MovieClip
         // note that __well (0, 0) is grid center.
         __well.clear();
         __well.moveTo(__width/-2, __height/-2);
-        __well.lineStyle();
-        __well.beginFill(0x666666, 100);
+        __well.beginFill(__map.backgroundColor, 100);
         __well.lineTo(__width/-2, __height/2);
         __well.lineTo(__width/2, __height/2);
         __well.lineTo(__width/2, __height/-2);
