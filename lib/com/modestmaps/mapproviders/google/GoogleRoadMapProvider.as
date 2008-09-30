@@ -19,6 +19,7 @@ implements IMapProvider, DispatchableInterface
 
 	private function getTileUrl( coord : Coordinate ) : String
 	{		
+		// TODO: http://mt1.google.com/mt?v=w2.83&hl=en&x=10513&s=&y=25304&z=16&s=Gal
 		return "http://mt" + Math.floor(Math.random() * 4) + ".google.com/mt?n=404&v=" + __roadVersion + getZoomString(sourceCoordinate(coord));		
 	}
 	

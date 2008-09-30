@@ -20,6 +20,7 @@ implements IMapProvider, DispatchableInterface
 
 	public function getTileUrl( coord : Coordinate ) : String
 	{
+	    // TODO: http://khm1.google.com/kh?v=32&hl=en&x=10513&s=&y=25304&z=16&s=Gal
 		return "http://kh" + Math.floor(Math.random() * 4) + ".google.com/kh?n=404&v=" + __aerialVersion + "&t=" + getZoomString(sourceCoordinate(coord));
 	}
 	
