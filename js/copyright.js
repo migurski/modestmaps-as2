@@ -27,53 +27,8 @@ var modestMaps = {
                 case 'MICROSOFT_HYBRID':
                     this.microsoft.copyright(undefined, minLat, minLon, maxLat, maxLon, zoom);
                     break;
-    
-                case 'GOOGLE_ROAD':
-                    this.google.copyright('', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-                    break;
-        
-                case 'GOOGLE_AERIAL':
-                    this.google.copyright('&t=k', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-                    break;
-        
-                case 'GOOGLE_HYBRID':
-                    this.google.copyright('&t=h', cenLat, cenLon, maxLat-minLat, maxLon-minLon, zoom);
-                    break;
             } 
-        },
-    
-    google: {
-        holders: undefined,
-    
-        addCopyright:
-            function(holder)
-            {
-                if(!this.holders || !holder) {
-                    return;
-                }
-                
-                var newHolder = true;
-                
-                for(var i = 0; i < this.holders.length; i += 1) {
-                    if(holder == this.holders[i]) {
-                        newHolder = false;
-                    }
-                }
-                
-                if(newHolder) {
-                    this.holders.push(holder);
-                    modestMaps.copyrightCallback(this.holders.join(', '));
-                }
-            },
-    
-        copyright:
-            function(t, cenLat, cenLon, spanLat, spanLon, zoom)
-            {
-                this.holders = ['&copy; Google'];
-                var s = document.createElement('script');
-                s.src='http://maps.google.com/maps?spn='+spanLat+','+spanLon+'&z='+zoom+'&vp='+cenLat+','+cenLon+'&ev=p'+t;
-                document.getElementsByTagName('head')[0].appendChild(s);
-            }
+        }
     },
 
     microsoft: {
@@ -151,4 +106,3 @@ var modestMaps = {
     }
 };
 
-GAddCopyright = function(g,a,r,b,a,g,e, holder) { modestMaps.google.addCopyright(holder); };

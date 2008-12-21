@@ -84,10 +84,6 @@ class SampleClient1
         buttons.push(makeButton(__mapButtons, 'MICROSOFT_AERIAL', 'ms aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
         buttons.push(makeButton(__mapButtons, 'MICROSOFT_HYBRID', 'ms hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
 
-		buttons.push(makeButton(__mapButtons, 'GOOGLE_ROAD', 'google road', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'GOOGLE_AERIAL', 'google aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
-        buttons.push(makeButton(__mapButtons, 'GOOGLE_HYBRID', 'google hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
-
 		buttons.push(makeButton(__mapButtons, 'YAHOO_ROAD', 'yahoo road', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
         buttons.push(makeButton(__mapButtons, 'YAHOO_AERIAL', 'yahoo aerial', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
         buttons.push(makeButton(__mapButtons, 'YAHOO_HYBRID', 'yahoo hybrid', Delegate.create(SampleClient1, SampleClient1.switchMapProvider)));
@@ -134,18 +130,6 @@ class SampleClient1
 				__map.setMapProvider(new com.modestmaps.mapproviders.microsoft.MicrosoftHybridMapProvider());
 				break;
 				
-			case 'GOOGLE_ROAD':
-				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleRoadMapProvider());
-				break;
-
-			case 'GOOGLE_AERIAL':
-				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleAerialMapProvider());
-				break;
-
-			case 'GOOGLE_HYBRID':
-				__map.setMapProvider(new com.modestmaps.mapproviders.google.GoogleHybridMapProvider());
-				break;
-
 			case 'YAHOO_ROAD':
 				__map.setMapProvider(new com.modestmaps.mapproviders.yahoo.YahooRoadMapProvider());
 				break;
